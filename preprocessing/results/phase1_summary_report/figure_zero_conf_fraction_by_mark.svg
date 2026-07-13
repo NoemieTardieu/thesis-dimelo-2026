@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="480">
+<rect width="100%" height="100%" fill="white"/>
+<text x="460.0" y="30" text-anchor="middle" font-size="20" font-family="Arial">Fraction of Reads with Zero Confident Mods</text>
+<line x1="80" y1="390" x2="890" y2="390" stroke="black" stroke-width="1"/>
+<line x1="80" y1="60" x2="80" y2="390" stroke="black" stroke-width="1"/>
+<line x1="80" y1="390.0" x2="890" y2="390.0" stroke="#ececec"/>
+<text x="72" y="394.0" text-anchor="end" font-size="12" font-family="Arial">0.0</text>
+<line x1="80" y1="324.0" x2="890" y2="324.0" stroke="#ececec"/>
+<text x="72" y="328.0" text-anchor="end" font-size="12" font-family="Arial">9.1</text>
+<line x1="80" y1="258.0" x2="890" y2="258.0" stroke="#ececec"/>
+<text x="72" y="262.0" text-anchor="end" font-size="12" font-family="Arial">18.3</text>
+<line x1="80" y1="192.0" x2="890" y2="192.0" stroke="#ececec"/>
+<text x="72" y="196.0" text-anchor="end" font-size="12" font-family="Arial">27.4</text>
+<line x1="80" y1="126.0" x2="890" y2="126.0" stroke="#ececec"/>
+<text x="72" y="130.0" text-anchor="end" font-size="12" font-family="Arial">36.6</text>
+<line x1="80" y1="60.0" x2="890" y2="60.0" stroke="#ececec"/>
+<text x="72" y="64.0" text-anchor="end" font-size="12" font-family="Arial">45.7</text>
+<rect x="125.0" y="96.2" width="72.0" height="293.8" fill="#4daf4a"/>
+<rect x="215.0" y="356.0" width="72.0" height="34.0" fill="#984ea3"/>
+<text x="215.0" y="410" text-anchor="middle" font-size="12" font-family="Arial">h3k27ac</text>
+<rect x="395.0" y="90.0" width="72.0" height="300.0" fill="#4daf4a"/>
+<rect x="485.0" y="335.6" width="72.0" height="54.4" fill="#984ea3"/>
+<text x="485.0" y="410" text-anchor="middle" font-size="12" font-family="Arial">h3k27me3</text>
+<rect x="665.0" y="128.7" width="72.0" height="261.3" fill="#4daf4a"/>
+<rect x="755.0" y="349.7" width="72.0" height="40.3" fill="#984ea3"/>
+<text x="755.0" y="410" text-anchor="middle" font-size="12" font-family="Arial">h3k4me3</text>
+<rect x="90" y="30" width="12" height="12" fill="#4daf4a"/>
+<text x="108" y="40" font-size="12" font-family="Arial">A_mod_conf == 0 (%)</text>
+<rect x="90" y="50" width="12" height="12" fill="#984ea3"/>
+<text x="108" y="60" font-size="12" font-family="Arial">C_mod_conf == 0 (%)</text>
+<text x="25" y="225.0" text-anchor="middle" transform="rotate(-90 25,225.0)" font-size="12" font-family="Arial">percentage of reads</text>
+</svg>

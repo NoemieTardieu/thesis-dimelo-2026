@@ -1,0 +1,349 @@
+PHASE 3 PREPARATION CHECKLIST
+=============================
+
+Purpose
+- This document defines what can already be prepared for Phase 3 before the new data arrive.
+- Phase 3 is the first modeling phase: P(M | D, C).
+- The goal is to reduce uncertainty now, so that once the new data are available, Phase 1 and Phase 2 can be rerun in a controlled way and Phase 3 can start immediately afterward.
+
+Current position
+- Phase 1 is complete for the current DiMeLo-seq dataset.
+- Phase 2 is complete for the current DiMeLo-seq dataset.
+- New data are expected later and will likely need to go through the same preprocessing logic.
+- HyenaDNA adaptation should not be the first next step; the first next step is a stable baseline for P(M | D, C).
+
+-----------------------------------------------------------------
+1) LOCK THE FORMAL TASK DEFINITION
+-----------------------------------------------------------------
+Main task
+- Predict methylation state M from DNA sequence D and context C.
+
+Task notation
+- P(M | D, C)
+
+What each symbol means
+- D:
+  - DNA sequence for a genomic interval or a local sequence window
+- M:
+  - methylation target derived from the Phase 2 backend
+- C:
+  - biological context information
+
+Immediate decisions to make
+- Define exactly what one training example is:
+  - one genomic interval
+  - one 1 kb bin
+  - one sequence-centered window
+- Define exactly what one target is:
+  - per-base binary methylation label
+  - per-bin methylation fraction
+  - per-position 3-state label {0,1,unknown}
+- Define how unknown values are handled:
+  - masked in the loss
+  - never converted into numeric zero
+
+Recommended first choice
+- Use the discrete label representation already established in Phase 2:
+  - 0 = unmethylated
+  - 1 = methylated
+  - 2 = unknown/masked
+
+Why this is recommended
+- It matches the backend already built.
+- It is easy to mask in a supervised loss.
+- It avoids unnecessary redesign before the first baseline.
+
+-----------------------------------------------------------------
+2) DEFINE THE UNIT OF MODELING
+-----------------------------------------------------------------
+This must be fixed before dataset assembly.
+
+Possible units
+- Per-base prediction inside an interval
+- Per-bin prediction inside a larger interval
+- Centered short window extracted from a larger interval
+
+Recommended practical first choice
+- Use a short or moderate local window around positions with known methylation labels.
+- Keep long-context HyenaDNA for later.
+
+Why
+- This lets Phase 3 validate the data and task without coupling it immediately to the hardest architecture.
+- It is a cleaner baseline before long-context scaling.
+
+Question to answer now
+- For the first Phase 3 model, will one sample correspond to:
+  - a labeled base with surrounding sequence context
+  - or a bin-level methylation target?
+
+Recommended baseline framing
+- One sample = one target position or local target region with its surrounding DNA sequence and sample context.
+
+-----------------------------------------------------------------
+3) DEFINE THE CONTEXT VARIABLE C
+-----------------------------------------------------------------
+You need to decide what is included in C before building the training table.
+
+Candidates for C
+- cell type
+- sample identity
+- mark identity
+- run or batch identifier
+
+Recommended minimum C
+- sample identity
+- cell type
+
+Optional C
+- mark identity, if multiple marks are mixed in the same Phase 3 training setup
+
+Decision to make now
+- Will Phase 3 use:
+  - only one mark at a time
+  - or pooled data across marks
+
+Recommended first choice
+- Start with one coherent setting first, then consider pooled data later.
+- If marks are pooled, include mark identity explicitly as context.
+
+-----------------------------------------------------------------
+4) DEFINE THE TRAIN / VALIDATION / TEST SPLIT STRATEGY
+-----------------------------------------------------------------
+This is one of the most important decisions.
+
+Possible split dimensions
+- chromosome split
+- sample split
+- cell-type split
+
+What must be avoided
+- train and test examples from overlapping or adjacent genomic regions if you want true genomic generalization
+- train and test examples from the same sample if your goal is sample-level generalization
+
+Recommended first split
+- Keep chromosome-based splitting as the default core split.
+- Then document sample and cell-type composition separately.
+
+Optional stronger evaluation
+- hold out one cell type completely
+- or hold out one sample per cell type
+
+Questions to answer now
+- Is the first Phase 3 question:
+  - generalization across genomic loci within seen cell types?
+  - or generalization across unseen cell types?
+
+Recommended first objective
+- Start with genomic generalization inside the available data.
+- Add cross-cell-type generalization only if the sample count later supports it.
+
+-----------------------------------------------------------------
+5) DEFINE THE DATASET SCHEMA
+-----------------------------------------------------------------
+You can specify the required fields now, even before the new data arrive.
+
+Every training entry should have at least:
+- sample_id
+- cell_type
+- mark
+- chromosome
+- start
+- end
+- split
+- sequence_source
+- methylation_target_source
+- known_mask
+
+If using interval backends
+- backend_npz_path
+- interval_id
+- local_offset or target_position
+
+Recommended output table for Phase 3
+- one master TSV index describing all trainable examples
+
+This table should be able to answer:
+- where the sequence comes from
+- where the methylation target comes from
+- which sample and cell type it belongs to
+- which split it belongs to
+
+-----------------------------------------------------------------
+6) DEFINE THE SEQUENCE EXTRACTION PLAN
+-----------------------------------------------------------------
+Phase 3 needs DNA sequence as input.
+
+Decisions needed
+- reference genome version
+- source FASTA path
+- sequence length to extract per example
+- handling of ambiguous bases
+
+Recommended first choice
+- use one consistent reference genome build for all Phase 3 data
+- extract fixed-length sequence windows
+- encode A/C/G/T/N in a simple way for the baseline model
+
+Important
+- the same genome build must match the aligned coordinates used in the methylation backend
+
+-----------------------------------------------------------------
+7) DEFINE THE BASELINE MODEL PLAN
+-----------------------------------------------------------------
+Do this before touching HyenaDNA.
+
+Goal of the first model
+- validate that P(M | D, C) is learnable
+- validate the dataset, labels, and metrics
+
+Recommended first baseline family
+- a simple sequence model with context metadata support
+- examples:
+  - small CNN
+  - shallow 1D convolutional model
+  - compact transformer on short windows
+
+What the baseline should prove
+- the task runs end-to-end
+- the input/output schema is correct
+- the model beats trivial baselines
+
+What the baseline does not need to prove
+- state-of-the-art long-context performance
+
+-----------------------------------------------------------------
+8) DEFINE THE LOSS AND METRICS
+-----------------------------------------------------------------
+This should be fixed early to avoid confusion later.
+
+Loss choices
+- binary cross-entropy if using binary methylation targets
+- masked loss if unknown positions are present
+
+Metrics to define now
+- accuracy on known labels
+- AUROC
+- AUPRC
+- class balance statistics
+- fraction of masked positions
+
+Optional
+- calibration or confidence analysis
+- per-cell-type performance
+- per-mark performance
+
+Recommended principle
+- always report the fraction of known vs unknown targets
+- always compare against a trivial baseline
+
+-----------------------------------------------------------------
+9) DEFINE THE TRIVIAL BASELINES
+-----------------------------------------------------------------
+These are needed so the first model result means something.
+
+Examples
+- always predict majority class
+- predict sample-specific methylation prevalence
+- predict chromosome-level prevalence
+
+Why this matters
+- if the learned model does not beat a simple baseline, the result is weak even if training runs correctly
+
+-----------------------------------------------------------------
+10) PREPARE THE METADATA TABLE TEMPLATE
+-----------------------------------------------------------------
+This can be created before the new data arrive.
+
+Recommended columns
+- sample_id
+- accession
+- assay_type
+- mark
+- cell_type
+- organism
+- genome_build
+- source_path
+- data_format
+- preprocessing_status
+- phase1_status
+- phase2_status
+- notes
+
+Why this matters
+- once multiple datasets arrive, metadata confusion becomes a major risk
+- this table will let you track which samples are usable and comparable
+
+-----------------------------------------------------------------
+11) PREPARE THE PHASE 3 DIRECTORY STRUCTURE
+-----------------------------------------------------------------
+This can also be planned now.
+
+Suggested folders
+- phase3_hyena/
+- phase3_hyena/index/
+- phase3_hyena/config/
+- phase3_hyena/baselines/
+- phase3_hyena/results/
+- phase3_hyena/notes/
+
+Purpose
+- keep dataset indexing, baseline modeling, and future HyenaDNA work organized
+
+-----------------------------------------------------------------
+12) PREPARE THE THESIS WRITING FRAME
+-----------------------------------------------------------------
+You can already draft the Phase 3 Methods section skeleton.
+
+Suggested section headings
+- Objective of the first modeling task
+- Definition of D, M, and C
+- Construction of the Phase 3 training dataset
+- Train/validation/test splitting strategy
+- Baseline model and evaluation metrics
+
+Why this helps now
+- it forces the task definition to become precise before implementation
+
+-----------------------------------------------------------------
+13) WHAT TO DO IMMEDIATELY WHEN THE NEW DATA ARRIVE
+-----------------------------------------------------------------
+1. Record metadata for each new sample.
+2. Check compatibility:
+   - file format
+   - genome build
+   - cell type label
+   - assay consistency
+3. Re-run Phase 1 on the new samples.
+4. Re-run Phase 2 backend generation on the new samples.
+5. Build the unified Phase 3 training index.
+6. Run the first baseline model.
+
+-----------------------------------------------------------------
+14) WHAT NOT TO DO YET
+-----------------------------------------------------------------
+- Do not start full HyenaDNA adaptation before the baseline task is defined.
+- Do not redesign the preprocessing representation unless the new data force it.
+- Do not mix many heterogeneous datasets before metadata rules are fixed.
+- Do not rely on external nanopore datasets unless their methylation outputs and metadata are clearly compatible.
+
+-----------------------------------------------------------------
+15) MINIMUM DECISIONS TO LOCK NOW
+-----------------------------------------------------------------
+Before the new data arrive, you should aim to have the following fixed:
+
+1. What exactly is the Phase 3 target?
+2. What exactly is one training example?
+3. What variables are included in C?
+4. What split strategy will be used?
+5. What is the first baseline model family?
+6. What metrics define success?
+7. What metadata fields are mandatory for including a sample?
+
+-----------------------------------------------------------------
+16) SHORT SUMMARY
+-----------------------------------------------------------------
+- You do not need to wait passively for the new data.
+- The best use of time now is to lock the Phase 3 problem definition and dataset schema.
+- Once the new data arrive, the work should become an execution pipeline:
+  Phase 1 -> Phase 2 -> Phase 3 baseline.
+- Only after that should the full HyenaDNA adaptation become the main focus.

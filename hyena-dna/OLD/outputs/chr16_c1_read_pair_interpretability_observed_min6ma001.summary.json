@@ -1,0 +1,13 @@
+{
+  "cases": [
+    "same_locus_different_6mA",
+    "same_locus_similar_6mA_different_DNA"
+  ],
+  "outputs": {
+    "selected_pairs": "outputs/chr16_c1_read_pair_interpretability_observed_min6ma001.selected_pairs.tsv",
+    "dna_context_alignment": "outputs/chr16_c1_read_pair_interpretability_observed_min6ma001.dna_context_alignment.tsv",
+    "plot": "outputs/chr16_c1_read_pair_interpretability_observed_min6ma001.interpretability_pairs.png",
+    "summary": "outputs/chr16_c1_read_pair_interpretability_observed_min6ma001.summary.json"
+  },
+  "interpretation": "same_locus_different_6mA tests whether reads mapping to the same locus can have very different regulatory labels. same_locus_similar_6mA_different_DNA tests whether local read DNA differences necessarily imply regulatory-label differences. Adding local 5mC and optional P(Reg|D,M) predictions lets you ask whether methylation explains variation better than DNA sequence alone."
+}

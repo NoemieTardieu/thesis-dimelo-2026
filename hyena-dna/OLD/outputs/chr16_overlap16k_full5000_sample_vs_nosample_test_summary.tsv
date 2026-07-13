@@ -1,0 +1,5 @@
+model	task	reads	valid_positions	mae	pearson	spearman	auroc	auprc	mean_pred	mean_target	pos_frac
+sample_conditioned_overnight	5mC	1877	1094769	0.3069	0.4662	0.3905	0.7234	0.7671	0.5526	0.6012	0.6068
+sample_conditioned_overnight	6mA	1877	10193258	0.1090	0.2231	0.1923	0.6940	0.1244	0.0724	0.0845	0.0525
+nosample_overnight	5mC	1877	1094769	0.2970	0.4633	0.3930	0.7236	0.7671	0.5840	0.6012	0.6068
+nosample_overnight	6mA	1877	10193258	0.1203	0.2238	0.2191	0.6822	0.1176	0.0965	0.0845	0.0525

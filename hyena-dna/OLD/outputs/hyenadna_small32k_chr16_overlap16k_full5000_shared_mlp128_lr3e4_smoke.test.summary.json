@@ -1,0 +1,55 @@
+{
+  "npz": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.test.npz",
+  "metadata": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.test.metadata.tsv",
+  "split_name": "test",
+  "checkpoint": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_region_split_sampleid_shared_mlp128_lr3e4_smoke_2epochs_100batches.pt",
+  "model_name": "hyenadna-small-32k-seqlen",
+  "device": "cuda",
+  "reads": 1877,
+  "reads_evaluated": 1877,
+  "batches_evaluated": 1877,
+  "max_batches": null,
+  "batch_size": 1,
+  "max_length_used": 32768,
+  "num_samples": 2,
+  "sample_embedding_dim": 16,
+  "decoder_type": "auto",
+  "decoder_hidden_dim": 128,
+  "decoder_dropout": 0.1,
+  "decoder_kernel_size": 9,
+  "thresholds": {
+    "5mC": 0.5,
+    "6mA": 0.5
+  },
+  "metrics": {
+    "5mC": {
+      "valid_positions": 1094769,
+      "bce": 0.6224827170372009,
+      "mse": 0.13431090116500854,
+      "mae": 0.32227692008018494,
+      "mean_pred": 0.5514688491821289,
+      "mean_target": 0.6011877059936523,
+      "pearson": 0.40688055753707886,
+      "spearman": 0.3126522363887075,
+      "auroc": 0.6866046386430409,
+      "auprc": 0.7334719144474895,
+      "positive_fraction": 0.6067617917569825
+    },
+    "6mA": {
+      "valid_positions": 10193258,
+      "bce": 0.2866019010543823,
+      "mse": 0.037259798496961594,
+      "mae": 0.10884945094585419,
+      "mean_pred": 0.06575488299131393,
+      "mean_target": 0.08454174548387527,
+      "pearson": 0.16205216944217682,
+      "spearman": 0.1198238223556051,
+      "auroc": 0.6599286998665667,
+      "auprc": 0.10130804243902777,
+      "positive_fraction": 0.052536195983659
+    }
+  },
+  "per_region_metrics": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_shared_mlp128_lr3e4_smoke.test.per_region_metrics.tsv",
+  "per_sample_metrics": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_shared_mlp128_lr3e4_smoke.test.per_sample_metrics.tsv",
+  "per_chrom_metrics": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_shared_mlp128_lr3e4_smoke.test.per_chrom_metrics.tsv"
+}

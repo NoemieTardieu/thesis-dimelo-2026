@@ -1,0 +1,122 @@
+{
+  "datasets": [
+    {
+      "npz": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.train.npz",
+      "metadata": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.train.metadata.tsv"
+    },
+    {
+      "npz": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.val.npz",
+      "metadata": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.val.metadata.tsv"
+    },
+    {
+      "npz": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.test.npz",
+      "metadata": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.test.metadata.tsv"
+    }
+  ],
+  "threshold": 0.5,
+  "min_reads": 3,
+  "collapse_cpg_dyads": true,
+  "counters": {
+    "5mC_reads_processed": 4918,
+    "5mC_read_positions_after_window_collapse": 3290172,
+    "5mC_positions_mapped_to_reference": 3138140,
+    "5mC_positions_unmapped_indel_or_softclip": 152032,
+    "5mC_merged_e5b_selected_reads": 2127,
+    "5mC_merged_e5b_alignments_found": 2127,
+    "5mC_merged_c1_selected_reads": 2791,
+    "5mC_merged_c1_alignments_found": 2791,
+    "6mA_reads_processed": 4918,
+    "6mA_read_positions_after_window_collapse": 31152282,
+    "6mA_positions_mapped_to_reference": 29332339,
+    "6mA_positions_unmapped_indel_or_softclip": 1819943,
+    "6mA_merged_e5b_selected_reads": 2127,
+    "6mA_merged_e5b_alignments_found": 2127,
+    "6mA_merged_c1_selected_reads": 2791,
+    "6mA_merged_c1_alignments_found": 2791
+  },
+  "groups": {
+    "all": {
+      "5mC": {
+        "reported_loci": 172708,
+        "observations_at_reported_loci": 2874151,
+        "median_variance": 0.06753824022081165,
+        "mean_variance": 0.07657712163697335,
+        "variance_q90": 0.17250569661458331,
+        "variance_q95": 0.20175355574663945,
+        "median_read_coverage": 13.0,
+        "global_mean": 0.6335002866661755,
+        "within_locus_fraction_of_total_variation": 0.4650384143975083,
+        "between_locus_fraction_of_total_variation": 0.5349615856024917
+      },
+      "6mA": {
+        "reported_loci": 2567226,
+        "observations_at_reported_loci": 27202105,
+        "median_variance": 0.007554054260253905,
+        "mean_variance": 0.032512774246145335,
+        "variance_q90": 0.10347194520253983,
+        "variance_q95": 0.14792312394723803,
+        "median_read_coverage": 9.0,
+        "global_mean": 0.07475051067681619,
+        "within_locus_fraction_of_total_variation": 0.806570871895661,
+        "between_locus_fraction_of_total_variation": 0.193429128104339
+      }
+    },
+    "merged_c1": {
+      "5mC": {
+        "reported_loci": 133036,
+        "observations_at_reported_loci": 1397384,
+        "median_variance": 0.06210835774739583,
+        "mean_variance": 0.07574804888220774,
+        "variance_q90": 0.18128688596446774,
+        "variance_q95": 0.21390090215773808,
+        "median_read_coverage": 9.0,
+        "global_mean": 0.636689834361922,
+        "within_locus_fraction_of_total_variation": 0.43428542162850103,
+        "between_locus_fraction_of_total_variation": 0.5657145783714991
+      },
+      "6mA": {
+        "reported_loci": 1796301,
+        "observations_at_reported_loci": 12684704,
+        "median_variance": 0.005236126127697173,
+        "mean_variance": 0.03252968280428651,
+        "variance_q90": 0.1137913295200893,
+        "variance_q95": 0.16537895202636715,
+        "median_read_coverage": 6.0,
+        "global_mean": 0.07442769182744627,
+        "within_locus_fraction_of_total_variation": 0.7628388118028407,
+        "between_locus_fraction_of_total_variation": 0.23716118819715926
+      }
+    },
+    "merged_e5b": {
+      "5mC": {
+        "reported_loci": 138593,
+        "observations_at_reported_loci": 1372252,
+        "median_variance": 0.060801188151041664,
+        "mean_variance": 0.07400718166233493,
+        "variance_q90": 0.1774882967509921,
+        "variance_q95": 0.21017652366593564,
+        "median_read_coverage": 8.0,
+        "global_mean": 0.6340277639875912,
+        "within_locus_fraction_of_total_variation": 0.43098323910777064,
+        "between_locus_fraction_of_total_variation": 0.5690167608922293
+      },
+      "6mA": {
+        "reported_loci": 1892308,
+        "observations_at_reported_loci": 12440925,
+        "median_variance": 0.004761505126953125,
+        "mean_variance": 0.032862888921179174,
+        "variance_q90": 0.1178202207160719,
+        "variance_q95": 0.16832134246826166,
+        "median_read_coverage": 6.0,
+        "global_mean": 0.07450558307310348,
+        "within_locus_fraction_of_total_variation": 0.7563038948307744,
+        "between_locus_fraction_of_total_variation": 0.24369610516922557
+      }
+    }
+  },
+  "outputs": {
+    "per_locus_variance": "outputs/chr16_overlap16k_full5000_locus_variance.per_locus_variance.tsv",
+    "variance_plots": "outputs/chr16_overlap16k_full5000_locus_variance.variance_plots.png",
+    "summary": "outputs/chr16_overlap16k_full5000_locus_variance.summary.json"
+  }
+}

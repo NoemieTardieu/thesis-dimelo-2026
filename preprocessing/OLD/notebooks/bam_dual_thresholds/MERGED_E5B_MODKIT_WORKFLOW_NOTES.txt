@@ -1,0 +1,369 @@
+Efficient modkit workflow for merged_e5b.sorted.bam
+
+File
+- /staging/leuven/stg_00118/ONT_BAM_Noemie/bam_files/merged_e5b.sorted.bam
+
+What was confirmed
+- The BAM is present in staging and is about 177G.
+- The BAM header matches canonical GRCh38 / hg38 chromosome lengths.
+- The BAM header and read-group metadata indicate alignment against:
+  - /omics/groups/OE0219/internal/Etienne/data/reference/GRCh38/GRCh38.d1.vd1.fa
+- In the current environment, the accessible local reference to use is:
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/data/hg38.fa
+- The BAM currently does not have an adjacent `.bai` in staging.
+- `modkit modbam check-tags` on the first 1000 reads showed:
+  - A+a.
+  - C+h?
+  - C+m?
+- `modkit summary` and `modkit sample-probs` were already run successfully and saved.
+
+Useful metadata summary for this BAM
+- sample / library label:
+  - A549_LOY_E5B
+- platform:
+  - ONT PromethION
+- basecaller:
+  - dorado 1.1.0
+- modbase models:
+  - 5mCG_5hmCG
+  - 6mA
+- reference family:
+  - GRCh38.d1.vd1 / hg38-compatible header lengths
+
+Practical interpretation of mod codes
+- A:a corresponds to the adenine modification track to keep genome-wide.
+- C:m and C:h correspond to cytosine modification classes from the 5mCG_5hmCG model.
+- For the intended workflow, the clean default is:
+  - all A using `A:a`
+  - CpG-only C using `C` with `--combine-mods`
+
+Saved QC outputs already created
+- /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/merged_e5b/check_tags.stderr.txt
+- /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/merged_e5b/check_tags.stdout.txt
+- /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/merged_e5b/summary.tsv
+- /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/merged_e5b/summary.log
+- /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/merged_e5b/sample_probs.tsv
+- /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/merged_e5b/sample_probs.log
+
+Observed summary values
+- `sample_probs.tsv`:
+  - A 10th percentile threshold: `0.7988281`
+  - C 10th percentile threshold: `0.5839844`
+- Chosen project thresholds remain:
+  - A:0.9
+  - C:0.8
+
+Working directory layout
+- final small QC outputs:
+  - /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/merged_e5b
+- scratch read-level work:
+  - /scratch/leuven/383/vsc38330/modkit_preproc/merged_e5b
+- scratch pileup outputs:
+  - /scratch/leuven/383/vsc38330/pileup_tracks/merged_e5b
+- staging extract-full outputs:
+  - /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b
+
+Shell setup
+```bash
+source /data/leuven/383/vsc38330/.venv/bin/activate
+export PATH="/data/leuven/383/vsc38330/bin/dist_modkit_v0.6.1_481e3c9:$PATH"
+
+bam="/staging/leuven/stg_00118/ONT_BAM_Noemie/bam_files/merged_e5b.sorted.bam"
+ref="/data/leuven/383/vsc38330/thesis_dimelo/src/data/hg38.fa"
+final_dir="/data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/merged_e5b"
+scratch_preproc="/scratch/leuven/383/vsc38330/modkit_preproc/merged_e5b"
+scratch_pileup="/scratch/leuven/383/vsc38330/pileup_tracks/merged_e5b"
+stage_dir="/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b"
+
+mkdir -p "$final_dir" "$scratch_preproc" "$scratch_pileup" "$stage_dir" \
+  "$stage_dir/by_chrom" "$stage_dir/by_chunk"
+```
+
+Step 1. Create a BAM index
+
+Because there is no adjacent `.bai` in staging yet, create one in scratch and symlink it back next to the BAM.
+
+```bash
+module load SAMtools/1.22.1-GCC-14.2.0
+
+mkdir -p /scratch/leuven/383/vsc38330/merged_e5b_bam
+
+samtools index -@ 8 \
+  /staging/leuven/stg_00118/ONT_BAM_Noemie/bam_files/merged_e5b.sorted.bam \
+  /scratch/leuven/383/vsc38330/merged_e5b_bam/merged_e5b.sorted.bam.bai
+
+ln -s /scratch/leuven/383/vsc38330/merged_e5b_bam/merged_e5b.sorted.bam.bai \
+  /staging/leuven/stg_00118/ONT_BAM_Noemie/bam_files/merged_e5b.sorted.bam.bai
+
+ls -lh /staging/leuven/stg_00118/ONT_BAM_Noemie/bam_files/merged_e5b.sorted.bam*
+```
+
+Step 2. Reusable chromosome list for first-pass `extract full`
+
+```bash
+cat > /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/chromosomes.txt <<'EOF'
+chr1
+chr2
+chr3
+chr4
+chr5
+chr6
+chr7
+chr8
+chr9
+chr10
+chr11
+chr12
+chr13
+chr14
+chr15
+chr16
+chr17
+chr18
+chr19
+chr20
+chr21
+chr22
+chrX
+EOF
+```
+
+Step 3. First-pass chromosome-by-chromosome `modkit extract full`
+
+This is the recommended starting point for `merged_e5b`.
+Do not start with one whole-genome `extract full` job.
+
+Save as for example:
+- `/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/run_merged_e5b_extract_full_chr.sbatch`
+
+```bash
+#!/bin/bash
+#SBATCH --job-name=merged_e5b_full_chr
+#SBATCH -M genius
+#SBATCH -A intro_vsc38330
+#SBATCH --partition=batch
+#SBATCH --time=12:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=36
+#SBATCH --mem=180000M
+#SBATCH --array=1-23%2
+#SBATCH --output=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/slurm-%A_%a.out
+#SBATCH --error=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/slurm-%A_%a.err
+
+source /data/leuven/383/vsc38330/.venv/bin/activate
+export PATH="/data/leuven/383/vsc38330/bin/dist_modkit_v0.6.1_481e3c9:$PATH"
+
+BAM=/staging/leuven/stg_00118/ONT_BAM_Noemie/bam_files/merged_e5b.sorted.bam
+REF=/data/leuven/383/vsc38330/thesis_dimelo/src/data/hg38.fa
+CHROMS=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/chromosomes.txt
+OUTDIR=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/by_chrom
+
+REGION=$(sed -n "${SLURM_ARRAY_TASK_ID}p" "$CHROMS")
+mkdir -p "$OUTDIR"
+
+/data/leuven/383/vsc38330/bin/dist_modkit_v0.6.1_481e3c9/modkit extract full \
+  "$BAM" \
+  "$OUTDIR/extract_full_${REGION}.tsv.gz" \
+  --bgzf \
+  --region "$REGION" \
+  --ref "$REF"
+```
+
+Submit with:
+```bash
+sbatch /data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/run_merged_e5b_extract_full_chr.sbatch
+```
+
+Monitoring commands
+```bash
+squeue -u vsc38330
+sacct -j <jobid> -X --format=JobID,JobName%30,State,ExitCode,Elapsed,MaxRSS
+find /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/by_chrom -maxdepth 1 -type f | sort
+grep -RniE "error|failed|traceback|exception|Killed|oom" /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/slurm-*.err /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/slurm-*.out
+```
+
+Step 4. Chunk-rescue strategy for chromosomes that OOM
+
+If some chromosomes fail at the chromosome stage, rerun only those chromosomes as chunks.
+
+Recommended first rescue chunk size:
+- 50 Mb
+
+If any 50 Mb chunk still OOMs:
+- split that failed chunk into 25 Mb pieces
+
+Example intervals file:
+```bash
+cat > /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/intervals_retry.tsv <<'EOF'
+chr1:1-50000000
+chr1:50000001-100000000
+chr1:100000001-150000000
+chr1:150000001-200000000
+chr1:200000001-248956422
+chr2:1-50000000
+chr2:50000001-100000000
+chr2:100000001-150000000
+chr2:150000001-200000000
+chr2:200000001-242193529
+EOF
+```
+
+Chunk rescue SLURM template:
+```bash
+#!/bin/bash
+#SBATCH --job-name=merged_e5b_full_chunk
+#SBATCH -M genius
+#SBATCH -A intro_vsc38330
+#SBATCH --partition=batch
+#SBATCH --time=12:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=36
+#SBATCH --mem=180000M
+#SBATCH --array=1-10%2
+#SBATCH --output=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/slurm-retry-%A_%a.out
+#SBATCH --error=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/slurm-retry-%A_%a.err
+
+source /data/leuven/383/vsc38330/.venv/bin/activate
+export PATH="/data/leuven/383/vsc38330/bin/dist_modkit_v0.6.1_481e3c9:$PATH"
+
+BAM=/staging/leuven/stg_00118/ONT_BAM_Noemie/bam_files/merged_e5b.sorted.bam
+REF=/data/leuven/383/vsc38330/thesis_dimelo/src/data/hg38.fa
+INTERVALS=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/intervals_retry.tsv
+OUTDIR=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/by_chunk
+
+REGION=$(sed -n "${SLURM_ARRAY_TASK_ID}p" "$INTERVALS")
+SAFE_REGION=$(echo "$REGION" | tr ':-' '__')
+mkdir -p "$OUTDIR"
+
+/data/leuven/383/vsc38330/bin/dist_modkit_v0.6.1_481e3c9/modkit extract full \
+  "$BAM" \
+  "$OUTDIR/extract_full_${SAFE_REGION}.tsv.gz" \
+  --bgzf \
+  --region "$REGION" \
+  --ref "$REF"
+```
+
+Important assembly rule
+- If a chromosome failed at the chromosome level and was later recovered by chunks, trust only the chunk outputs for that chromosome.
+- Keep successful chromosome-level outputs for chromosomes that never OOMed.
+
+Step 5. `modkit pileup` commands to reuse from the `merged_c1` workflow
+
+Important practical note from `merged_c1`
+- In this environment, `modkit pileup` required `--reference` even for the A-only command.
+- Use the bundled:
+  - `/data/leuven/383/vsc38330/bin/dist_modkit_v0.6.1_481e3c9`
+
+Set variables:
+```bash
+source /data/leuven/383/vsc38330/.venv/bin/activate
+export PATH="/data/leuven/383/vsc38330/bin/dist_modkit_v0.6.1_481e3c9:$PATH"
+
+bam="/staging/leuven/stg_00118/ONT_BAM_Noemie/bam_files/merged_e5b.sorted.bam"
+ref="/data/leuven/383/vsc38330/thesis_dimelo/src/data/hg38.fa"
+pileup_dir="/scratch/leuven/383/vsc38330/pileup_tracks/merged_e5b"
+
+mkdir -p "$pileup_dir"
+```
+
+Whole-genome A pileup:
+```bash
+modkit pileup "$bam" "$pileup_dir/merged_e5b_A_a_all.bed.gz" \
+  --modified-bases A:a \
+  --reference "$ref" \
+  --bgzf \
+  --filter-threshold A:0.9 \
+  --filter-threshold C:0.8 \
+  --log-filepath "$pileup_dir/merged_e5b_A_a_all.log"
+```
+
+Whole-genome combined CpG-only C pileup:
+```bash
+modkit pileup "$bam" "$pileup_dir/merged_e5b_C_combined_cpg.bed.gz" \
+  --modified-bases C \
+  --combine-mods \
+  --cpg \
+  --reference "$ref" \
+  --bgzf \
+  --filter-threshold A:0.9 \
+  --filter-threshold C:0.8 \
+  --log-filepath "$pileup_dir/merged_e5b_C_combined_cpg.log"
+```
+
+Chromosome-wise A pileup:
+```bash
+for chrom in chr1 chr2 chr3 chr4 chr5 chr6 chr7 chr8 chr9 chr10 chr11 chr12 chr13 chr14 chr15 chr16 chr17 chr18 chr19 chr20 chr21 chr22 chrX; do
+  base="$pileup_dir/merged_e5b_A_a_${chrom}"
+  modkit pileup "$bam" "${base}.bed.gz" \
+    --modified-bases A:a \
+    --reference "$ref" \
+    --region "$chrom" \
+    --bgzf \
+    --filter-threshold A:0.9 \
+    --filter-threshold C:0.8 \
+    --log-filepath "${base}.log"
+done
+```
+
+Chromosome-wise combined CpG-only C pileup:
+```bash
+for chrom in chr1 chr2 chr3 chr4 chr5 chr6 chr7 chr8 chr9 chr10 chr11 chr12 chr13 chr14 chr15 chr16 chr17 chr18 chr19 chr20 chr21 chr22 chrX; do
+  base="$pileup_dir/merged_e5b_C_combined_cpg_${chrom}"
+  modkit pileup "$bam" "${base}.bed.gz" \
+    --modified-bases C \
+    --combine-mods \
+    --cpg \
+    --reference "$ref" \
+    --region "$chrom" \
+    --bgzf \
+    --filter-threshold A:0.9 \
+    --filter-threshold C:0.8 \
+    --log-filepath "${base}.log"
+done
+```
+
+Step 6. Optional read-level `extract calls` commands
+
+These are the direct analogs of the `merged_c1` read-level workflow if needed later.
+
+All-genome extract calls:
+```bash
+modkit extract calls "$bam" "$scratch_preproc/extract_calls_all.tsv.gz" \
+  --ignore-index \
+  --bgzf \
+  --filter-threshold A:0.9 \
+  --filter-threshold C:0.8 \
+  --log-filepath "$scratch_preproc/extract_calls_all.log"
+```
+
+CpG-only extract calls:
+```bash
+modkit extract calls "$bam" "$scratch_preproc/extract_calls_cpg.tsv.gz" \
+  --ignore-index \
+  --bgzf \
+  --cpg \
+  --reference "$ref" \
+  --filter-threshold A:0.9 \
+  --filter-threshold C:0.8 \
+  --log-filepath "$scratch_preproc/extract_calls_cpg.log"
+```
+
+Interpretation
+- Keep `canonical_base = A` rows from `extract_calls_all.tsv.gz` for A-associated read-level analyses.
+- Keep `canonical_base = C` rows from `extract_calls_cpg.tsv.gz` for CpG-only C read-level analyses.
+
+Recommended operational order for `merged_e5b`
+1. create and link the BAM index
+2. run chromosome-by-chromosome `modkit extract full`
+3. inspect which chromosomes, if any, OOMed
+4. rerun only failed chromosomes as chunks
+5. after extraction is stable, run `modkit pileup` for:
+   - all A using `A:a`
+   - combined CpG-only C using `C --combine-mods --cpg`
+
+Short practical recommendation
+- For `extract full`, start chromosome-by-chromosome rather than whole-genome.
+- For `pileup`, use the `merged_c1`-style reference-aware commands above.
+- Use `hg38.fa` for `merged_e5b`.

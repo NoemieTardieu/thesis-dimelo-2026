@@ -1,0 +1,53 @@
+{
+  "npz": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.test.npz",
+  "metadata": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.test.metadata.tsv",
+  "split_name": "test",
+  "checkpoint": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_region_split_sampleid_shared_mlp128_smoke_2epochs_100batches.pt",
+  "model_name": "hyenadna-small-32k-seqlen",
+  "device": "cuda",
+  "reads": 1877,
+  "reads_evaluated": 1877,
+  "batches_evaluated": 1877,
+  "max_batches": null,
+  "batch_size": 1,
+  "max_length_used": 32768,
+  "num_samples": 2,
+  "sample_embedding_dim": 16,
+  "decoder_hidden_dim": 128,
+  "decoder_dropout": 0.1,
+  "thresholds": {
+    "5mC": 0.5,
+    "6mA": 0.5
+  },
+  "metrics": {
+    "5mC": {
+      "valid_positions": 1094769,
+      "bce": 0.6274892091751099,
+      "mse": 0.13652488589286804,
+      "mae": 0.32335165143013,
+      "mean_pred": 0.5333657264709473,
+      "mean_target": 0.6011877059936523,
+      "pearson": 0.40850740671157837,
+      "spearman": 0.31992996370021043,
+      "auroc": 0.6908138635618333,
+      "auprc": 0.7383407587695628,
+      "positive_fraction": 0.6067617917569825
+    },
+    "6mA": {
+      "valid_positions": 10193258,
+      "bce": 0.28328028321266174,
+      "mse": 0.036894094198942184,
+      "mae": 0.12076093256473541,
+      "mean_pred": 0.09114669263362885,
+      "mean_target": 0.08454174548387527,
+      "pearson": 0.17298881709575653,
+      "spearman": 0.13723711802454355,
+      "auroc": 0.6654716173518687,
+      "auprc": 0.1037338976003842,
+      "positive_fraction": 0.052536195983659
+    }
+  },
+  "per_region_metrics": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_shared_mlp128_smoke.test.per_region_metrics.tsv",
+  "per_sample_metrics": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_shared_mlp128_smoke.test.per_sample_metrics.tsv",
+  "per_chrom_metrics": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_shared_mlp128_smoke.test.per_chrom_metrics.tsv"
+}

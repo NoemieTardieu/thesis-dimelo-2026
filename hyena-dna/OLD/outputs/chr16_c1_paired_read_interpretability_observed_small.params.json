@@ -1,0 +1,31 @@
+{
+  "datasets": [
+    "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.val.npz|outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.val.metadata.tsv",
+    "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.test.npz|outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.test.metadata.tsv"
+  ],
+  "bam": "/staging/leuven/stg_00118/ONT_BAM_Noemie/bam_files/merged_c1.sorted.bam",
+  "sample": "merged_c1",
+  "chrom": "chr16",
+  "locus_variance": "outputs/full_chr16_c1_locus_variance.per_locus_variance.tsv.gz",
+  "out_prefix": "outputs/chr16_c1_paired_read_interpretability_observed_small",
+  "reference_fasta": "/data/leuven/383/vsc38330/thesis_dimelo/src/data/hg38.fa",
+  "top_loci": 120,
+  "max_candidate_loci": 25,
+  "max_reads_per_locus": 12,
+  "window_size": 500,
+  "bin_size": 50,
+  "min_reads_locus": 8,
+  "min_window_coverage_fraction": 0.5,
+  "min_pair_comparable_fraction": 0.5,
+  "min_base_quality": 0,
+  "min_valid_6ma_positions": 8,
+  "min_valid_5mc_positions": 1,
+  "max_missing_signal_fraction": 0.97,
+  "max_mismatch_rate": null,
+  "min_valid_per_bin": 1,
+  "min_shared_bins": 2,
+  "low_quantile": 0.1,
+  "high_quantile": 0.9,
+  "top_n_per_case": 3,
+  "seed": 7
+}

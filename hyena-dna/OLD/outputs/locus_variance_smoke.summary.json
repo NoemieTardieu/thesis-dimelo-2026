@@ -1,0 +1,90 @@
+{
+  "datasets": [
+    {
+      "npz": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.val.npz",
+      "metadata": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.val.metadata.tsv"
+    }
+  ],
+  "threshold": 0.5,
+  "min_reads": 2,
+  "collapse_cpg_dyads": true,
+  "counters": {
+    "5mC_reads_processed": 200,
+    "5mC_read_positions_after_window_collapse": 148946,
+    "5mC_positions_mapped_to_reference": 145130,
+    "5mC_positions_unmapped_indel_or_softclip": 3816,
+    "5mC_merged_e5b_selected_reads": 254,
+    "5mC_merged_e5b_alignments_found": 100,
+    "5mC_merged_c1_selected_reads": 381,
+    "5mC_merged_c1_alignments_found": 100,
+    "6mA_reads_processed": 200,
+    "6mA_read_positions_after_window_collapse": 1352160,
+    "6mA_positions_mapped_to_reference": 1289635,
+    "6mA_positions_unmapped_indel_or_softclip": 62525,
+    "6mA_merged_e5b_selected_reads": 254,
+    "6mA_merged_e5b_alignments_found": 100,
+    "6mA_merged_c1_selected_reads": 381,
+    "6mA_merged_c1_alignments_found": 100
+  },
+  "groups": {
+    "all": {
+      "5mC": {
+        "reported_loci": 11993,
+        "median_variance": 0.05121709650213067,
+        "mean_variance": 0.07184055660387019,
+        "variance_q90": 0.178559802827381,
+        "variance_q95": 0.21640899339635097,
+        "median_read_coverage": 7.0
+      },
+      "6mA": {
+        "reported_loci": 157047,
+        "median_variance": 0.00397438473171658,
+        "mean_variance": 0.034555487680408344,
+        "variance_q90": 0.11273097952453737,
+        "variance_q95": 0.17881393432617188,
+        "median_read_coverage": 5.0
+      }
+    },
+    "merged_c1": {
+      "5mC": {
+        "reported_loci": 7992,
+        "median_variance": 0.045746764244391905,
+        "mean_variance": 0.07080414465822436,
+        "variance_q90": 0.1860753958565848,
+        "variance_q95": 0.22465820312499998,
+        "median_read_coverage": 7.0
+      },
+      "6mA": {
+        "reported_loci": 100623,
+        "median_variance": 0.0024805068969726562,
+        "mean_variance": 0.034615996846718976,
+        "variance_q90": 0.1242837905883789,
+        "variance_q95": 0.1936176300048828,
+        "median_read_coverage": 4.0
+      }
+    },
+    "merged_e5b": {
+      "5mC": {
+        "reported_loci": 8158,
+        "median_variance": 0.04979630874775512,
+        "mean_variance": 0.07234423178655745,
+        "variance_q90": 0.18117294311523444,
+        "variance_q95": 0.2255416731400923,
+        "median_read_coverage": 6.0
+      },
+      "6mA": {
+        "reported_loci": 119279,
+        "median_variance": 0.0022131601969401045,
+        "mean_variance": 0.031250571690623966,
+        "variance_q90": 0.11371280125209259,
+        "variance_q95": 0.17914510454450291,
+        "median_read_coverage": 5.0
+      }
+    }
+  },
+  "outputs": {
+    "per_locus_variance": "outputs/locus_variance_smoke.per_locus_variance.tsv",
+    "variance_plots": "outputs/locus_variance_smoke.variance_plots.png",
+    "summary": "outputs/locus_variance_smoke.summary.json"
+  }
+}

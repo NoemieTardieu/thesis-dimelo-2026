@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="480">
+<rect width="100%" height="100%" fill="white"/>
+<text x="460.0" y="30" text-anchor="middle" font-size="20" font-family="Arial">Read Length Quantiles by Mark</text>
+<line x1="80" y1="390" x2="890" y2="390" stroke="black" stroke-width="1"/>
+<line x1="80" y1="60" x2="80" y2="390" stroke="black" stroke-width="1"/>
+<line x1="80" y1="390.0" x2="890" y2="390.0" stroke="#ececec"/>
+<text x="72" y="394.0" text-anchor="end" font-size="12" font-family="Arial">0.0</text>
+<line x1="80" y1="324.0" x2="890" y2="324.0" stroke="#ececec"/>
+<text x="72" y="328.0" text-anchor="end" font-size="12" font-family="Arial">8811.9</text>
+<line x1="80" y1="258.0" x2="890" y2="258.0" stroke="#ececec"/>
+<text x="72" y="262.0" text-anchor="end" font-size="12" font-family="Arial">17623.8</text>
+<line x1="80" y1="192.0" x2="890" y2="192.0" stroke="#ececec"/>
+<text x="72" y="196.0" text-anchor="end" font-size="12" font-family="Arial">26435.6</text>
+<line x1="80" y1="126.0" x2="890" y2="126.0" stroke="#ececec"/>
+<text x="72" y="130.0" text-anchor="end" font-size="12" font-family="Arial">35247.5</text>
+<line x1="80" y1="60.0" x2="890" y2="60.0" stroke="#ececec"/>
+<text x="72" y="64.0" text-anchor="end" font-size="12" font-family="Arial">44059.4</text>
+<rect x="125.0" y="364.5" width="72.0" height="25.5" fill="#377eb8"/>
+<rect x="215.0" y="94.1" width="72.0" height="295.9" fill="#e41a1c"/>
+<text x="215.0" y="410" text-anchor="middle" font-size="12" font-family="Arial">h3k27ac</text>
+<rect x="395.0" y="368.7" width="72.0" height="21.3" fill="#377eb8"/>
+<rect x="485.0" y="90.0" width="72.0" height="300.0" fill="#e41a1c"/>
+<text x="485.0" y="410" text-anchor="middle" font-size="12" font-family="Arial">h3k27me3</text>
+<rect x="665.0" y="366.4" width="72.0" height="23.6" fill="#377eb8"/>
+<rect x="755.0" y="103.0" width="72.0" height="287.0" fill="#e41a1c"/>
+<text x="755.0" y="410" text-anchor="middle" font-size="12" font-family="Arial">h3k4me3</text>
+<rect x="90" y="30" width="12" height="12" fill="#377eb8"/>
+<text x="108" y="40" font-size="12" font-family="Arial">ReadLen p50</text>
+<rect x="90" y="50" width="12" height="12" fill="#e41a1c"/>
+<text x="108" y="60" font-size="12" font-family="Arial">ReadLen p95</text>
+<text x="25" y="225.0" text-anchor="middle" transform="rotate(-90 25,225.0)" font-size="12" font-family="Arial">bp</text>
+</svg>

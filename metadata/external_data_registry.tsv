@@ -1,0 +1,20 @@
+pillar	role	path	note
+preprocessing	raw mark-specific modBAM	/scratch/leuven/383/vsc38330/data/raw_bam/GSM6337767_gm12878_h3k27ac.mod_mappings.sorted.bam	server-resident input
+preprocessing	raw mark-specific modBAM	/scratch/leuven/383/vsc38330/data/raw_bam/GSM6337768_gm12878_h3k27me3.mod_mappings.sorted.bam	server-resident input
+preprocessing	raw mark-specific modBAM	/scratch/leuven/383/vsc38330/data/raw_bam/GSM6337769_gm12878_h3k4me3.mod_mappings.sorted.bam	server-resident input
+hyena-dna	merged C1 BAM	/staging/leuven/stg_00118/ONT_BAM_Noemie/bam_files/merged_c1.sorted.bam	server-resident input
+hyena-dna	merged E5B BAM	/staging/leuven/stg_00118/ONT_BAM_Noemie/bam_files/merged_e5b.sorted.bam	server-resident input
+hyena-dna	modkit extract-full C1 by chromosome	/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/by_chrom	large server-resident labels
+hyena-dna	modkit extract-full E5B by chromosome	/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/by_chrom	large server-resident labels
+alphagenome	external ENCODE H3K4me3 BigWig	/data/leuven/383/vsc38330/thesis_project_clean/alphagenome/metadata/external_tracks/ENCSR203XPU	large BigWig ignored by Git
+server_artifact	large retained file	/data/leuven/383/vsc38330/thesis_project_clean/alphagenome/server_artifacts/external_tracks/ENCSR203XPU/ENCFF074PND_ENCSR203XPU_A549_H3K4me3_fold_change_GRCh38.bigWig	large external BigWig retained on server but excluded from GitHub
+server_artifact	large retained file	/data/leuven/383/vsc38330/thesis_project_clean/alphagenome/server_artifacts/external_tracks/GSE91218/GSM2421502_ENCFF987FCK_signal_of_unique_reads_GRCh38.bigWig	large external BigWig retained on server but excluded from GitHub
+server_artifact	large retained file	/data/leuven/383/vsc38330/thesis_project_clean/alphagenome/server_artifacts/external_tracks/GSE91218/GSM2421503_ENCFF374BHV_signal_of_unique_reads_GRCh38.bigWig	large external BigWig retained on server but excluded from GitHub
+server_artifact	large retained file	/data/leuven/383/vsc38330/thesis_project_clean/alphagenome/server_artifacts/external_tracks/GSE91218/GSM2421504_ENCFF997ANB_signal_of_unique_reads_GRCh38.bigWig	large external BigWig retained on server but excluded from GitHub
+server_artifact	large retained file	/data/leuven/383/vsc38330/thesis_project_clean/hyena-dna/server_artifacts/checkpoints/hyenadna_small32k_chr16_overlap16k_full5000_reg_given_m_nosample_mlp256_lowlr_lastblock_25epochs_1000batches.best.pt	large final checkpoint retained on server but excluded from GitHub
+server_artifact	large retained file	/data/leuven/383/vsc38330/thesis_project_clean/hyena-dna/server_artifacts/checkpoints/hyenadna_small32k_chr16_overlap16k_full5000_reg_given_m_nosample_mlp256_posw2_focal1_lastblock_22epochs_1000batches.best.pt	large final checkpoint retained on server but excluded from GitHub
+preprocessing	residual original preprocessing tree	/data/leuven/383/vsc38330/thesis_project_clean/preprocessing/server_artifacts/original_thesis_dimelo_residual	large generated/reference artifacts retained on server
+hyena-dna	upstream HyenaDNA source dependency	/data/leuven/383/vsc38330/thesis_project_clean/hyena-dna/upstream_hyena_dna	preserved upstream repository/backbone source
+hyena-dna	upstream HyenaDNA checkpoints	/data/leuven/383/vsc38330/thesis_project_clean/hyena-dna/server_artifacts/upstream_checkpoints	large pretrained checkpoints ignored by Git
+preprocessing	local modkit install	/data/leuven/383/vsc38330/thesis_project_clean/preprocessing/server_artifacts/modkit_tool_install	server-resident tool install ignored by Git
+root	runtime environment archive	/data/leuven/383/vsc38330/thesis_project_clean/server_artifacts/root_environment	visible root tooling state ignored by Git

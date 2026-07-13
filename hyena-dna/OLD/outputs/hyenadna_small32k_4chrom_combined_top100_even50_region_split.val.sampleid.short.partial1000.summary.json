@@ -1,0 +1,51 @@
+{
+  "npz": "outputs/merged_e5b_c1_chr16_chr19_chr11_chr17_selected_top100_even50_region_split.val.npz",
+  "metadata": "outputs/merged_e5b_c1_chr16_chr19_chr11_chr17_selected_top100_even50_region_split.val.metadata.tsv",
+  "split_name": "val",
+  "checkpoint": "outputs/hyenadna_small32k_4chrom_combined_top100_even50_region_split_sampleid_short_2epochs_150batches.pt",
+  "model_name": "hyenadna-small-32k-seqlen",
+  "device": "cuda",
+  "reads": 5742,
+  "reads_evaluated": 1000,
+  "batches_evaluated": 1000,
+  "max_batches": 1000,
+  "batch_size": 1,
+  "max_length_used": 32768,
+  "num_samples": 2,
+  "sample_embedding_dim": 16,
+  "thresholds": {
+    "5mC": 0.5,
+    "6mA": 0.5
+  },
+  "metrics": {
+    "5mC": {
+      "valid_positions": 382416,
+      "bce": 0.6262143850326538,
+      "mse": 0.13882440328598022,
+      "mae": 0.31889498233795166,
+      "mean_pred": 0.6049864292144775,
+      "mean_target": 0.5714636445045471,
+      "pearson": 0.4148399829864502,
+      "spearman": 0.32998423681371336,
+      "auroc": 0.6959868371715174,
+      "auprc": 0.7188830395078352,
+      "positive_fraction": 0.5746124639136437
+    },
+    "6mA": {
+      "valid_positions": 3339087,
+      "bce": 0.2827213406562805,
+      "mse": 0.038505084812641144,
+      "mae": 0.1170586422085762,
+      "mean_pred": 0.08129094541072845,
+      "mean_target": 0.08433593064546585,
+      "pearson": 0.16682805120944977,
+      "spearman": 0.15078474534791733,
+      "auroc": 0.6553190860317998,
+      "auprc": 0.10073223635790554,
+      "positive_fraction": 0.054936274496591435
+    }
+  },
+  "per_region_metrics": "outputs/hyenadna_small32k_4chrom_combined_top100_even50_region_split.val.sampleid.short.partial1000.per_region_metrics.tsv",
+  "per_sample_metrics": "outputs/hyenadna_small32k_4chrom_combined_top100_even50_region_split.val.sampleid.short.partial1000.per_sample_metrics.tsv",
+  "per_chrom_metrics": "outputs/hyenadna_small32k_4chrom_combined_top100_even50_region_split.val.sampleid.short.partial1000.per_chrom_metrics.tsv"
+}

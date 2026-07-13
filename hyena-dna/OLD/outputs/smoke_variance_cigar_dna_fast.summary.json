@@ -1,0 +1,27 @@
+{
+  "variance_tsv": "outputs/full_chr16_c1_locus_variance.per_locus_variance.tsv.gz",
+  "bam": "/staging/leuven/stg_00118/ONT_BAM_Noemie/bam_files/merged_c1.sorted.bam",
+  "reference_fasta": "/data/leuven/383/vsc38330/thesis_dimelo/src/data/hg38.fa",
+  "group": "merged_c1",
+  "chrom": "chr16",
+  "marks": [
+    "5mC",
+    "6mA"
+  ],
+  "top_n": 3,
+  "bottom_n": 3,
+  "min_reads": 10,
+  "local_window": 20,
+  "insertion_window": 5,
+  "selected_loci": 12,
+  "per_read_rows": 394,
+  "outputs": {
+    "selected_loci": "outputs/smoke_variance_cigar_dna_fast.selected_loci.tsv",
+    "per_read": "outputs/smoke_variance_cigar_dna_fast.per_read.tsv.gz",
+    "per_locus_summary": "outputs/smoke_variance_cigar_dna_fast.per_locus_summary.tsv",
+    "group_summary": "outputs/smoke_variance_cigar_dna_fast.group_summary.tsv",
+    "plots": "outputs/smoke_variance_cigar_dna_fast.cigar_dna_plots.png",
+    "summary": "outputs/smoke_variance_cigar_dna_fast.summary.json"
+  },
+  "interpretation": "If high-variance loci show higher mismatch/indel/softclip rates or lower MAPQ than low-variance loci, some target variance may be explained by underlying read-level DNA/alignment heterogeneity. If not, the variance is more likely biological or measurement noise rather than sequence differences."
+}

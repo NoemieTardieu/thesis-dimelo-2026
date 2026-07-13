@@ -1,0 +1,114 @@
+{
+  "datasets": [
+    {
+      "npz": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.val.npz",
+      "metadata": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.val.metadata.tsv"
+    }
+  ],
+  "threshold": 0.5,
+  "min_reads": 2,
+  "collapse_cpg_dyads": true,
+  "counters": {
+    "5mC_reads_processed": 40,
+    "5mC_read_positions_after_window_collapse": 51715,
+    "5mC_positions_mapped_to_reference": 50640,
+    "5mC_positions_unmapped_indel_or_softclip": 1075,
+    "5mC_merged_e5b_selected_reads": 254,
+    "5mC_merged_e5b_alignments_found": 20,
+    "5mC_merged_c1_selected_reads": 381,
+    "5mC_merged_c1_alignments_found": 20,
+    "6mA_reads_processed": 40,
+    "6mA_read_positions_after_window_collapse": 247714,
+    "6mA_positions_mapped_to_reference": 229040,
+    "6mA_positions_unmapped_indel_or_softclip": 18674,
+    "6mA_merged_e5b_selected_reads": 254,
+    "6mA_merged_e5b_alignments_found": 20,
+    "6mA_merged_c1_selected_reads": 381,
+    "6mA_merged_c1_alignments_found": 20
+  },
+  "groups": {
+    "all": {
+      "5mC": {
+        "reported_loci": 4890,
+        "observations_at_reported_loci": 47023,
+        "median_variance": 0.05947585332961311,
+        "mean_variance": 0.0719902664931783,
+        "variance_q90": 0.16063675653366816,
+        "variance_q95": 0.2034021377563477,
+        "median_read_coverage": 8.0,
+        "global_mean": 0.6995180965298896,
+        "within_locus_fraction_of_total_variation": 0.5289258987993317,
+        "between_locus_fraction_of_total_variation": 0.4710741012006682
+      },
+      "6mA": {
+        "reported_loci": 37073,
+        "observations_at_reported_loci": 212666,
+        "median_variance": 0.006409962972005208,
+        "mean_variance": 0.04457924290285869,
+        "variance_q90": 0.14831044283780206,
+        "variance_q95": 0.2115039825439453,
+        "median_read_coverage": 4.0,
+        "global_mean": 0.08928726375807604,
+        "within_locus_fraction_of_total_variation": 0.7269521373323558,
+        "between_locus_fraction_of_total_variation": 0.27304786266764425
+      }
+    },
+    "merged_c1": {
+      "5mC": {
+        "reported_loci": 4178,
+        "observations_at_reported_loci": 25926,
+        "median_variance": 0.041606267293294266,
+        "mean_variance": 0.06470270553309794,
+        "variance_q90": 0.16364613184853208,
+        "variance_q95": 0.20265606471470424,
+        "median_read_coverage": 6.0,
+        "global_mean": 0.6705786420967369,
+        "within_locus_fraction_of_total_variation": 0.4041154790461616,
+        "between_locus_fraction_of_total_variation": 0.5958845209538384
+      },
+      "6mA": {
+        "reported_loci": 32614,
+        "observations_at_reported_loci": 119794,
+        "median_variance": 0.0023365020751953125,
+        "mean_variance": 0.04693084560782244,
+        "variance_q90": 0.17655303955078125,
+        "variance_q95": 0.25438849767049154,
+        "median_read_coverage": 3.0,
+        "global_mean": 0.0973280498710286,
+        "within_locus_fraction_of_total_variation": 0.6300698697547324,
+        "between_locus_fraction_of_total_variation": 0.36993013024526766
+      }
+    },
+    "merged_e5b": {
+      "5mC": {
+        "reported_loci": 2026,
+        "observations_at_reported_loci": 18361,
+        "median_variance": 0.07061877281837214,
+        "mean_variance": 0.07850461514375456,
+        "variance_q90": 0.158612060546875,
+        "variance_q95": 0.1942665645054409,
+        "median_read_coverage": 7.0,
+        "global_mean": 0.7692335103956757,
+        "within_locus_fraction_of_total_variation": 0.7812315036571411,
+        "between_locus_fraction_of_total_variation": 0.21876849634285883
+      },
+      "6mA": {
+        "reported_loci": 14249,
+        "observations_at_reported_loci": 76544,
+        "median_variance": 0.003398895263671875,
+        "mean_variance": 0.031163382609968968,
+        "variance_q90": 0.10873924255371101,
+        "variance_q95": 0.1660162607828776,
+        "median_read_coverage": 5.0,
+        "global_mean": 0.06441288568503083,
+        "within_locus_fraction_of_total_variation": 0.7847211897905391,
+        "between_locus_fraction_of_total_variation": 0.21527881020946094
+      }
+    }
+  },
+  "outputs": {
+    "per_locus_variance": "outputs/locus_variance_smoke2.per_locus_variance.tsv",
+    "variance_plots": "outputs/locus_variance_smoke2.variance_plots.png",
+    "summary": "outputs/locus_variance_smoke2.summary.json"
+  }
+}

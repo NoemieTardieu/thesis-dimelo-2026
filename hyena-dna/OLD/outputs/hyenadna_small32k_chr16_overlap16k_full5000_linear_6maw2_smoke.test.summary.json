@@ -1,0 +1,55 @@
+{
+  "npz": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.test.npz",
+  "metadata": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.test.metadata.tsv",
+  "split_name": "test",
+  "checkpoint": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_region_split_sampleid_linear_6maw2_smoke_2epochs_100batches.pt",
+  "model_name": "hyenadna-small-32k-seqlen",
+  "device": "cuda",
+  "reads": 1877,
+  "reads_evaluated": 1877,
+  "batches_evaluated": 1877,
+  "max_batches": null,
+  "batch_size": 1,
+  "max_length_used": 32768,
+  "num_samples": 2,
+  "sample_embedding_dim": 16,
+  "decoder_type": "auto",
+  "decoder_hidden_dim": 0,
+  "decoder_dropout": 0.0,
+  "decoder_kernel_size": 9,
+  "thresholds": {
+    "5mC": 0.5,
+    "6mA": 0.5
+  },
+  "metrics": {
+    "5mC": {
+      "valid_positions": 1094769,
+      "bce": 0.6205878853797913,
+      "mse": 0.13328586518764496,
+      "mae": 0.3219672441482544,
+      "mean_pred": 0.5743504166603088,
+      "mean_target": 0.6011877059936523,
+      "pearson": 0.4003135859966278,
+      "spearman": 0.3059290786115189,
+      "auroc": 0.6818260615158264,
+      "auprc": 0.7249333255573045,
+      "positive_fraction": 0.6067617917569825
+    },
+    "6mA": {
+      "valid_positions": 10193258,
+      "bce": 0.2840411067008972,
+      "mse": 0.03697052225470543,
+      "mae": 0.1122928261756897,
+      "mean_pred": 0.07377269864082336,
+      "mean_target": 0.08454174548387527,
+      "pearson": 0.16725654900074005,
+      "spearman": 0.13024949672397718,
+      "auroc": 0.6651362290445112,
+      "auprc": 0.1012441607448936,
+      "positive_fraction": 0.052536195983659
+    }
+  },
+  "per_region_metrics": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_linear_6maw2_smoke.test.per_region_metrics.tsv",
+  "per_sample_metrics": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_linear_6maw2_smoke.test.per_sample_metrics.tsv",
+  "per_chrom_metrics": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_linear_6maw2_smoke.test.per_chrom_metrics.tsv"
+}

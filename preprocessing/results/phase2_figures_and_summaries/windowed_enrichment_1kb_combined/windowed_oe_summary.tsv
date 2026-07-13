@@ -1,0 +1,5 @@
+scope	mark	subset	n_bins
+mark	h3k27ac	coverage_ge_30	3022353
+mark	h3k27me3	coverage_ge_30	3019241
+mark	h3k4me3	coverage_ge_30	3021485
+pooled	all	coverage_ge_30	9063079

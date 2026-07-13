@@ -1,0 +1,493 @@
+THESIS WORKFLOW (GENOMIC-CONTEXT STRATIFICATION WITH deepTools)
+==============================================================
+
+Purpose
+- Build promoter-, enhancer-, and locus-centered heatmaps/profiles from Phase 2 signal tracks.
+- Reuse the existing 1 kb Phase 2 feature caches whenever possible.
+
+Project root
+- /data/leuven/383/vsc38330/thesis_dimelo
+
+Python
+- /data/leuven/383/vsc38330/.venv/bin/python
+
+Current local annotation files already present
+- /lustre1/scratch/383/vsc38330/gencode.v49.annotation.gtf
+- /lustre1/scratch/383/vsc38330/hg38.chrom.sizes
+- /lustre1/scratch/383/vsc38330/TSS.bed
+- /lustre1/scratch/383/vsc38330/promoters_2kb.bed
+- /lustre1/scratch/383/vsc38330/promoters_2kb_clean.bed
+
+Existing Phase 2 cache inputs already present
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_combined/feature_cache_h3k27ac_bin1000_a_mod_per_kb_c_meth_frac_cov30.npz
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_combined/feature_cache_h3k27me3_bin1000_a_mod_per_kb_c_meth_frac_cov30.npz
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_combined/feature_cache_h3k4me3_bin1000_a_mod_per_kb_c_meth_frac_cov30.npz
+
+New helper scripts
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/build_context_beds_from_gtf.py
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/export_phase2_cache_to_bedgraph.py
+
+-----------------------------------------------------------------
+1) PROMOTER BEDS FROM GTF
+-----------------------------------------------------------------
+Use this if you want a reproducible promoter BED directly from GENCODE instead of relying on shell history.
+
+1A) All transcript-level promoters, +/- 2 kb, merged
+- /data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/build_context_beds_from_gtf.py promoters \
+  --gtf /lustre1/scratch/383/vsc38330/gencode.v49.annotation.gtf \
+  --chrom-sizes /lustre1/scratch/383/vsc38330/hg38.chrom.sizes \
+  --feature-level transcript \
+  --biotype any \
+  --upstream 2000 \
+  --downstream 2000 \
+  --merge \
+  --out-bed /lustre1/scratch/383/vsc38330/promoters_2kb_allTranscripts_merged.bed
+
+1B) Protein-coding transcript-level promoters, +/- 2 kb, merged
+- /data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/build_context_beds_from_gtf.py promoters \
+  --gtf /lustre1/scratch/383/vsc38330/gencode.v49.annotation.gtf \
+  --chrom-sizes /lustre1/scratch/383/vsc38330/hg38.chrom.sizes \
+  --feature-level transcript \
+  --biotype protein_coding \
+  --upstream 2000 \
+  --downstream 2000 \
+  --merge \
+  --out-bed /lustre1/scratch/383/vsc38330/promoters_2kb_proteinCoding_merged.bed
+
+1C) Gene-level promoters instead of transcript-level promoters
+- Same command, but set `--feature-level gene`.
+
+/data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/build_context_beds_from_gtf.py promoters \
+  --gtf /lustre1/scratch/383/vsc38330/gencode.v49.annotation.gtf \
+  --chrom-sizes /lustre1/scratch/383/vsc38330/hg38.chrom.sizes \
+  --feature-level gene \
+  --biotype protein_coding \
+  --upstream 2000 \
+  --downstream 2000 \
+  --merge \
+  --out-bed /lustre1/scratch/383/vsc38330/promoters_2kb_gene_level_promoters_merged.bed
+
+Recommended default for first deepTools run
+- Start with:
+  /lustre1/scratch/383/vsc38330/promoters_2kb_clean.bed
+- Then compare against:
+  /lustre1/scratch/383/vsc38330/promoters_2kb_proteinCoding_merged.bed
+
+-----------------------------------------------------------------
+2) SELECTED LOCI BEDS (HOX OR OTHER GENE SETS)
+-----------------------------------------------------------------
+Example: make one BED covering HOX loci with +/- 20 kb flanks.
+
+- /data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/build_context_beds_from_gtf.py gene-loci \
+  --gtf /lustre1/scratch/383/vsc38330/gencode.v49.annotation.gtf \
+  --chrom-sizes /lustre1/scratch/383/vsc38330/hg38.chrom.sizes \
+  --gene-name HOXA1 \
+  --gene-name HOXA2 \
+  --gene-name HOXA3 \
+  --gene-name HOXA4 \
+  --gene-name HOXA5 \
+  --gene-name HOXA6 \
+  --gene-name HOXA7 \
+  --gene-name HOXA9 \
+  --gene-name HOXA10 \
+  --gene-name HOXB1 \
+  --gene-name HOXB2 \
+  --gene-name HOXB3 \
+  --gene-name HOXB4 \
+  --gene-name HOXB5 \
+  --gene-name HOXB6 \
+  --gene-name HOXB7 \
+  --gene-name HOXB8 \
+  --gene-name HOXB9 \
+  --gene-name HOXC4 \
+  --gene-name HOXC5 \
+  --gene-name HOXC6 \
+  --gene-name HOXC8 \
+  --gene-name HOXC9 \
+  --gene-name HOXC10 \
+  --gene-name HOXD1 \
+  --gene-name HOXD3 \
+  --gene-name HOXD4 \
+  --gene-name HOXD8 \
+  --gene-name HOXD9 \
+  --gene-name HOXD10 \
+  --gene-name HOXD11 \
+  --gene-name HOXD12 \
+  --gene-name HOXD13 \
+  --flank 20000 \
+  --merge \
+  --out-bed /lustre1/scratch/383/vsc38330/hox_loci_plus20kb.bed
+
+Notes
+- For enhancers, use any external BED you trust and place it in `/lustre1/scratch/383/vsc38330/`.
+- No extra conversion is needed if it is already a sorted BED with at least 3 columns.
+
+-----------------------------------------------------------------
+3) EXPORT PHASE 2 SIGNAL TRACKS TO bedGraph / bigWig
+-----------------------------------------------------------------
+This exports the already computed 1 kb Phase 2 cache arrays into genome-coordinate signal tracks.
+
+Signals produced
+- `reg_a_mod_per_kb`
+- `meth_c_meth_frac`
+
+3A) Export bedGraph only
+- /data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/export_phase2_cache_to_bedgraph.py \
+  --intervals-tsv /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/intervals_long_context.tsv \
+  --cache-dir /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_combined \
+  --chrom-sizes /lustre1/scratch/383/vsc38330/hg38.chrom.sizes \
+  --out-dir /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb \
+  --bin-size 1000 \
+  --reg-mode a_mod_per_kb \
+  --m-mode c_meth_frac \
+  --min-cov 30 \
+  --filter-cov-ok
+
+3B) Export bigWig too
+- Same command, plus:
+ /data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/export_phase2_cache_to_bedgraph.py \
+  --intervals-tsv /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/intervals_long_context.tsv \
+  --cache-dir /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_combined \
+  --chrom-sizes /lustre1/scratch/383/vsc38330/hg38.chrom.sizes \
+  --out-dir /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb \
+  --bin-size 1000 \
+  --reg-mode a_mod_per_kb \
+  --m-mode c_meth_frac \
+  --min-cov 30 \
+  --filter-cov-ok \
+  --make-bigwig \
+  --bedgraphtobigwig /absolute/path/to/bedGraphToBigWig
+
+Important
+- `bedGraphToBigWig` was not on the current shell PATH during this session, so give its absolute path if needed.
+- `computeMatrix` needs bigWig inputs, so bigWig conversion is the normal end state.
+
+Expected outputs
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27ac.reg_a_mod_per_kb.bedGraph
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27ac.meth_c_meth_frac.bedGraph
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27me3.reg_a_mod_per_kb.bedGraph
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27me3.meth_c_meth_frac.bedGraph
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k4me3.reg_a_mod_per_kb.bedGraph
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k4me3.meth_c_meth_frac.bedGraph
+- If converted: matching `.bw` files
+
+-----------------------------------------------------------------
+4) FIRST deepTools RUN: PROMOTERS
+-----------------------------------------------------------------
+Replace `computeMatrix`, `plotHeatmap`, and `plotProfile` with absolute paths if deepTools is not on PATH.
+
+Example using methylation bigWigs only
+/data/leuven/383/vsc38330/.venv/bin/computeMatrix reference-point \
+  -S \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27ac.meth_c_meth_frac.bw \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27me3.meth_c_meth_frac.bw \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k4me3.meth_c_meth_frac.bw \
+  -R /lustre1/scratch/383/vsc38330/promoters_2kb_clean.bed \
+  --referencePoint center \
+  -b 3000 \
+  -a 3000 \
+  --skipZeros \
+  --missingDataAsZero \
+  -o /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoters_meth_matrix.gz
+
+/data/leuven/383/vsc38330/.venv/bin/plotHeatmap \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoters_meth_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoters_meth_heatmap.png \
+  --colorMap Blues \
+  --whatToShow "heatmap and colorbar"
+
+/data/leuven/383/vsc38330/.venv/bin/plotProfile \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoters_meth_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoters_meth_profile.png
+
+
+- plotHeatmap \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoters_meth_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoters_meth_heatmap.png \
+  --colorMap Blues \
+  --whatToShow "heatmap and colorbar"
+
+- plotProfile \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoters_meth_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoters_meth_profile.png
+
+Example using regulatory tracks only
+- Same command pattern, but use:
+  h3k27ac.reg_a_mod_per_kb.bw
+  h3k27me3.reg_a_mod_per_kb.bw
+  h3k4me3.reg_a_mod_per_kb.bw
+
+Example using both methylation and regulatory tracks in one matrix
+- Put all six bigWigs after `-S` in the order you want them displayed.
+
+
+better command:
+/data/leuven/383/vsc38330/.venv/bin/computeMatrix reference-point \
+  -S \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27ac.meth_c_meth_frac.bw \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27me3.meth_c_meth_frac.bw \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k4me3.meth_c_meth_frac.bw \
+  -R /lustre1/scratch/383/vsc38330/TSS.bed \
+  --referencePoint TSS \
+  -b 3000 \
+  -a 3000 \
+  --skipZeros \
+  --missingDataAsZero \
+  -o /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_meth_matrix.gz
+
+this is what I have done (it was too heavy computationally)
+/data/leuven/383/vsc38330/.venv/bin/computeMatrix reference-point \
+  -S \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27ac.meth_c_meth_frac.bw \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27me3.meth_c_meth_frac.bw \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k4me3.meth_c_meth_frac.bw \
+  -R /lustre1/scratch/383/vsc38330/TSS.bed \
+  --referencePoint TSS \
+  -b 3000 \
+  -a 3000 \
+  --binSize 50 \
+  --skipZeros \
+  --missingDataAsZero \
+  -o /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_meth_matrix.gz \
+  > /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_computeMatrix.log 2>&1
+
+
+then plotting: 
+/data/leuven/383/vsc38330/.venv/bin/plotHeatmap \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_meth_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_meth_heatmap_kmeans4.png \
+  --kmeans 4 \
+  --sortUsing mean \
+  --samplesLabel h3k27ac h3k27me3 h3k4me3 \
+  --whatToShow "plot, heatmap and colorbar"
+
+
+/data/leuven/383/vsc38330/.venv/bin/plotProfile \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_meth_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_meth_profile.png \
+  --samplesLabel h3k27ac h3k27me3 h3k4me3
+
+
+-----------------------------------------------------------------
+5) EXTEND TO ENHANCERS AND HOX LOCI
+-----------------------------------------------------------------
+Enhancers
+- Replace `-R /lustre1/scratch/383/vsc38330/promoters_2kb_clean.bed` with your enhancer BED.
+
+HOX loci
+- Replace `-R` with:
+  /lustre1/scratch/383/vsc38330/hox_loci_plus20kb.bed
+
+Interpretation note
+- For compact loci like HOX clusters, a smaller flank may make a cleaner heatmap than promoter-style windows.
+
+-----------------------------------------------------------------
+6) COMBINED CONTEXT HEATMAPS
+-----------------------------------------------------------------
+To create one matrix with separate context blocks, pass multiple region files to `-R`:
+
+- computeMatrix reference-point \
+  -S \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27ac.meth_c_meth_frac.bw \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27me3.meth_c_meth_frac.bw \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k4me3.meth_c_meth_frac.bw \
+  -R \
+  /lustre1/scratch/383/vsc38330/promoters_2kb_clean.bed \
+  /path/to/enhancers.bed \
+  /lustre1/scratch/383/vsc38330/hox_loci_plus20kb.bed \
+  --referencePoint center \
+  -b 3000 \
+  -a 3000 \
+  --skipZeros \
+  --missingDataAsZero \
+  -o /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/combined_contexts_meth_matrix.gz
+
+This will produce a final heatmap with separate blocks per region file, in the order provided.
+
+-----------------------------------------------------------------
+7) PRACTICAL ORDER TO RUN
+-----------------------------------------------------------------
+1. Use the existing merged promoter BED first:
+   /lustre1/scratch/383/vsc38330/promoters_2kb_clean.bed
+2. Export the 1 kb Phase 2 caches to bedGraph/bigWig.
+3. Run promoter-centered `computeMatrix` on methylation tracks first.
+4. Repeat with regulatory tracks.
+5. Compare promoter BED definitions:
+   all transcripts vs protein-coding only.
+6. Add enhancers.
+7. Add HOX loci.
+8. Build a combined promoter/enhancer/HOX matrix for the final figure.
+
+
+-----------------------------------------------------------------
+8) A-MOD TSS FIGURES, INCLUDING EXPRESSION-STRATIFIED TSS BEDS
+-----------------------------------------------------------------
+Goal
+- Build TSS-centered figures from the adenine-modification signal (`reg_a_mod_per_kb`) instead of the C-methylation signal.
+- Optionally stratify TSSs by gene expression before plotting so the figure tests whether promoter/TSS A-mod signal is concentrated in expressed genes.
+
+Important interpretation note
+- In this workflow, the A-based track is the assay-derived adenine-modification / regulatory proxy exported as:
+  - `*.reg_a_mod_per_kb.bw`
+- It is cleaner to describe this in the thesis as `A-mod signal` or `adenine-modification signal` unless you explicitly want to call it 6mA and that wording is justified for your assay.
+
+Required inputs
+- Existing bigWigs from step 3:
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27ac.reg_a_mod_per_kb.bw
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27me3.reg_a_mod_per_kb.bw
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k4me3.reg_a_mod_per_kb.bw
+- TSS BED already present:
+  - /lustre1/scratch/383/vsc38330/TSS.bed
+- Expression table with at least:
+  - one id column matching the BED column 4 ids (for example `gene_id`)
+  - one numeric expression column (for example `TPM`)
+
+New helper script
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/split_tss_by_expression.py
+
+8A) Split the TSS BED into expressed vs non-expressed genes
+Use this when you have one expression table and want a clean binary contrast.
+
+Example command
+  /data/leuven/383/vsc38330/.venv/bin/computeMatrix reference-point \
+  -S \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27ac.reg_a_mod_per_kb.bw \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27me3.reg_a_mod_per_kb.bw \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k4me3.reg_a_mod_per_kb.bw \
+  -R /lustre1/scratch/383/vsc38330/TSS.bed \
+  --referencePoint TSS \
+  -b 3000 \
+  -a 3000 \
+  --binSize 50 \
+  --skipZeros \
+  --missingDataAsZero \
+  -o /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_amod_matrix.gz
+
+  then the graphs: 
+/data/leuven/383/vsc38330/.venv/bin/plotHeatmap \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_amod_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_amod_heatmap_kmeans4.png \
+  --kmeans 4 \
+  --sortUsing mean \
+  --samplesLabel h3k27ac h3k27me3 h3k4me3 \
+  --whatToShow "plot, heatmap and colorbar"
+
+
+/data/leuven/383/vsc38330/.venv/bin/plotProfile \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_amod_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_amod_profile.png \
+  --samplesLabel h3k27ac h3k27me3 h3k4me3
+
+
+Expected outputs
+- /lustre1/scratch/383/vsc38330/tss_by_expression.expressed.bed
+- /lustre1/scratch/383/vsc38330/tss_by_expression.non_expressed.bed
+
+Notes
+- `--bed-id-mode auto` strips version suffixes like `.12` from BED ids if needed.
+- If your expression file uses transcript ids instead of gene ids, change `--id-column` accordingly.
+- A threshold of `TPM >= 1` is a reasonable starting point for `expressed`.
+
+8B) Optional: split the positive-expression genes into quantiles
+Use this if you want a more thesis-friendly gradient instead of only expressed vs non-expressed.
+
+Example command
+/data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/split_tss_by_expression.py \
+  --tss-bed /lustre1/scratch/383/vsc38330/TSS.bed \
+  --expression-tsv /path/to/expression_table.tsv \
+  --id-column gene_id \
+  --value-column TPM \
+  --bed-id-mode auto \
+  --mode quantiles \
+  --n-quantiles 4 \
+  --out-prefix /lustre1/scratch/383/vsc38330/tss_by_expression_quartiles
+
+Expected outputs
+- /lustre1/scratch/383/vsc38330/tss_by_expression_quartiles.q1.bed
+- /lustre1/scratch/383/vsc38330/tss_by_expression_quartiles.q2.bed
+- /lustre1/scratch/383/vsc38330/tss_by_expression_quartiles.q3.bed
+- /lustre1/scratch/383/vsc38330/tss_by_expression_quartiles.q4.bed
+
+Interpretation note
+- In quantile mode, the script uses only rows with expression > 0 and splits them into equally sized expression groups.
+- This is useful if you want a low-to-high expression trend instead of a binary contrast.
+
+8C) Build one A-mod matrix with separate blocks for expressed and non-expressed TSSs
+This is the cleanest first expression-stratified A-mod figure.
+
+/data/leuven/383/vsc38330/.venv/bin/computeMatrix reference-point \
+  -S \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27ac.reg_a_mod_per_kb.bw \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27me3.reg_a_mod_per_kb.bw \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k4me3.reg_a_mod_per_kb.bw \
+  -R \
+  /lustre1/scratch/383/vsc38330/tss_by_expression.expressed.bed \
+  /lustre1/scratch/383/vsc38330/tss_by_expression.non_expressed.bed \
+  --referencePoint TSS \
+  -b 3000 \
+  -a 3000 \
+  --binSize 50 \
+  --skipZeros \
+  --missingDataAsZero \
+  -o /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_amod_expr_matrix.gz
+
+Why this command
+- Same TSS-centered geometry as the methylation figure.
+- Uses the A-mod signal tracks instead of `meth_c_meth_frac` tracks.
+- Passing two BEDs after `-R` makes deepTools keep separate region blocks in one matrix.
+
+8D) Plot the expression-stratified A-mod heatmap
+/data/leuven/383/vsc38330/.venv/bin/plotHeatmap \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_amod_expr_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_amod_expr_heatmap.png \
+  --samplesLabel h3k27ac h3k27me3 h3k4me3 \
+  --regionsLabel Expressed Non_expressed \
+  --whatToShow "plot, heatmap and colorbar"
+
+8E) Plot the expression-stratified A-mod profile
+/data/leuven/383/vsc38330/.venv/bin/plotProfile \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_amod_expr_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_amod_expr_profile.png \
+  --samplesLabel h3k27ac h3k27me3 h3k4me3 \
+  --regionsLabel Expressed Non_expressed \
+  --perGroup
+
+Expected outputs
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_amod_expr_matrix.gz
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_amod_expr_heatmap.png
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_amod_expr_profile.png
+
+8F) Optional: expression-quantile A-mod figure
+If you created quartile BEDs in step 8B, run:
+
+/data/leuven/383/vsc38330/.venv/bin/computeMatrix reference-point \
+  -S \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27ac.reg_a_mod_per_kb.bw \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27me3.reg_a_mod_per_kb.bw \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k4me3.reg_a_mod_per_kb.bw \
+  -R \
+  /lustre1/scratch/383/vsc38330/tss_by_expression_quartiles.q1.bed \
+  /lustre1/scratch/383/vsc38330/tss_by_expression_quartiles.q2.bed \
+  /lustre1/scratch/383/vsc38330/tss_by_expression_quartiles.q3.bed \
+  /lustre1/scratch/383/vsc38330/tss_by_expression_quartiles.q4.bed \
+  --referencePoint TSS \
+  -b 3000 \
+  -a 3000 \
+  --binSize 50 \
+  --skipZeros \
+  --missingDataAsZero \
+  -o /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_amod_expr_quartiles_matrix.gz
+
+Then plot with:
+
+/data/leuven/383/vsc38330/.venv/bin/plotProfile \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_amod_expr_quartiles_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_amod_expr_quartiles_profile.png \
+  --samplesLabel h3k27ac h3k27me3 h3k4me3 \
+  --regionsLabel Q1_low Q2 Q3 Q4_high \
+  --perGroup
+
+Recommended first figure for the thesis
+- Start with the binary expressed vs non-expressed A-mod profile and heatmap.
+- If that clearly separates the groups, the quartile version is a strong follow-up figure.
+- If the profile is flat, check whether your expression table ids match the TSS BED ids before interpreting the biology.

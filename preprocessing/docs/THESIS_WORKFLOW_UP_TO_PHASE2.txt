@@ -1,0 +1,554 @@
+THESIS WORKFLOW (UP TO PHASE 2 LONG-CONTEXT BACKEND)
+=====================================================
+
+Project root
+- /data/leuven/383/vsc38330/thesis_dimelo
+
+Python environment
+- /data/leuven/383/vsc38330/.venv/bin/python
+
+BAM files used
+- /scratch/leuven/383/vsc38330/data/raw_bam/GSM6337767_gm12878_h3k27ac.mod_mappings.sorted.bam
+- /scratch/leuven/383/vsc38330/data/raw_bam/GSM6337768_gm12878_h3k27me3.mod_mappings.sorted.bam
+- /scratch/leuven/383/vsc38330/data/raw_bam/GSM6337769_gm12878_h3k4me3.mod_mappings.sorted.bam
+
+-----------------------------------------------------------------
+0) OPTIONAL CLEAN START
+-----------------------------------------------------------------
+Use only if you want to remove previous generated outputs.
+
+- Remove Phase 1 outputs:
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase1_output
+- Remove Phase 1 exploratory outputs:
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase_1_visualization/output
+- Remove Phase 2 outputs:
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks_smoke
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backend_h3k27ac_smoke
+
+-----------------------------------------------------------------
+1) PHASE 1 QC + PARSING (ALL 3 MARKS)
+-----------------------------------------------------------------
+Script
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase1_dimelo_qc.py
+
+Run
+- /data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase1_dimelo_qc.py
+
+What it does (short)
+- Reads each modBAM, parses Mm/Ml tags, extracts A/C channels, applies basic filters, writes per-read QC.
+
+Main outputs
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase1_output/*.per_read.tsv
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase1_output/*.binned_tracks.npz
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase1_output/*.png
+
+-----------------------------------------------------------------
+2) PHASE 1 SUMMARY TABLES + PRESENTATION FIGURES
+-----------------------------------------------------------------
+Script
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase1_qc_summary.py
+
+Run
+- /data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase1_qc_summary.py
+
+What it does (short)
+- Aggregates per-mark QC metrics and writes compact summary tables + SVG figures.
+
+Outputs
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase1_output/summary_report/phase1_qc_summary.tsv
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase1_output/summary_report/phase1_npz_inventory.tsv
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase1_output/summary_report/phase1_qc_report.md
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase1_output/summary_report/*.svg
+
+-----------------------------------------------------------------
+3) PHASE 1 EXPLORATORY VISUALIZATION
+-----------------------------------------------------------------
+Script
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase_1_visualization/phase1_exploratory_viz.py
+
+Run
+- /data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase_1_visualization/phase1_exploratory_viz.py
+
+What it does (short)
+- Creates exploratory signal summaries and Reg-vs-M co-occurrence heatmap.
+
+Outputs
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase_1_visualization/output/*.svg
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase_1_visualization/output/viz_exploration_notes.md
+
+-----------------------------------------------------------------
+4) PHASE 2 (LONG CONTEXT) - GENERATE 1M INTERVALS
+-----------------------------------------------------------------
+Script
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/generate_long_context_intervals.py
+
+Run (uses BAM header for chromosome sizes)
+- /data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/generate_long_context_intervals.py \
+  --bam /scratch/leuven/383/vsc38330/data/raw_bam/GSM6337767_gm12878_h3k27ac.mod_mappings.sorted.bam \
+  --out-tsv /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/intervals_long_context.tsv \
+  --window-size 1000000 \
+  --stride 1000000
+
+What it does (short)
+- Creates fixed long windows with split labels (train/valid/test by chromosome).
+
+Output
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/intervals_long_context.tsv
+
+-----------------------------------------------------------------
+5) PHASE 2 (LONG CONTEXT) - BUILD BACKEND FOR ALL 3 MARKS
+-----------------------------------------------------------------
+Primary builder script
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/build_methylation_interval_backend.py
+
+All-marks runner script
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/run_backend_all_marks.py
+
+5A) Optional smoke test first (2 intervals/mark)
+- /data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/run_backend_all_marks.py \
+  --intervals-tsv /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/intervals_long_context.tsv \
+  --out-root /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks_smoke \
+  --target-base C \
+  --max-intervals 2 \
+  --progress-every 25 \
+  --resume
+
+5B) Full build split by mark (recommended for 10h interactive sessions)
+
+5B.1) h3k27ac only
+- /data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/build_methylation_interval_backend.py \
+  --bam /scratch/leuven/383/vsc38330/data/raw_bam/GSM6337767_gm12878_h3k27ac.mod_mappings.sorted.bam \
+  --intervals-tsv /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/intervals_long_context.tsv \
+  --out-dir /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_h3k27ac_C \
+  --mark h3k27ac \
+  --target-base C \
+  --min-mapq 20 \
+  --ml-threshold 128 \
+  --min-coverage 3 \
+  --methylated-frac-thr 0.7 \
+  --unmethylated-frac-thr 0.3 \
+  --progress-every 25 \
+  --resume
+
+5B.2) h3k27me3 only
+- /data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/build_methylation_interval_backend.py \
+  --bam /scratch/leuven/383/vsc38330/data/raw_bam/GSM6337768_gm12878_h3k27me3.mod_mappings.sorted.bam \
+  --intervals-tsv /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/intervals_long_context.tsv \
+  --out-dir /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_h3k27me3_C \
+  --mark h3k27me3 \
+  --target-base C \
+  --min-mapq 20 \
+  --ml-threshold 128 \
+  --min-coverage 3 \
+  --methylated-frac-thr 0.7 \
+  --unmethylated-frac-thr 0.3 \
+  --progress-every 25 \
+  --resume
+
+5B.3) h3k4me3 only
+- /data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/build_methylation_interval_backend.py \
+  --bam /scratch/leuven/383/vsc38330/data/raw_bam/GSM6337769_gm12878_h3k4me3.mod_mappings.sorted.bam \
+  --intervals-tsv /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/intervals_long_context.tsv \
+  --out-dir /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_h3k4me3_C \
+  --mark h3k4me3 \
+  --target-base C \
+  --min-mapq 20 \
+  --ml-threshold 128 \
+  --min-coverage 3 \
+  --methylated-frac-thr 0.7 \
+  --unmethylated-frac-thr 0.3 \
+  --progress-every 25 \
+  --resume
+
+5C) Resume after interruption (recommended if job was killed)
+- Re-run the same mark-specific command with `--resume` (it will skip already recorded windows).
+
+What it does (short)
+- For each interval and mark, computes discrete per-position labels:
+  0 = unmethylated, 1 = methylated, 2 = unknown
+- Writes one NPZ per interval + per-mark manifest TSV.
+
+Expected full outputs
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_h3k27ac_C/manifest_h3k27ac_C.tsv
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_h3k27me3_C/manifest_h3k27me3_C.tsv
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_h3k4me3_C/manifest_h3k4me3_C.tsv
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_<mark>_C/<mark>_C_labels/*.npz
+
+-----------------------------------------------------------------
+6) PHASE 2 QC SUMMARY OF MANIFESTS
+-----------------------------------------------------------------
+Script
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/summarize_backend_manifests.py
+
+Run (full backends)
+- /data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/summarize_backend_manifests.py \
+  --manifest-glob "/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_*_C/manifest_*_C.tsv" \
+  --out-dir /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/summary
+
+What it does (short)
+- Summarizes known-label fraction, methylated fraction among known labels, and read-usage stats by mark/split.
+
+Outputs
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/summary/backend_manifest_qc_summary.tsv
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/summary/backend_manifest_qc_summary.md
+
+-----------------------------------------------------------------
+7) OPTIONAL MONITORING (IF YOU RUN LONG JOBS IN BACKGROUND)
+-----------------------------------------------------------------
+Check running backend processes
+- ps -ef | grep build_methylation_interval_backend.py | grep -v grep
+
+Tail per-mark logs
+- tail -f /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_h3k27ac_C/build_h3k27ac.log
+- tail -f /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_h3k27me3_C/build_h3k27me3.log
+- tail -f /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_h3k4me3_C/build_h3k4me3.log
+
+8) PHASE 2 WINDOWED O/E ENRICHMENT HEATMAPS (BIN FEATURES, NOT PER-READ)
+-----------------------------------------------------------------
+Goal
+- Reproduce Phase 1-style observed/expected Reg-vs-M enrichment heatmaps, but on genomic sub-bins inside each 1 Mb window.
+
+New script
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_oe_enrichment_heatmap.py
+
+Feature definitions in this script
+- Reg_bin:
+  - default: A_mod_count per kb (`--reg-mode a_mod_per_kb`)
+  - optional: A_mod / A_covered (`--reg-mode a_mod_frac`)
+- M_bin:
+  - default: C_methylated / C_covered (`--m-mode c_meth_frac`)
+  - optional: C_mod_count per kb (`--m-mode c_mod_per_kb`)
+
+Robustness stratification
+- Coverage filter: keep only bins with `C_coverage >= X` via `--min-bin-c-coverage X`.
+- Optional peaks stratification: pass mark-specific peak BEDs with `--peaks-bed-map mark=/path/to/file.bed`.
+
+8A) Practical default run (10 kb bins; recommended first)
+- /data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_oe_enrichment_heatmap.py \
+  --intervals-tsv /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/intervals_long_context.tsv \
+  --manifest-glob "/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_*_C/manifest_*_C.tsv" \
+  --out-dir /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_10kb \
+  --bin-size 10000 \
+  --n-quantiles 10 \
+  --min-mapq 20 \
+  --ml-threshold 128 \
+  --min-bin-c-coverage 30 \
+  --reg-mode a_mod_per_kb \
+  --m-mode c_meth_frac \
+  --progress-every 25 \
+  --checkpoint-every 25 \
+  --resume
+
+8B) Higher-resolution run (1 kb bins; heavier compute)
+- /data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_oe_enrichment_heatmap.py \
+  --intervals-tsv /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/intervals_long_context.tsv \
+  --manifest-glob "/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_*_C/manifest_*_C.tsv" \
+  --out-dir /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb \
+  --bin-size 1000 \
+  --n-quantiles 10 \
+  --min-mapq 20 \
+  --ml-threshold 128 \
+  --min-bin-c-coverage 30 \
+  --reg-mode a_mod_per_kb \
+  --m-mode c_meth_frac \
+  --progress-every 25 \
+  --checkpoint-every 25 \
+  --resume
+
+8C) Optional peak-vs-non-peak stratification (persuasive analysis)
+- Add the mark-specific peak files:
+  --peaks-bed-map h3k27ac=/path/to/h3k27ac_peaks.bed \
+  --peaks-bed-map h3k27me3=/path/to/h3k27me3_peaks.bed \
+  --peaks-bed-map h3k4me3=/path/to/h3k4me3_peaks.bed
+
+Example full command (10 kb + peaks + save bin table)
+- /data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_oe_enrichment_heatmap.py \
+  --intervals-tsv /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/intervals_long_context.tsv \
+  --manifest-glob "/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_*_C/manifest_*_C.tsv" \
+  --out-dir /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_10kb_peaks \
+  --bin-size 10000 \
+  --n-quantiles 10 \
+  --min-mapq 20 \
+  --ml-threshold 128 \
+  --min-bin-c-coverage 30 \
+  --reg-mode a_mod_per_kb \
+  --m-mode c_meth_frac \
+  --progress-every 25 \
+  --checkpoint-every 25 \
+  --resume \
+  --peaks-bed-map h3k27ac=/path/to/h3k27ac_peaks.bed \
+  --peaks-bed-map h3k27me3=/path/to/h3k27me3_peaks.bed \
+  --peaks-bed-map h3k4me3=/path/to/h3k4me3_peaks.bed \
+  --write-bin-table
+
+8D) 1 kb run split by mark (recommended for short sessions)
+
+8D.1) h3k27ac only
+- /data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_oe_enrichment_heatmap.py \
+  --intervals-tsv /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/intervals_long_context.tsv \
+  --manifest-glob "/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_h3k27ac_C/manifest_h3k27ac_C.tsv" \
+  --out-dir /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_h3k27ac \
+  --bin-size 1000 \
+  --n-quantiles 10 \
+  --min-mapq 20 \
+  --ml-threshold 128 \
+  --min-bin-c-coverage 30 \
+  --reg-mode a_mod_per_kb \
+  --m-mode c_meth_frac \
+  --progress-every 25 \
+  --checkpoint-every 25 \
+  --resume
+
+8D.2) h3k27me3 only
+- /data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_oe_enrichment_heatmap.py \
+  --intervals-tsv /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/intervals_long_context.tsv \
+  --manifest-glob "/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_h3k27me3_C/manifest_h3k27me3_C.tsv" \
+  --out-dir /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_h3k27me3 \
+  --bin-size 1000 \
+  --n-quantiles 10 \
+  --min-mapq 20 \
+  --ml-threshold 128 \
+  --min-bin-c-coverage 30 \
+  --reg-mode a_mod_per_kb \
+  --m-mode c_meth_frac \
+  --progress-every 25 \
+  --checkpoint-every 25 \
+  --resume
+
+8D.3) h3k4me3 only
+- /data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_oe_enrichment_heatmap.py \
+  --intervals-tsv /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/intervals_long_context.tsv \
+  --manifest-glob "/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_h3k4me3_C/manifest_h3k4me3_C.tsv" \
+  --out-dir /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_h3k4me3 \
+  --bin-size 1000 \
+  --n-quantiles 10 \
+  --min-mapq 20 \
+  --ml-threshold 128 \
+  --min-bin-c-coverage 30 \
+  --reg-mode a_mod_per_kb \
+  --m-mode c_meth_frac \
+  --progress-every 25 \
+  --checkpoint-every 25 \
+  --resume
+
+Resume behavior
+- With `--resume`, the script writes per-mark feature caches in `--out-dir` and reuses them on rerun:
+  `feature_cache_<mark>_bin<...>_<reg_mode>_<m_mode>_cov<...>.npz`
+- With `--checkpoint-every 25`, partial checkpoints are saved during long runs:
+  `feature_checkpoint_<mark>_bin<...>_<reg_mode>_<m_mode>_cov<...>.npz`
+- Safe rerun pattern after interruption: run the exact same command again with `--resume`.
+
+Flag support note
+- `--resume` and `--progress-every` are supported for Step 5/8 build scripts.
+- `--checkpoint-every` is supported by `windowed_oe_enrichment_heatmap.py` (Step 8), not by Step 5 backend builder.
+- Step 6 (`summarize_backend_manifests.py`) is a short summarization command and does not expose resume/progress flags.
+
+Main outputs
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_*/oe_heatmap_<mark>.svg
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_*/oe_heatmap_by_mark.svg
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_*/oe_heatmap_pooled.svg
+- (if peaks provided) `*_in_peak.svg`, `*_nonpeak.svg`, and pooled peak/non-peak figures
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_*/windowed_oe_summary.tsv
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_*/windowed_oe_notes.md
+- Optional: `/windowed_bin_features.tsv` (large file)
+
+-----------------------------------------------------------------
+9) FILES ADDED FOR PHASE 2 LONG-CONTEXT PREPROCESSING
+-----------------------------------------------------------------
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/generate_long_context_intervals.py
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/build_methylation_interval_backend.py
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/methylation_interval_store.py
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/run_backend_all_marks.py
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/summarize_backend_manifests.py
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_oe_enrichment_heatmap.py
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/README.md
+
+-----------------------------------------------------------------
+10) PHASE 3 (NEXT) - HYENADNA + METHYLATION CHANNEL INTEGRATION
+-----------------------------------------------------------------
+Goal
+- Extend HyenaDNA input from sequence-only to sequence + methylation channels, without changing Hyena operator blocks.
+- Use Phase 2 backend outputs as methylation source aligned to long genomic windows.
+
+Primary repositories
+- Thesis preprocessing/data prep:
+  /data/leuven/383/vsc38330/thesis_dimelo
+- HyenaDNA codebase:
+  /data/leuven/383/vsc38330/hyena-dna-main
+
+Inputs from previous phases
+- Intervals:
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/intervals_long_context.tsv
+- Per-mark manifests:
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_h3k27ac_C/manifest_h3k27ac_C.tsv
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_h3k27me3_C/manifest_h3k27me3_C.tsv
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_h3k4me3_C/manifest_h3k4me3_C.tsv
+- Per-interval label arrays:
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_<mark>_C/<mark>_C_labels/*.npz
+
+Design target (model side)
+- DNA token embedding stays unchanged.
+- Add methylation embedding/projection branch.
+- Combine as:
+  Z0 = token_embed(D) + meth_embed(M)   (or concat + projection)
+- Feed Z0 into existing HyenaDNA backbone unchanged.
+- Add config toggles to enable/disable methylation channels.
+
+-----------------------------------------------------------------
+11) PHASE 3A - BUILD TRAINING TABLE FOR HYENADNA DATASET LOADER
+-----------------------------------------------------------------
+What to build
+- A single table (TSV/Parquet) listing one row per interval with:
+  interval_id, chrom, start, end, split,
+  dna_source (reference FASTA info),
+  c_meth_npz_path (required),
+  reg_npz_path (optional; directed A-mod proxy),
+  mark (optional if multi-mark setup).
+
+Why
+- Keeps data access explicit and reproducible.
+- Allows one loader to support:
+  D only, D+C, D+C+Reg
+
+Implementation note
+- If not already done, create a script in thesis repo to merge interval TSV + manifest TSV(s) into one training index.
+- Keep chromosome split from intervals TSV; do not reshuffle across split labels.
+
+-----------------------------------------------------------------
+12) PHASE 3B - HYENADNA CODE MODIFICATIONS (MINIMAL-INVASIVE)
+-----------------------------------------------------------------
+Required edits in /data/leuven/383/vsc38330/hyena-dna-main
+
+12.1 Dataset / collate
+- Extend dataset output batch to include:
+  input_ids: [B, L]
+  targets: [B, L] (existing DNA LM target or downstream target, depending on task)
+  methyl_ids: [B, L] with values {0,1,2}  (0 unmethylated, 1 methylated, 2 unknown)
+  methyl_mask: [B, L] bool (methyl_ids != 2)
+  attention/padding mask for variable lengths
+- Ensure padding uses:
+  input_ids pad token (existing behavior)
+  methyl_ids pad value = 2 (unknown)
+
+12.2 Embedding layer
+- Add methyl embedding module:
+  meth_embed = nn.Embedding(3, d_model)
+- In forward:
+  x = token_embed(input_ids)
+  if methylation_enabled:
+      x = x + meth_embed(methyl_ids)
+- Keep positional encoding behavior exactly as in original code.
+
+12.3 Optional second channel (Reg proxy)
+- If using directed adenine signal as second methylation-like channel:
+  - Add separate embedding/projection for Reg channel.
+  - Gate by config flag, e.g. use_reg_channel=true/false.
+  - Unknown value handling must mirror methyl unknown masking.
+
+12.4 Downstream heads (fine-tuning stage)
+- Add supervised head(s) on top of final hidden states Z:
+  - Main head: predict Reg from (D,M)
+  - Optional auxiliary head: predict methylation from sequence P(M|D)
+- Do not alter Hyena blocks.
+
+-----------------------------------------------------------------
+13) PHASE 3C - FINE-TUNING PLAN (NOT FULL PRETRAIN FROM SCRATCH)
+-----------------------------------------------------------------
+Step order
+1. Load pretrained HyenaDNA checkpoint.
+2. Freeze full backbone first; train only new embedding branch + prediction head(s).
+3. Unfreeze top N backbone layers (partial unfreeze) after stable convergence.
+4. Compare:
+   - Baseline: D only
+   - D + C methylation
+   - D + C + Reg (optional)
+
+Loss suggestions
+- Main supervised task:
+  predict Reg signal (binary or continuous depending on target definition).
+- Optional multitask:
+  loss_total = loss_reg + lambda_m * loss_methyl
+- For methyl labels, always mask unknown positions (value 2).
+
+Long-context constraints
+- Start with short context smoke tests (1 kb to 10 kb).
+- Scale to 100 kb, then 1 Mb after memory/performance validation.
+- Keep gradient accumulation/checkpointing settings explicit in config.
+
+Sanity checks before long runs
+- Batch shape check:
+  input_ids.shape == methyl_ids.shape == padding_mask.shape
+- Unknown masking check:
+  methyl loss excludes all positions with methyl_ids == 2
+- Resume/reproducibility:
+  save config + checkpoint + data index snapshot for each run
+
+-----------------------------------------------------------------
+14) PHASE 3D - MINIMAL EXPERIMENT MATRIX (THESIS-READY)
+-----------------------------------------------------------------
+Recommended first matrix
+- E1: D only (frozen backbone, downstream head)
+- E2: D + C methylation (same freeze schedule)
+- E3: D + C methylation + partial unfreeze top layers
+- E4 (optional): D + C + Reg channel
+
+Report for each experiment
+- Train/valid/test metric by chromosome split
+- Runtime + max memory
+- Convergence curves
+- Ablation summary table (improvement vs baseline E1)
+
+-----------------------------------------------------------------
+15) PRACTICAL NOTE
+-----------------------------------------------------------------
+Current status in this project
+- Phase 1 and Phase 2 preprocessing are already set up and runnable.
+- Phase 3 requires code edits inside hyena-dna-main and a training index builder from Phase 2 manifests.
+- This section defines the exact next implementation target before model training.
+
+-----------------------------------------------------------------
+16) PHASE 3 RUN COMMANDS (CONCRETE STARTER)
+-----------------------------------------------------------------
+16A) Build merged Phase 3 training index (from Phase 2 manifests)
+
+New script
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase3_hyena/build_phase3_training_index.py
+
+Run
+- /data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase3_hyena/build_phase3_training_index.py \
+  --manifest-glob "/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_*_C/manifest_*_C.tsv" \
+  --out-tsv /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase3_hyena/phase3_training_index.tsv \
+  --marks h3k27ac,h3k27me3,h3k4me3 \
+  --min-known-frac 0.0 
+
+Quick check
+- wc -l /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase3_hyena/phase3_training_index.tsv
+- sed -n '1,5p' /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase3_hyena/phase3_training_index.tsv
+
+16B) HyenaDNA environment sanity test (before custom modifications)
+
+Repo
+- /data/leuven/383/vsc38330/hyena-dna-main
+
+Smoke command (1 epoch small task, verifies train launcher works)
+- cd /data/leuven/383/vsc38330/hyena-dna-main
+- /data/leuven/383/vsc38330/.venv/bin/python -m train wandb.mode=disabled experiment=hg38/genomic_benchmark_scratch trainer.devices=1 trainer.max_epochs=1
+
+16C) Load pretrained checkpoint + fine-tuning entry (after methylation code integration)
+
+Template command (edit experiment/config names after implementing custom dataset/model hook)
+- cd /data/leuven/383/vsc38330/hyena-dna-main
+- /data/leuven/383/vsc38330/.venv/bin/python -m train \
+  wandb.mode=disabled \
+  experiment=hg38/genomic_benchmark_scratch \
+  train.pretrained_model_path=/path/to/hyenadna_pretrained.ckpt \
+  train.pretrained_model_strict_load=false \
+  trainer.devices=1
+
+Notes
+- `train.pretrained_model_path` is the main switch to load a pretrained HyenaDNA checkpoint.
+- Use a custom experiment/config once your methylation dataloader + embedding branch are added.
+- Keep Phase 3 first run short (debug epoch/subset) before full long-context fine-tuning.
+
+END

@@ -1,0 +1,2 @@
+name	strand	Assay title	ontology_curie	biosample_name	biosample_type	biosample_life_stage	histone_mark	data_source	endedness	genetically_modified	nonzero_mean
+EFO:0001086 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0001086	A549	cell_line	adult	H3K4me3	encode	single	False	0.6755056977272034

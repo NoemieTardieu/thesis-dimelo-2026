@@ -1,0 +1,80 @@
+# secrets
+.env
+env
+*.key
+*API_KEY*
+
+# raw/genomic data and generated arrays
+*.bam
+*.bai
+*.cram
+*.crai
+*.bigWig
+*.bw
+*.npz
+*.npy
+
+# model checkpoints
+*.pt
+*.pth
+checkpoints/
+
+# generated heavy tables
+canonical_raw_bins.tsv.gz
+canonical_normalized_bins.tsv.gz
+all_read_bin_values.tsv
+alphagenome_readseq_*.tsv
+*.per_locus_variance.tsv.gz
+*.per_locus_variance.tsv
+*.all_pairs.tsv
+*.tsv.gz
+*_matrix.gz
+*.matrix.gz
+
+# AlphaGenome and runtime caches
+cache*/
+**/cache*/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# SLURM / cluster logs
+*.sbatch
+slurm-*.out
+slurm-*.err
+*.out
+*.err
+
+# server-resident large artifacts
+server_artifacts/
+**/server_artifacts/
+
+# cleanup/debris snapshots
+preprocessing/to_delete/
+hyena-dna/to_delete/
+# root cleanup / local runtime state
+root_environment/
+**/root_environment/
+upstream_hyena_dna/.git/
+hyena-dna/upstream_hyena_dna/
+upstream_hyena_dna/outputs/
+upstream_hyena_dna/**/__pycache__/
+*.sock
+coder.json
+serve-web-key-half
+CachedProfilesData/
+CachedExtensionVSIXs/
+User/
+Machine/
+logs/
+venvs/
+bin/
+modkit/
+
+# AlphaGenome archived large generated tables
+alphagenome_test_128bp.tsv
+dimelo_*_128bp*.tsv
+hyenadna_*_128bp*.tsv
+*.per_read.tsv

@@ -1,0 +1,70 @@
+{
+  "checkpoint": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_reg_given_m_nosample_mlp256_lowlr_lastblock_25epochs_1000batches.best.pt",
+  "model_type": "P(6mA|DNA,5mC)",
+  "sample_conditioned": false,
+  "decoder_hidden_dim": 256,
+  "decoder_dropout": 0.15,
+  "label_threshold_6ma": 0.5,
+  "chosen_prediction_threshold": 0.117,
+  "validation": {
+    "aggregation": {
+      "reads": 1258,
+      "raw_window_valid_positions": 6594628,
+      "aggregated_read_positions": 3887376,
+      "duplicate_overlap_observations_removed": 2707252
+    },
+    "metrics_at_chosen_threshold": {
+      "threshold": 0.117,
+      "n": 3887376,
+      "tp": 53399,
+      "fp": 404353,
+      "fn": 140802,
+      "tn": 3288822,
+      "precision": 0.11665486988587707,
+      "recall": 0.274967688116951,
+      "specificity": 0.8905134471017485,
+      "f1": 0.16381242206109947,
+      "predicted_positive_fraction": 0.11775346660575155,
+      "true_positive_fraction": 0.04995683463601154
+    }
+  },
+  "test": {
+    "aggregation": {
+      "reads": 1877,
+      "raw_window_valid_positions": 10193258,
+      "aggregated_read_positions": 5869663,
+      "duplicate_overlap_observations_removed": 4323595
+    },
+    "metrics_at_validation_threshold": {
+      "threshold": 0.117,
+      "n": 5869663,
+      "tp": 91605,
+      "fp": 648151,
+      "fn": 212800,
+      "tn": 4917107,
+      "precision": 0.12383137142517263,
+      "recall": 0.30093132504393816,
+      "specificity": 0.8835362170091665,
+      "f1": 0.17546144703738217,
+      "predicted_positive_fraction": 0.12603040413052674,
+      "true_positive_fraction": 0.05186072863126895
+    },
+    "metrics_at_fixed_0.5_threshold": {
+      "threshold": 0.5,
+      "n": 5869663,
+      "tp": 217,
+      "fp": 345,
+      "fn": 304188,
+      "tn": 5564913,
+      "precision": 0.3861209964412811,
+      "recall": 0.0007128660830144052,
+      "specificity": 0.9999380082648459,
+      "f1": 0.001423104794945027,
+      "predicted_positive_fraction": 9.574655308149719e-05,
+      "true_positive_fraction": 0.05186072863126895
+    }
+  },
+  "outputs": {
+    "validation_threshold_scan": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_reg_given_m_nosample_mlp256_lowlr_threshold_metrics.val_threshold_scan.tsv"
+  }
+}

@@ -1,0 +1,3 @@
+model	task	reads	valid_positions	mae	pearson	spearman	auroc	auprc	mean_pred	mean_target
+overlap16k_smoke	5mC	417	277363	0.3163	0.3866	0.2897	0.6721	0.7231	0.5867	0.6071
+overlap16k_smoke	6mA	417	2563791	0.1170	0.1574	0.1183	0.6607	0.0996	0.0820	0.0847

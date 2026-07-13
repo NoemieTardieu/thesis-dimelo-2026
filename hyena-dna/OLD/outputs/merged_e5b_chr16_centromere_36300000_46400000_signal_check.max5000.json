@@ -1,0 +1,45 @@
+{
+  "bam": "/staging/leuven/stg_00118/ONT_BAM_Noemie/bam_files/merged_e5b.sorted.bam",
+  "extract_full": "/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/by_chrom/extract_full_chr16.tsv.gz",
+  "region": "chr16:36300000-46400000",
+  "min_mapq": 20,
+  "max_reads": 5000,
+  "eligible_reads": 5000,
+  "reads_with_modkit_rows": 5000,
+  "read_length": {
+    "mean": 22356.709,
+    "median": 18785.5,
+    "max": 135405,
+    "gt_32768": 866
+  },
+  "signal": {
+    "5mC_CpG": {
+      "n": 4524448,
+      "mean": 0.29671678972761645,
+      "median": 0.025390625,
+      "q95": 0.9902344
+    },
+    "5mC_nonCpG": {
+      "n": 0,
+      "mean": null,
+      "median": null,
+      "q95": null
+    },
+    "6mA": {
+      "n": 35267836,
+      "mean": 0.03032210149774032,
+      "median": 0.0,
+      "q95": 0.18554688
+    }
+  },
+  "counters": {
+    "bam_records_seen": 84271,
+    "eligible_reads": 5000,
+    "skip_secondary_supplementary": 65995,
+    "skip_low_mapq": 13276,
+    "extract_rows_for_region_reads": 44316732,
+    "rows_6mA": 35267836,
+    "rows_other_C_h": 4524448,
+    "rows_5mC_CpG": 4524448
+  }
+}

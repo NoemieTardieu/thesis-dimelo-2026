@@ -1,0 +1,33 @@
+{
+  "datasets": [
+    {
+      "npz": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.test.npz",
+      "metadata": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.test.metadata.tsv",
+      "label": "chr16_test"
+    },
+    {
+      "npz": "outputs/merged_e5b_c1_chr11_selected_top100_overlap16k_full5000_region_split.test.npz",
+      "metadata": "outputs/merged_e5b_c1_chr11_selected_top100_overlap16k_full5000_region_split.test.metadata.tsv",
+      "label": "chr11_test"
+    },
+    {
+      "npz": "outputs/merged_e5b_c1_chr17_selected_top100_overlap16k_full5000_region_split.test.npz",
+      "metadata": "outputs/merged_e5b_c1_chr17_selected_top100_overlap16k_full5000_region_split.test.metadata.tsv",
+      "label": "chr17_test"
+    },
+    {
+      "npz": "outputs/merged_e5b_c1_chr19_selected_top100_overlap16k_full5000_region_split.test.npz",
+      "metadata": "outputs/merged_e5b_c1_chr19_selected_top100_overlap16k_full5000_region_split.test.metadata.tsv",
+      "label": "chr19_test"
+    }
+  ],
+  "outputs": {
+    "window": "outputs/final_m_reg_relationship_4chrom_test_overlapagg.window.tsv",
+    "read_overlap_collapsed": "outputs/final_m_reg_relationship_4chrom_test_overlapagg.read_overlap_collapsed.tsv",
+    "region": "outputs/final_m_reg_relationship_4chrom_test_overlapagg.region.tsv",
+    "correlation_summary": "outputs/final_m_reg_relationship_4chrom_test_overlapagg.correlation_summary.tsv",
+    "window_cooccurrence": "outputs/final_m_reg_relationship_4chrom_test_overlapagg.window.cooccurrence.tsv",
+    "read_overlap_collapsed_cooccurrence": "outputs/final_m_reg_relationship_4chrom_test_overlapagg.read_overlap_collapsed.cooccurrence.tsv",
+    "plot": "outputs/final_m_reg_relationship_4chrom_test_overlapagg.hexbin.png"
+  }
+}

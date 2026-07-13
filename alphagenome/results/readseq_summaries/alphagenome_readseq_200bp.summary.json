@@ -1,0 +1,16 @@
+{
+  "out": "outputs/alphagenome_readseq_200bp.tsv",
+  "regions": "outputs/4chrom_test_regions.tsv",
+  "bin_size": 200,
+  "sequence_length": 131072,
+  "max_reads_per_region_per_sample": 2,
+  "note": "AlphaGenome was run on original BAM query sequences. Its read-coordinate output bins were expanded across their covered read positions, mapped through the CIGAR to reference coordinates, and aggregated into genomic bins.",
+  "counters": {
+    "merged_c1_selected_reads": 120,
+    "mapped_read_positions": 11214836,
+    "unmapped_read_positions": 344418,
+    "alphagenome_bins_in_padding": 155215,
+    "read_sequence_predictions_used": 240,
+    "merged_e5b_selected_reads": 120
+  }
+}

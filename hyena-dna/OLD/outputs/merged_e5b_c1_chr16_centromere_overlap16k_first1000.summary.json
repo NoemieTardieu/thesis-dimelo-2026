@@ -1,0 +1,49 @@
+{
+  "sample_a": {
+    "name": "merged_e5b",
+    "sample_id": 0,
+    "reads": 1000,
+    "npz": "outputs/merged_e5b_chr16_centromere_overlap16k_first1000.npz",
+    "metadata": "outputs/merged_e5b_chr16_centromere_overlap16k_first1000.metadata.tsv"
+  },
+  "sample_b": {
+    "name": "merged_c1",
+    "sample_id": 1,
+    "reads": 1000,
+    "npz": "outputs/merged_c1_chr16_centromere_overlap16k_first1000.npz",
+    "metadata": "outputs/merged_c1_chr16_centromere_overlap16k_first1000.metadata.tsv"
+  },
+  "combined_reads": 2000,
+  "arrays": {
+    "input_ids": [
+      2000,
+      32768
+    ],
+    "target_5mC": [
+      2000,
+      32768
+    ],
+    "mask_5mC": [
+      2000,
+      32768
+    ],
+    "target_6mA": [
+      2000,
+      32768
+    ],
+    "mask_6mA": [
+      2000,
+      32768
+    ],
+    "sample_id": [
+      2000
+    ]
+  },
+  "valid_5mC_targets": 182979,
+  "valid_6mA_targets": 3630784,
+  "outputs": {
+    "npz": "outputs/merged_e5b_c1_chr16_centromere_overlap16k_first1000.npz",
+    "metadata": "outputs/merged_e5b_c1_chr16_centromere_overlap16k_first1000.metadata.tsv",
+    "summary": "outputs/merged_e5b_c1_chr16_centromere_overlap16k_first1000.summary.json"
+  }
+}

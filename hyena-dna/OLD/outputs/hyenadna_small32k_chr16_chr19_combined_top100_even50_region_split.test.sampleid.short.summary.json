@@ -1,0 +1,48 @@
+{
+  "npz": "outputs/merged_e5b_c1_chr16_chr19_selected_top100_even50_region_split.test.npz",
+  "metadata": "outputs/merged_e5b_c1_chr16_chr19_selected_top100_even50_region_split.test.metadata.tsv",
+  "split_name": "test",
+  "checkpoint": "outputs/hyenadna_small32k_chr16_chr19_combined_top100_even50_region_split_sampleid_short_2epochs_150batches.pt",
+  "model_name": "hyenadna-small-32k-seqlen",
+  "device": "cuda",
+  "reads": 3203,
+  "batch_size": 1,
+  "max_length_used": 32768,
+  "num_samples": 2,
+  "sample_embedding_dim": 16,
+  "thresholds": {
+    "5mC": 0.5,
+    "6mA": 0.5
+  },
+  "metrics": {
+    "5mC": {
+      "valid_positions": 1236818,
+      "bce": 0.6353529691696167,
+      "mse": 0.14248842000961304,
+      "mae": 0.3350003659725189,
+      "mean_pred": 0.5396718382835388,
+      "mean_target": 0.614318311214447,
+      "pearson": 0.36300069093704224,
+      "spearman": 0.282067974462432,
+      "auroc": 0.6709082344971917,
+      "auprc": 0.7318570782559964,
+      "positive_fraction": 0.622808691335346
+    },
+    "6mA": {
+      "valid_positions": 11001154,
+      "bce": 0.27711594104766846,
+      "mse": 0.0375821553170681,
+      "mae": 0.12057708948850632,
+      "mean_pred": 0.08947120606899261,
+      "mean_target": 0.08172085136175156,
+      "pearson": 0.16056402027606964,
+      "spearman": 0.13063015565244737,
+      "auroc": 0.6562638550036197,
+      "auprc": 0.0982308521504906,
+      "positive_fraction": 0.052975169695833726
+    }
+  },
+  "per_region_metrics": "outputs/hyenadna_small32k_chr16_chr19_combined_top100_even50_region_split.test.sampleid.short.per_region_metrics.tsv",
+  "per_sample_metrics": "outputs/hyenadna_small32k_chr16_chr19_combined_top100_even50_region_split.test.sampleid.short.per_sample_metrics.tsv",
+  "per_chrom_metrics": "outputs/hyenadna_small32k_chr16_chr19_combined_top100_even50_region_split.test.sampleid.short.per_chrom_metrics.tsv"
+}

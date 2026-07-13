@@ -1,0 +1,49 @@
+{
+  "sample_a": {
+    "name": "merged_e5b",
+    "sample_id": 0,
+    "reads": 942,
+    "npz": "outputs/merged_e5b_chr16_selected_top100_overlap16k_full5000_region_split.test.npz",
+    "metadata": "outputs/merged_e5b_chr16_selected_top100_overlap16k_full5000_region_split.test.metadata.tsv"
+  },
+  "sample_b": {
+    "name": "merged_c1",
+    "sample_id": 1,
+    "reads": 935,
+    "npz": "outputs/merged_c1_chr16_selected_top100_overlap16k_full5000_region_split.test.npz",
+    "metadata": "outputs/merged_c1_chr16_selected_top100_overlap16k_full5000_region_split.test.metadata.tsv"
+  },
+  "combined_reads": 1877,
+  "arrays": {
+    "input_ids": [
+      1877,
+      32768
+    ],
+    "target_5mC": [
+      1877,
+      32768
+    ],
+    "mask_5mC": [
+      1877,
+      32768
+    ],
+    "target_6mA": [
+      1877,
+      32768
+    ],
+    "mask_6mA": [
+      1877,
+      32768
+    ],
+    "sample_id": [
+      1877
+    ]
+  },
+  "valid_5mC_targets": 1094769,
+  "valid_6mA_targets": 10193258,
+  "outputs": {
+    "npz": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.test.npz",
+    "metadata": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.test.metadata.tsv",
+    "summary": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.test.summary.json"
+  }
+}

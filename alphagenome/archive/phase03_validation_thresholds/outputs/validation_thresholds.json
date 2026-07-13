@@ -1,0 +1,13 @@
+{
+  "covered_bins": 26613,
+  "minimum_observed_positions": 1,
+  "minimum_unique_reads": 1,
+  "selection": "sample == pooled",
+  "source": "outputs/dimelo_val_128bp.tsv",
+  "source_split": "val",
+  "thresholds": {
+    "top_10_percent_primary": 0.16258877840909086,
+    "top_20_percent": 0.1153911236562526,
+    "top_5_percent": 0.22945226438188487
+  }
+}

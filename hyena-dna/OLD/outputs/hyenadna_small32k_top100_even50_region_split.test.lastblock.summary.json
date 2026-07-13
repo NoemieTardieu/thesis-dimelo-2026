@@ -1,0 +1,44 @@
+{
+  "npz": "outputs/merged_e5b_chr16_selected_top100_even50_region_split.test.npz",
+  "metadata": "outputs/merged_e5b_chr16_selected_top100_even50_region_split.test.metadata.tsv",
+  "split_name": "test",
+  "checkpoint": "outputs/hyenadna_small32k_top100_even50_region_split_lastblock_3epochs_200batches.pt",
+  "model_name": "hyenadna-small-32k-seqlen",
+  "device": "cuda",
+  "reads": 845,
+  "batch_size": 1,
+  "max_length_used": 32768,
+  "thresholds": {
+    "5mC": 0.5,
+    "6mA": 0.5
+  },
+  "metrics": {
+    "5mC": {
+      "valid_positions": 318237,
+      "bce": 0.6091573238372803,
+      "mse": 0.1291576772928238,
+      "mae": 0.3035530149936676,
+      "mean_pred": 0.5978818535804749,
+      "mean_target": 0.6090921759605408,
+      "pearson": 0.43331050872802734,
+      "spearman": 0.32936707313527386,
+      "auroc": 0.6951627023373695,
+      "auprc": 0.7458266965734868,
+      "positive_fraction": 0.616597064451965
+    },
+    "6mA": {
+      "valid_positions": 3048735,
+      "bce": 0.2768324613571167,
+      "mse": 0.03707112744450569,
+      "mae": 0.12272342294454575,
+      "mean_pred": 0.09663230925798416,
+      "mean_target": 0.08150089532136917,
+      "pearson": 0.18882179260253906,
+      "spearman": 0.14433388475226855,
+      "auroc": 0.6659839565763013,
+      "auprc": 0.11248835503636898,
+      "positive_fraction": 0.052355485143838344
+    }
+  },
+  "per_region_metrics": "outputs/hyenadna_small32k_top100_even50_region_split.test.lastblock.per_region_metrics.tsv"
+}

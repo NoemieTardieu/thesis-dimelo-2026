@@ -1,0 +1,551 @@
+Per-read summaries from modkit extract-calls tables
+
+Files
+- summarize_modkit_extract_calls.py
+- MODKIT_PER_READ_SUMMARY_NOTES.txt
+
+What this step does
+This step takes the large read-position-level tables produced by:
+- modkit extract calls
+
+and converts them into smaller per-read summary tables.
+
+In other words:
+- modkit extract calls gives one row per base-call event on a read
+- the new summary script gives one row per read
+
+Why this is useful
+The raw modkit extract-calls tables are excellent standard outputs, but they are very large and not yet in the most convenient format for downstream biological analysis.
+
+For many thesis-style downstream analyses, the natural unit is the read, not each individual base-call event. A per-read table makes it much easier to:
+- compare reads across marks
+- filter reads by coverage or modification burden
+- compute read-level methylation fractions
+- connect read-level methylation to read length, alignment span, chromosome, or genomic context
+- build later promoter-, window-, or feature-level summaries from a cleaner intermediate table
+
+Why this is a good next step after modkit
+Your promoter asked for a more standard workflow. The standard part is now handled by modkit:
+- modkit modbam check-tags
+- modkit extract calls
+
+The new Python script does not replace modkit. It sits after modkit as a lightweight downstream summarization step.
+
+So the workflow becomes:
+1. Use modkit to read and standardize modified-base calls from the modBAM.
+2. Use the summary script to reshape those calls into a per-read analysis table.
+
+That is much easier to explain than relying only on a custom BAM parser from the beginning.
+
+What information the script uses from modkit
+From each extract-calls table, the script reads these key columns:
+- read_id
+- chrom
+- alignment_start
+- alignment_end
+- read_length
+- call_code
+- canonical_base
+- fail
+- flag
+
+How it interprets them
+- canonical_base tells us whether the event belongs to the A channel or the C channel.
+- call_code tells us whether the event was called as canonical or modified.
+  - In your data, canonical calls are represented by:
+    - call_code = -
+  - Modified calls are represented by mark-specific mod codes such as:
+    - Y for the A-associated channel
+    - Z for the C-associated channel
+- fail tells us whether the event passed the thresholding used during modkit extraction.
+  - fail = false means the call passed the thresholds you chose.
+  - fail = true means the call did not pass and should be treated more cautiously.
+
+Because the extract-calls step was run with:
+- A threshold = 0.9
+- C threshold = 0.8
+
+the per-read summaries inherit those same thresholds.
+
+What the script computes per read
+For each read, the script calculates:
+- chromosome and alignment span
+- read length
+- total number of calls
+- total number of passing calls
+- total number of failing calls
+
+For adenine-associated calls:
+- n_A_total
+- n_A_pass
+- n_A_fail
+- n_A_mod_all
+- n_A_mod_pass
+- n_A_canonical_pass
+- frac_A_mod_all
+- frac_A_mod_pass
+
+For cytosine-associated calls:
+- n_C_total
+- n_C_pass
+- n_C_fail
+- n_C_mod_all
+- n_C_mod_pass
+- n_C_canonical_pass
+- frac_C_mod_all
+- frac_C_mod_pass
+
+Interpretation of the fractions
+- frac_A_mod_pass = modified A calls among passing A calls for that read
+- frac_C_mod_pass = modified C calls among passing C calls for that read
+
+These are often the most useful summary values, because they focus on high-confidence calls only.
+
+The all-call fractions are also retained:
+- frac_A_mod_all
+- frac_C_mod_all
+
+These are sometimes useful for sensitivity analyses, but the pass-filtered fractions are usually cleaner for downstream interpretation.
+
+Why chunked reading is used
+The modkit extract-calls files are large. Reading them all into memory at once could be fragile or unnecessarily expensive.
+
+The script therefore uses pandas chunked reading:
+- it loads the file in blocks
+- updates per-read counters incrementally
+- writes the final smaller summary table at the end
+
+This makes it more practical on shared compute systems and better suited to the file sizes you have.
+
+Default inputs
+If run without arguments, the script uses these three files:
+- /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/h3k27ac/extract_calls.tsv.gz
+- /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/h3k27me3/extract_calls.tsv.gz
+- /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/h3k4me3/extract_calls.tsv.gz
+
+Default output directory
+- /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/per_read_summary
+
+Expected output files
+- h3k27ac.per_read_modkit_summary.tsv
+- h3k27me3.per_read_modkit_summary.tsv
+- h3k4me3.per_read_modkit_summary.tsv
+
+How to run it
+From anywhere:
+python3 /data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/summarize_modkit_extract_calls.py
+
+If you want to use your virtual environment explicitly:
+/data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/summarize_modkit_extract_calls.py
+
+How to run it on custom files
+You can also provide inputs manually:
+python3 /data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/summarize_modkit_extract_calls.py \
+  --input h3k27ac=/path/to/h3k27ac_extract.tsv.gz \
+  --input h3k27me3=/path/to/h3k27me3_extract.tsv.gz \
+  --input h3k4me3=/path/to/h3k4me3_extract.tsv.gz \
+  --output-dir /path/to/output_dir
+
+What this step is not doing
+This script is not re-parsing the BAM itself.
+It is not replacing modkit.
+It is not redefining modification thresholds.
+
+It is only summarizing the standardized modkit output into a cleaner read-level form.
+
+Why this makes sense for your thesis
+This gives you a workflow that is both:
+- standard at the modified-base extraction stage
+- flexible at the downstream analysis stage
+
+That combination is often ideal:
+- modkit handles the specialized modBAM parsing
+- your custom downstream scripts work on transparent TSV tables
+
+That is easier to justify methodologically and easier for other bioinformaticians to follow.
+
+Browser tracks from standardized modkit outputs
+
+Why make browser tracks
+The per-read summary TSVs are excellent for downstream quantitative analysis, but they are not the easiest format for genome browser inspection. Genome browsers such as IGV work much better with genomic tracks such as:
+- BED
+- bedGraph
+- bigWig
+- BAM
+
+For this project, the most interpretable browser tracks are separate fraction tracks for:
+- A-associated modification signal
+- C-associated modification signal
+
+for each mark.
+
+Why use fraction rather than raw 0/1 values
+At the level of a single call, a modification state is effectively binary:
+- modified
+- canonical
+
+However, browser tracks are much more useful when they summarize many calls at the same genomic position. For visualization, the most natural quantity is therefore the modified fraction:
+- 0.0 means no passing calls at that position were modified
+- 1.0 means all passing calls at that position were modified
+- values between 0 and 1 reflect partial modification across the reads covering that position
+
+This is usually more informative than plotting raw 0/1 calls, because raw per-call values are too sparse and noisy at genome-browser scale.
+
+What this track-building step does
+The new script:
+- build_modkit_fraction_tracks.py
+
+uses the standardized:
+- modkit extract calls
+
+outputs as input.
+
+It does not go back to the BAM. Instead, it reads the extract-calls TSV files and for each genomic position:
+1. keeps only passing calls
+2. separates A-channel and C-channel events using canonical_base
+3. treats call_code = - as canonical and any other code as modified
+4. computes:
+   - modified_count / total_passing_calls
+5. writes separate bedGraph files for A and C
+
+This creates position-level fraction tracks that are much easier to visualize in IGV.
+
+Why this is methodologically nice
+This approach stays fully downstream of modkit. That means:
+- modkit remains the standardized modified-base extraction step
+- the custom script only reshapes modkit output into browser-friendly tracks
+
+So the workflow remains easy to explain:
+1. verify modBAM tags with modkit
+2. extract standardized call tables with modkit
+3. derive per-read summary tables and per-position browser tracks from those tables
+
+That is a clean separation between standardized preprocessing and project-specific downstream summarization.
+
+What files the script creates
+For each mark, the script writes two bedGraph files:
+- one for A fraction
+- one for C fraction
+
+With default settings, the output directory is:
+- /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/fraction_tracks
+
+Expected files:
+- h3k27ac_A_mod_fraction.bedGraph
+- h3k27ac_C_mod_fraction.bedGraph
+- h3k27me3_A_mod_fraction.bedGraph
+- h3k27me3_C_mod_fraction.bedGraph
+- h3k4me3_A_mod_fraction.bedGraph
+- h3k4me3_C_mod_fraction.bedGraph
+
+How coordinates are written
+The track builder uses:
+- chrom
+- ref_position
+
+from the modkit extract-calls tables.
+
+Each output row is written as a one-base interval:
+- start = ref_position
+- end = ref_position + 1
+
+This is appropriate for bedGraph-style genomic tracks, where each value is tied to a genomic interval.
+
+How to run it
+From anywhere:
+python3 /data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/build_modkit_fraction_tracks.py
+
+Using the project virtual environment explicitly:
+/data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/build_modkit_fraction_tracks.py
+
+What inputs it uses by default
+If run with no extra arguments, it reads:
+- /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/h3k27ac/extract_calls.tsv.gz
+- /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/h3k27me3/extract_calls.tsv.gz
+- /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/h3k4me3/extract_calls.tsv.gz
+
+What values are used in the tracks
+Only passing calls are used.
+That means the browser tracks inherit the same thresholds already used during modkit extraction:
+- A threshold = 0.9
+- C threshold = 0.8
+
+So each track represents a high-confidence modification fraction, not an unfiltered raw fraction.
+
+How to inspect the outputs
+Once the script has run, check:
+- ls -lh /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/fraction_tracks
+
+Then inspect the first lines of a track:
+- head -n 5 /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/fraction_tracks/h3k27ac_A_mod_fraction.bedGraph
+- head -n 5 /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/fraction_tracks/h3k27ac_C_mod_fraction.bedGraph
+
+How to use them in IGV
+You can load the generated bedGraph files directly into IGV.
+This is often much lighter and easier to browse than loading a full BAM.
+
+If needed, these bedGraph files can later be converted to bigWig for even faster browsing. bigWig is often preferable for large genomic tracks, but bedGraph is usually a good starting point.
+
+Standard positional summarization with modkit pileup
+
+Why this is more standard than the custom fraction-track script
+The script build_modkit_fraction_tracks.py is useful, but it is still a project-specific downstream summarization step.
+If you want the positional summarization itself to also be handled in a standard way, the better tool is:
+- modkit pileup
+
+modkit pileup creates a bedMethyl file directly from the modBAM. This is the standard genomic-position-level summary format produced by modkit.
+
+How to separate A and C outputs with modkit
+The standard way to separate A-associated and C-associated modification output is to run modkit pileup separately for each primary base / modification code of interest using:
+- --modified-bases A:Y
+- --modified-bases C:Z
+
+In this dataset, modkit check-tags showed:
+- A+Y
+- C+Z
+
+so the relevant channel-specific pileup runs are:
+- A:Y for adenine-associated calls
+- C:Z for cytosine-associated calls
+
+Important note about the reference
+The modkit documentation recommends using:
+- --modified-bases
+n together with:
+- --reference <reference.fasta>
+
+This is the clearest and most standard invocation, and it improves performance and interpretation. If you do not provide a reference, pileup can still run, but the output is less constrained and less standard.
+
+Exact modkit pileup commands for the three marks
+Replace:
+- <reference.fasta>
+
+with your actual GRCh38/hg38 reference FASTA path.
+
+Create an output directory first:
+mkdir -p /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks
+
+h3k27ac A track: --> running
+modkit pileup \
+  /scratch/leuven/383/vsc38330/data/raw_bam/GSM6337767_gm12878_h3k27ac.mod_mappings.sorted.bam \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27ac_A_Y.bed \
+  --modified-bases A:Y \
+  --reference <reference.fasta> \
+  --filter-threshold A:0.9 \
+  --log-filepath /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27ac_A_Y.log
+
+h3k27ac C track:
+modkit pileup \
+  /scratch/leuven/383/vsc38330/data/raw_bam/GSM6337767_gm12878_h3k27ac.mod_mappings.sorted.bam \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27ac_C_Z.bed \
+  --modified-bases C:Z \
+  --reference <reference.fasta> \
+  --filter-threshold C:0.8 \
+  --log-filepath /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27ac_C_Z.log
+
+h3k27me3 A track:
+modkit pileup \
+  /scratch/leuven/383/vsc38330/data/raw_bam/GSM6337768_gm12878_h3k27me3.mod_mappings.sorted.bam \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27me3_A_Y.bed \
+  --modified-bases A:Y \
+  --reference <reference.fasta> \
+  --filter-threshold A:0.9 \
+  --log-filepath /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27me3_A_Y.log
+
+h3k27me3 C track:
+modkit pileup \
+  /scratch/leuven/383/vsc38330/data/raw_bam/GSM6337768_gm12878_h3k27me3.mod_mappings.sorted.bam \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27me3_C_Z.bed \
+  --modified-bases C:Z \
+  --reference <reference.fasta> \
+  --filter-threshold C:0.8 \
+  --log-filepath /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27me3_C_Z.log
+
+h3k4me3 A track:
+modkit pileup \
+  /scratch/leuven/383/vsc38330/data/raw_bam/GSM6337769_gm12878_h3k4me3.mod_mappings.sorted.bam \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k4me3_A_Y.bed \
+  --modified-bases A:Y \
+  --reference <reference.fasta> \
+  --filter-threshold A:0.9 \
+  --log-filepath /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k4me3_A_Y.log
+
+h3k4me3 C track:
+modkit pileup \
+  /scratch/leuven/383/vsc38330/data/raw_bam/GSM6337769_gm12878_h3k4me3.mod_mappings.sorted.bam \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k4me3_C_Z.bed \
+  --modified-bases C:Z \
+  --reference <reference.fasta> \
+  --filter-threshold C:0.8 \
+  --log-filepath /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k4me3_C_Z.log
+
+Does pileup give the fraction values needed for IGV?
+Yes, but one detail matters:
+- modkit pileup bedMethyl column 11 is percent modified, not a 0-to-1 fraction
+
+According to the modkit documentation:
+- column 10 = N_valid_cov
+- column 11 = percent modified = (N_mod / N_valid_cov) * 100
+- column 12 = N_mod
+- column 13 = N_canonical
+
+So the standard modkit pileup output already contains the positional modification summary needed for IGV.
+The only difference is that the default bedMethyl value is in:
+- percent scale: 0 to 100
+
+rather than:
+- fraction scale: 0 to 1
+
+For IGV, percent is perfectly acceptable. In fact, this is the standard modkit/browser-style value.
+If you strongly prefer 0 to 1, you can rescale later, but that rescaling is no longer necessary for simple visualization.
+
+Standard bigWig generation from bedMethyl
+The modkit documentation also provides a standard route to convert bedMethyl to bigWig:
+- modkit bedmethyl tobigwig
+
+This is preferable to custom conversion if your goal is to stay within modkit as much as possible.
+
+Example for h3k27ac A:
+modkit bedmethyl tobigwig \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27ac_A_Y.bed \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27ac_A_Y.bw \
+  --mod-codes Y \
+  --header /scratch/leuven/383/vsc38330/data/raw_bam/GSM6337767_gm12878_h3k27ac.mod_mappings.sorted.bam
+
+Example for h3k27ac C:
+modkit bedmethyl tobigwig \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27ac_C_Z.bed \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27ac_C_Z.bw \
+  --mod-codes Z \
+  --header /scratch/leuven/383/vsc38330/data/raw_bam/GSM6337767_gm12878_h3k27ac.mod_mappings.sorted.bam
+
+The same pattern applies to the other two marks:
+- use the appropriate .bed output file
+- use --mod-codes Y for the A bedMethyl
+- use --mod-codes Z for the C bedMethyl
+- point --header to the corresponding BAM
+
+Practical interpretation
+If you want the most standard browser-track workflow, the cleanest route is:
+1. modkit modbam check-tags
+2. modkit pileup with separate A:Y and C:Z runs
+3. modkit bedmethyl tobigwig for IGV-friendly .bw tracks
+
+That means both extraction and positional track generation are handled by modkit rather than by a custom downstream script.
+
+Reference path correction for the modkit pileup examples
+
+Use this reference FASTA path in all pileup commands:
+- /data/leuven/383/vsc38330/thesis_dimelo/src/data/hg38.fa
+
+So wherever the earlier examples say:
+- --reference <reference.fasta>
+
+replace that with:
+- --reference /data/leuven/383/vsc38330/thesis_dimelo/src/data/hg38.fa
+
+Corrected commands
+
+h3k27ac A track:
+modkit pileup \
+  /scratch/leuven/383/vsc38330/data/raw_bam/GSM6337767_gm12878_h3k27ac.mod_mappings.sorted.bam \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27ac_A_Y.bed \
+  --modified-bases A:Y \
+  --reference /data/leuven/383/vsc38330/thesis_dimelo/src/data/hg38.fa \
+  --filter-threshold A:0.9 \
+  --log-filepath /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27ac_A_Y.log
+
+h3k27ac C track:
+modkit pileup \
+  /scratch/leuven/383/vsc38330/data/raw_bam/GSM6337767_gm12878_h3k27ac.mod_mappings.sorted.bam \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27ac_C_Z.bed \
+  --modified-bases C:Z \
+  --reference /data/leuven/383/vsc38330/thesis_dimelo/src/data/hg38.fa \
+  --filter-threshold C:0.8 \
+  --log-filepath /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27ac_C_Z.log
+
+h3k27me3 A track:
+modkit pileup \
+  /scratch/leuven/383/vsc38330/data/raw_bam/GSM6337768_gm12878_h3k27me3.mod_mappings.sorted.bam \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27me3_A_Y.bed \
+  --modified-bases A:Y \
+  --reference /data/leuven/383/vsc38330/thesis_dimelo/src/data/hg38.fa \
+  --filter-threshold A:0.9 \
+  --log-filepath /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27me3_A_Y.log
+
+h3k27me3 C track:
+modkit pileup \
+  /scratch/leuven/383/vsc38330/data/raw_bam/GSM6337768_gm12878_h3k27me3.mod_mappings.sorted.bam \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27me3_C_Z.bed \
+  --modified-bases C:Z \
+  --reference /data/leuven/383/vsc38330/thesis_dimelo/src/data/hg38.fa \
+  --filter-threshold C:0.8 \
+  --log-filepath /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27me3_C_Z.log
+
+h3k4me3 A track:
+modkit pileup \
+  /scratch/leuven/383/vsc38330/data/raw_bam/GSM6337769_gm12878_h3k4me3.mod_mappings.sorted.bam \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k4me3_A_Y.bed \
+  --modified-bases A:Y \
+  --reference /data/leuven/383/vsc38330/thesis_dimelo/src/data/hg38.fa \
+  --filter-threshold A:0.9 \
+  --log-filepath /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k4me3_A_Y.log
+
+h3k4me3 C track:
+modkit pileup \
+  /scratch/leuven/383/vsc38330/data/raw_bam/GSM6337769_gm12878_h3k4me3.mod_mappings.sorted.bam \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k4me3_C_Z.bed \
+  --modified-bases C:Z \
+  --reference /data/leuven/383/vsc38330/thesis_dimelo/src/data/hg38.fa \
+  --filter-threshold C:0.8 \
+  --log-filepath /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k4me3_C_Z.log
+
+Corrected modkit bedmethyl tobigwig commands
+
+These commands convert the standard modkit pileup bedMethyl outputs into bigWig tracks for IGV.
+The --header argument points to the BAM used to generate the bedMethyl, so modkit can recover chromosome sizes from the BAM header.
+
+Create the output directory first if needed:
+mkdir -p /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks
+
+h3k27ac A bigWig:
+modkit bedmethyl tobigwig \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27ac_A_Y.bed \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27ac_A_Y.bw \
+  --mod-codes Y \
+  --header /scratch/leuven/383/vsc38330/data/raw_bam/GSM6337767_gm12878_h3k27ac.mod_mappings.sorted.bam
+
+h3k27ac C bigWig:
+modkit bedmethyl tobigwig \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27ac_C_Z.bed \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27ac_C_Z.bw \
+  --mod-codes Z \
+  --header /scratch/leuven/383/vsc38330/data/raw_bam/GSM6337767_gm12878_h3k27ac.mod_mappings.sorted.bam
+
+h3k27me3 A bigWig:
+modkit bedmethyl tobigwig \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27me3_A_Y.bed \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27me3_A_Y.bw \
+  --mod-codes Y \
+  --header /scratch/leuven/383/vsc38330/data/raw_bam/GSM6337768_gm12878_h3k27me3.mod_mappings.sorted.bam
+
+h3k27me3 C bigWig:
+modkit bedmethyl tobigwig \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27me3_C_Z.bed \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k27me3_C_Z.bw \
+  --mod-codes Z \
+  --header /scratch/leuven/383/vsc38330/data/raw_bam/GSM6337768_gm12878_h3k27me3.mod_mappings.sorted.bam
+
+h3k4me3 A bigWig:
+modkit bedmethyl tobigwig \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k4me3_A_Y.bed \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k4me3_A_Y.bw \
+  --mod-codes Y \
+  --header /scratch/leuven/383/vsc38330/data/raw_bam/GSM6337769_gm12878_h3k4me3.mod_mappings.sorted.bam
+
+h3k4me3 C bigWig:
+modkit bedmethyl tobigwig \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k4me3_C_Z.bed \
+  /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/pileup_tracks/h3k4me3_C_Z.bw \
+  --mod-codes Z \
+  --header /scratch/leuven/383/vsc38330/data/raw_bam/GSM6337769_gm12878_h3k4me3.mod_mappings.sorted.bam

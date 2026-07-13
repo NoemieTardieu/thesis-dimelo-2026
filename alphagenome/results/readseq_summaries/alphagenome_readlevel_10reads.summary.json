@@ -1,0 +1,10 @@
+{
+  "cache_dir": "cache_readseq_10reads",
+  "split": "test",
+  "positive_cutoff": 0.5,
+  "cached_reads": 1198,
+  "matched_observations": 6758829,
+  "matched_reads": 750,
+  "dropped_observations": 0,
+  "note": "AlphaGenome predicts A549 H3K4me3 from original read sequence; these read-level metrics compare that cross-assay prediction to DiMeLo 6mA probabilities at observed read positions."
+}

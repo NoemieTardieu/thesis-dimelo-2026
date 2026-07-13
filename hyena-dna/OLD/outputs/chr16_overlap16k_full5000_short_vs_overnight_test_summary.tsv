@@ -1,0 +1,5 @@
+model	task	reads	valid_positions	mae	pearson	spearman	auroc	auprc	mean_pred	mean_target
+overlap16k_full5000_short	5mC	1877	1094769	0.3070	0.4339	0.3383	0.6972	0.7421	0.6138	0.6012
+overlap16k_full5000_short	6mA	1877	10193258	0.1159	0.1878	0.1492	0.6697	0.1107	0.0830	0.0845
+overlap16k_full5000_overnight	5mC	1877	1094769	0.3069	0.4662	0.3905	0.7234	0.7671	0.5526	0.6012
+overlap16k_full5000_overnight	6mA	1877	10193258	0.1090	0.2231	0.1923	0.6940	0.1244	0.0724	0.0845

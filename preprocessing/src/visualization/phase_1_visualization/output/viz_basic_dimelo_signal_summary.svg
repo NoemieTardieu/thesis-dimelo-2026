@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="950" height="520">
+<rect width="100%" height="100%" fill="white"/>
+<text x="475.0" y="30" text-anchor="middle" font-size="20" font-family="Arial">Basic DiMeLo-seq Signal Summary by Mark</text>
+<line x1="85" y1="425" x2="920" y2="425" stroke="black" stroke-width="1"/>
+<line x1="85" y1="60" x2="85" y2="425" stroke="black" stroke-width="1"/>
+<line x1="85" y1="425.0" x2="920" y2="425.0" stroke="#efefef"/>
+<text x="77" y="429.0" text-anchor="end" font-size="12" font-family="Arial">0.0</text>
+<line x1="85" y1="352.0" x2="920" y2="352.0" stroke="#efefef"/>
+<text x="77" y="356.0" text-anchor="end" font-size="12" font-family="Arial">8.9</text>
+<line x1="85" y1="279.0" x2="920" y2="279.0" stroke="#efefef"/>
+<text x="77" y="283.0" text-anchor="end" font-size="12" font-family="Arial">17.7</text>
+<line x1="85" y1="206.0" x2="920" y2="206.0" stroke="#efefef"/>
+<text x="77" y="210.0" text-anchor="end" font-size="12" font-family="Arial">26.6</text>
+<line x1="85" y1="133.0" x2="920" y2="133.0" stroke="#efefef"/>
+<text x="77" y="137.0" text-anchor="end" font-size="12" font-family="Arial">35.5</text>
+<line x1="85" y1="60.0" x2="920" y2="60.0" stroke="#efefef"/>
+<text x="77" y="64.0" text-anchor="end" font-size="12" font-family="Arial">44.3</text>
+<rect x="131.4" y="401.2" width="74.2" height="23.8" fill="#2c7fb8"/>
+<rect x="224.2" y="107.6" width="74.2" height="317.4" fill="#d95f0e"/>
+<text x="224.2" y="445" text-anchor="middle" font-size="12" font-family="Arial">h3k27ac</text>
+<rect x="409.7" y="395.9" width="74.2" height="29.1" fill="#2c7fb8"/>
+<rect x="502.5" y="270.9" width="74.2" height="154.1" fill="#d95f0e"/>
+<text x="502.5" y="445" text-anchor="middle" font-size="12" font-family="Arial">h3k27me3</text>
+<rect x="688.1" y="395.3" width="74.2" height="29.7" fill="#2c7fb8"/>
+<rect x="780.8" y="239.9" width="74.2" height="185.1" fill="#d95f0e"/>
+<text x="780.8" y="445" text-anchor="middle" font-size="12" font-family="Arial">h3k4me3</text>
+<rect x="95" y="32" width="12" height="12" fill="#2c7fb8"/>
+<text x="113" y="42" font-size="12" font-family="Arial">A density mean (mods/kb)</text>
+<rect x="95" y="52" width="12" height="12" fill="#d95f0e"/>
+<text x="113" y="62" font-size="12" font-family="Arial">C density mean (mods/kb)</text>
+<text x="27" y="242.5" text-anchor="middle" transform="rotate(-90 27,242.5)" font-size="12" font-family="Arial">mods per kb</text>
+</svg>

@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+<head>
+<meta charset='utf-8'>
+<title>AlphaGenome vs HyenaDNA readable metrics</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 28px; color: #202124; }
+table { border-collapse: collapse; font-size: 13px; }
+th, td { border: 1px solid #d0d7de; padding: 6px 8px; text-align: right; }
+th { background: #f6f8fa; position: sticky; top: 0; }
+td.left, th.left { text-align: left; }
+.hyena-strong { background: #b7e4c7; }
+.hyena { background: #d8f3dc; }
+.alpha-strong { background: #f4b6b6; }
+.alpha { background: #ffd6d6; }
+.tie { background: #f1f3f4; }
+.note { max-width: 980px; line-height: 1.45; }
+</style>
+</head>
+<body>
+<h1>AlphaGenome vs HyenaDNA: averaged-signal metrics</h1>
+<p class='note'>Green cells mean HyenaDNA is higher; red cells mean AlphaGenome is higher. Darker color means the difference is at least 0.05. The most compact interpretation: HyenaDNA usually wins continuous correlation; AlphaGenome is often stronger for AUPRC/peak-like retrieval.</p>
+<table>
+<tr>
+<th class='left'>sample</th><th class='left'>scope</th><th>bins</th><th>pos frac</th>
+<th>Alpha pearson</th>
+<th>Hyena pearson</th>
+<th>Delta pearson</th>
+<th>Better pearson</th>
+<th>Alpha spearman</th>
+<th>Hyena spearman</th>
+<th>Delta spearman</th>
+<th>Better spearman</th>
+<th>Alpha auroc</th>
+<th>Hyena auroc</th>
+<th>Delta auroc</th>
+<th>Better auroc</th>
+<th>Alpha auprc</th>
+<th>Hyena auprc</th>
+<th>Delta auprc</th>
+<th>Better auprc</th>
+</tr>
+<tr>
+<td class='left'>merged_c1</td>
+<td class='left'>pooled</td>
+<td>14105</td>
+<td>0.120</td>
+<td>0.568</td>
+<td>0.673</td>
+<td class='hyena-strong'>0.106</td>
+<td class='hyena-strong'>HyenaDNA</td>
+<td>0.362</td>
+<td>0.520</td>
+<td class='hyena-strong'>0.158</td>
+<td class='hyena-strong'>HyenaDNA</td>
+<td>0.867</td>
+<td>0.856</td>
+<td class='alpha'>-0.011</td>
+<td class='alpha'>AlphaGenome</td>
+<td>0.622</td>
+<td>0.557</td>
+<td class='alpha-strong'>-0.066</td>
+<td class='alpha-strong'>AlphaGenome</td>
+</tr>
+<tr>
+<td class='left'>merged_e5b</td>
+<td class='left'>pooled</td>
+<td>11854</td>
+<td>0.131</td>
+<td>0.585</td>
+<td>0.685</td>
+<td class='hyena-strong'>0.101</td>
+<td class='hyena-strong'>HyenaDNA</td>
+<td>0.347</td>
+<td>0.570</td>
+<td class='hyena-strong'>0.223</td>
+<td class='hyena-strong'>HyenaDNA</td>
+<td>0.837</td>
+<td>0.853</td>
+<td class='hyena'>0.017</td>
+<td class='hyena'>HyenaDNA</td>
+<td>0.645</td>
+<td>0.571</td>
+<td class='alpha-strong'>-0.074</td>
+<td class='alpha-strong'>AlphaGenome</td>
+</tr>
+<tr>
+<td class='left'>pooled</td>
+<td class='left'>pooled</td>
+<td>16720</td>
+<td>0.117</td>
+<td>0.581</td>
+<td>0.693</td>
+<td class='hyena-strong'>0.112</td>
+<td class='hyena-strong'>HyenaDNA</td>
+<td>0.375</td>
+<td>0.573</td>
+<td class='hyena-strong'>0.198</td>
+<td class='hyena-strong'>HyenaDNA</td>
+<td>0.873</td>
+<td>0.865</td>
+<td class='tie'>-0.008</td>
+<td class='tie'>similar</td>
+<td>0.641</td>
+<td>0.565</td>
+<td class='alpha-strong'>-0.076</td>
+<td class='alpha-strong'>AlphaGenome</td>
+</tr>
+</table>
+</body>
+</html>

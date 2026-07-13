@@ -1,0 +1,41 @@
+{
+  "bam": "/staging/leuven/stg_00118/ONT_BAM_Noemie/bam_files/merged_e5b.sorted.bam",
+  "extract_full": "/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/by_chrom/extract_full_chr16.tsv.gz",
+  "chrom": "chr16",
+  "max_length": 32768,
+  "max_reads": 100,
+  "n_reads": 100,
+  "input_ids_shape": [
+    100,
+    32768
+  ],
+  "target_5mC_shape": [
+    100,
+    32768
+  ],
+  "target_6mA_shape": [
+    100,
+    32768
+  ],
+  "valid_5mC_targets": 19527,
+  "valid_6mA_targets": 214474,
+  "reads_with_5mC_targets": 100,
+  "reads_with_6mA_targets": 100,
+  "counters": {
+    "bam_records_seen": 825,
+    "reads_collected": 100,
+    "skip_secondary_supplementary": 675,
+    "skip_long_read": 19,
+    "skip_low_mapq": 31,
+    "extract_rows_seen": 2188894,
+    "target_6ma_set": 214474,
+    "skip_mod_code_C_h": 19527,
+    "target_5mc_cpg_set": 19527,
+    "early_stop_after_alignment_start": 156506
+  },
+  "outputs": {
+    "npz": "outputs/merged_e5b_chr16_first100.npz",
+    "metadata": "outputs/merged_e5b_chr16_first100.metadata.tsv",
+    "summary": "outputs/merged_e5b_chr16_first100.summary.json"
+  }
+}

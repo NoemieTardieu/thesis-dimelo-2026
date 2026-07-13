@@ -1,0 +1,2 @@
+chrom	region_id	region_name	start	end	peak_score_external_alpha	all_four_mean_signal	mean_all_four_disagreement	selection_score
+chr17	9	chr16_rank10_score3.441_reads552	81870000	81872000	0.8345859538844419	0.7993011279474751	0.13086031328694614	1.5030267685449707

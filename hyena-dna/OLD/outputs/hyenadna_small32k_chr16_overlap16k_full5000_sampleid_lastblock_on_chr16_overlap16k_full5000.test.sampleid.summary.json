@@ -1,0 +1,51 @@
+{
+  "npz": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.test.npz",
+  "metadata": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.test.metadata.tsv",
+  "split_name": "test",
+  "checkpoint": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_region_split_sampleid_lastblock_3epochs_200batches.pt",
+  "model_name": "hyenadna-small-32k-seqlen",
+  "device": "cuda",
+  "reads": 1877,
+  "reads_evaluated": 1877,
+  "batches_evaluated": 1877,
+  "max_batches": null,
+  "batch_size": 1,
+  "max_length_used": 32768,
+  "num_samples": 2,
+  "sample_embedding_dim": 16,
+  "thresholds": {
+    "5mC": 0.5,
+    "6mA": 0.5
+  },
+  "metrics": {
+    "5mC": {
+      "valid_positions": 1094769,
+      "bce": 0.6097217798233032,
+      "mse": 0.12833364307880402,
+      "mae": 0.30696213245391846,
+      "mean_pred": 0.6137587428092957,
+      "mean_target": 0.6011877059936523,
+      "pearson": 0.4338684380054474,
+      "spearman": 0.33830748121745596,
+      "auroc": 0.6972177753874379,
+      "auprc": 0.7420837951407858,
+      "positive_fraction": 0.6067617917569825
+    },
+    "6mA": {
+      "valid_positions": 10193258,
+      "bce": 0.28196775913238525,
+      "mse": 0.03662290796637535,
+      "mae": 0.11590055376291275,
+      "mean_pred": 0.08304256200790405,
+      "mean_target": 0.08454174548387527,
+      "pearson": 0.18782714009284973,
+      "spearman": 0.14918798990677587,
+      "auroc": 0.6696785511168208,
+      "auprc": 0.11068404810774603,
+      "positive_fraction": 0.052536195983659
+    }
+  },
+  "per_region_metrics": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_sampleid_lastblock_on_chr16_overlap16k_full5000.test.sampleid.per_region_metrics.tsv",
+  "per_sample_metrics": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_sampleid_lastblock_on_chr16_overlap16k_full5000.test.sampleid.per_sample_metrics.tsv",
+  "per_chrom_metrics": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_sampleid_lastblock_on_chr16_overlap16k_full5000.test.sampleid.per_chrom_metrics.tsv"
+}

@@ -1,0 +1,207 @@
+name	strand	Assay title	ontology_curie	biosample_name	biosample_type	biosample_life_stage	histone_mark	data_source	endedness	genetically_modified	nonzero_mean
+CL:0000047 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000047	neuronal stem cell	in_vitro_differentiated_cells	embryonic	H3K4me3	encode	single	False	0.7188356518745422
+CL:0000062 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000062	osteoblast	primary_cell	unknown	H3K4me3	encode	single	False	0.8181998133659363
+CL:0000084 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000084	T-cell	primary_cell	adult	H3K4me3	encode	single	False	1.0828938484191895
+CL:0000100 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000100	motor neuron	in_vitro_differentiated_cells	adult	H3K4me3	encode	paired	False	0.5290273427963257
+CL:0000127 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000127	astrocyte	primary_cell	unknown	H3K4me3	encode	single	False	1.1788583993911743
+CL:0000134 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000134	mesenchymal stem cell	primary_cell	adult	H3K4me3	encode	single	False	0.9800390601158142
+CL:0000136 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000136	adipocyte	in_vitro_differentiated_cells	adult	H3K4me3	encode	single	False	0.9553647637367249
+CL:0000182 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000182	hepatocyte	in_vitro_differentiated_cells	embryonic	H3K4me3	encode	single	False	0.8021527528762817
+CL:0000188 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000188	skeletal muscle cell	primary_cell	unknown	H3K4me3	encode	single	False	2.709303379058838
+CL:0000192 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000192	smooth muscle cell	in_vitro_differentiated_cells	embryonic	H3K4me3	encode	single	False	0.8416850566864014
+CL:0000221 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000221	ectodermal cell	in_vitro_differentiated_cells	embryonic	H3K4me3	encode	single	False	1.5633736848831177
+CL:0000222 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000222	mesodermal cell	in_vitro_differentiated_cells	embryonic	H3K4me3	encode	single	False	5.64929723739624
+CL:0000223 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000223	endodermal cell	in_vitro_differentiated_cells	embryonic	H3K4me3	encode	single	False	0.8614636063575745
+CL:0000236 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000236	B cell	primary_cell	adult	H3K4me3	encode	single	False	0.789939820766449
+CL:0000312 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000312	keratinocyte	primary_cell	unknown	H3K4me3	encode	single	False	0.7693329453468323
+CL:0000351 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000351	trophoblast cell	in_vitro_differentiated_cells	embryonic	H3K4me3	encode	single	False	1.1339974403381348
+CL:0000515 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000515	skeletal muscle myoblast	primary_cell	adult	H3K4me3	encode	single	False	0.7095293402671814
+CL:0000540 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000540	neuron	in_vitro_differentiated_cells	embryonic	H3K4me3	encode	single	False	0.9025025963783264
+CL:0000594 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000594	skeletal muscle satellite cell	primary_cell	adult	H3K4me3	encode	single	False	0.8680325746536255
+CL:0000623 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000623	natural killer cell	primary_cell	adult	H3K4me3	encode	single	False	1.0924755334854126
+CL:0000624 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000624	CD4-positive, alpha-beta T cell	primary_cell	adult	H3K4me3	encode	single	False	1.1963306665420532
+CL:0000625 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000625	CD8-positive, alpha-beta T cell	primary_cell	adult	H3K4me3	encode	single	False	1.409015417098999
+CL:0000706 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000706	choroid plexus epithelial cell	primary_cell	unknown	H3K4me3	encode	single	False	2.0453009605407715
+CL:0000746 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000746	cardiac muscle cell	primary_cell	unknown	H3K4me3	encode	single	False	3.5106585025787354
+CL:0000775 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000775	neutrophil	primary_cell	unknown	H3K4me3	encode	single	False	0.8037970662117004
+CL:0000792 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000792	CD4-positive, CD25-positive, alpha-beta regulatory T cell	primary_cell	unknown	H3K4me3	encode	single	False	2.1308674812316895
+CL:0000842 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000842	mononuclear cell	primary_cell	unknown	H3K4me3	encode	single	False	0.8454005718231201
+CL:0000895 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000895	naive thymus-derived CD4-positive, alpha-beta T cell	primary_cell	unknown	H3K4me3	encode	single	False	0.7959851026535034
+CL:0000897 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000897	CD4-positive, alpha-beta memory T cell	primary_cell	unknown	H3K4me3	encode	single	False	0.7992186546325684
+CL:0000905 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000905	effector memory CD4-positive, alpha-beta T cell	primary_cell	unknown	H3K4me3	encode	single	False	1.0698696374893188
+CL:0000909 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0000909	CD8-positive, alpha-beta memory T cell	primary_cell	unknown	H3K4me3	encode	single	False	0.7764924168586731
+CL:0001054 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0001054	CD14-positive monocyte	primary_cell	adult	H3K4me3	encode	single	False	1.1920089721679688
+CL:0001059 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0001059	common myeloid progenitor, CD34-positive	primary_cell	adult	H3K4me3	encode	single	False	1.0541969537734985
+CL:0002252 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0002252	epithelial cell of esophagus	primary_cell	unknown	H3K4me3	encode	single	False	1.167810320854187
+CL:0002306 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0002306	epithelial cell of proximal tubule	primary_cell	unknown	H3K4me3	encode	single	False	1.7776589393615723
+CL:0002319 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0002319	neural cell	in_vitro_differentiated_cells	embryonic	H3K4me3	encode	single	False	0.8454180955886841
+CL:0002324 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0002324	myoepithelial cell of mammary gland	primary_cell	adult	H3K4me3	encode	single	False	1.9428181648254395
+CL:0002327 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0002327	mammary epithelial cell	primary_cell	adult	H3K4me3	encode	single	False	0.7996102571487427
+CL:0002328 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0002328	bronchial epithelial cell	primary_cell	unknown	H3K4me3	encode	single	False	2.163724184036255
+CL:0002372 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0002372	myotube	in_vitro_differentiated_cells	adult	H3K4me3	encode	single	False	1.263627290725708
+CL:0002518 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0002518	kidney epithelial cell	primary_cell	unknown	H3K4me3	encode	single	False	2.2789642810821533
+CL:0002547 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0002547	fibroblast of the aortic adventitia	primary_cell	unknown	H3K4me3	encode	single	False	2.15855073928833
+CL:0002548 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0002548	cardiac fibroblast	primary_cell	adult	H3K4me3	encode	single	False	4.85253381729126
+CL:0002551 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0002551	fibroblast of dermis	primary_cell	adult,unknown	H3K4me3	encode	single	False	0.9473881721496582
+CL:0002553 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0002553	fibroblast of lung	primary_cell	adult	H3K4me3	encode	single	False	1.4736813306808472
+CL:0002555 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0002555	fibroblast of mammary gland	primary_cell	unknown	H3K4me3	encode	single	False	1.3848494291305542
+CL:0002557 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0002557	fibroblast of pulmonary artery	primary_cell	unknown	H3K4me3	encode	single	False	1.9677774906158447
+CL:0002558 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0002558	fibroblast of villous mesenchyme	primary_cell	unknown	H3K4me3	encode	single	False	1.4901968240737915
+CL:0002586 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0002586	retinal pigment epithelial cell	primary_cell	unknown	H3K4me3	encode	single	False	1.5056036710739136
+CL:0002603 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0002603	astrocyte of the cerebellum	primary_cell	unknown	H3K4me3	encode	single	False	2.751863956451416
+CL:0002606 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0002606	astrocyte of the spinal cord	primary_cell	unknown	H3K4me3	encode	single	False	1.5362993478775024
+CL:0002618 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0002618	endothelial cell of umbilical vein	primary_cell	newborn	H3K4me3	encode	single	False	0.6240338087081909
+CL:0011020 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:0011020	neural progenitor cell	in_vitro_differentiated_cells	embryonic	H3K4me3	encode	single	False	0.7950120568275452
+CL:1001606 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:1001606	foreskin keratinocyte	primary_cell	newborn	H3K4me3	encode	paired	False	1.7137986421585083
+CL:1001608 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:1001608	foreskin fibroblast	primary_cell	newborn	H3K4me3	encode	paired	False	1.0306044816970825
+CL:2000001 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:2000001	peripheral blood mononuclear cell	primary_cell	adult	H3K4me3	encode	single	False	0.8846347332000732
+CL:2000044 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:2000044	brain microvascular endothelial cell	primary_cell	unknown	H3K4me3	encode	single	False	2.3882954120635986
+CL:2000045 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CL:2000045	foreskin melanocyte	primary_cell	newborn	H3K4me3	encode	paired	False	1.4662927389144897
+CLO:0007045 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CLO:0007045	Jurkat, Clone E6-1	cell_line	child	H3K4me3	encode	single	False	1.377289891242981
+CLO:0021511 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CLO:0021511	AG10803	cell_line	adult	H3K4me3	encode	single	False	1.5706654787063599
+CLO:0021752 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CLO:0021752	AG09309	cell_line	adult	H3K4me3	encode	single	False	1.7879945039749146
+CLO:0021754 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CLO:0021754	AG09319	cell_line	adult	H3K4me3	encode	single	False	2.75639009475708
+CLO:0034837 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	CLO:0034837	AG04449	cell_line	embryonic	H3K4me3	encode	single	False	1.7758548259735107
+EFO:0001086 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0001086	A549	cell_line	adult	H3K4me3	encode	single	False	0.6755056977272034
+EFO:0001099 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0001099	Caco-2	cell_line	adult	H3K4me3	encode	single	False	1.95445716381073
+EFO:0001162 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0001162	GM12875	cell_line	unknown	H3K4me3	encode	single	False	1.8323731422424316
+EFO:0001182 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0001182	HEK293	cell_line	embryonic	H3K4me3	encode	single	False	1.4261152744293213
+EFO:0001187 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0001187	HepG2	cell_line	child	H3K4me3	encode	single	False	0.7466471791267395
+EFO:0001196 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0001196	IMR-90	cell_line	embryonic	H3K4me3	encode	single	False	1.479701280593872
+EFO:0001203 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0001203	MCF-7	cell_line	adult	H3K4me3	encode	single	False	0.7882369756698608
+EFO:0001221 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0001221	NCI-H929	cell_line	adult	H3K4me3	encode	single	False	0.8140625357627869
+EFO:0001260 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0001260	WI38	cell_line	unknown	H3K4me3	encode	single	False	2.0542047023773193
+EFO:0002067 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0002067	K562	cell_line	adult	H3K4me3	encode	single	False	0.6676239967346191
+EFO:0002074 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0002074	PC-3	cell_line	adult	H3K4me3	encode	single	False	0.7329297661781311
+EFO:0002106 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0002106	A673	cell_line	child	H3K4me3	encode	single	False	1.032426357269287
+EFO:0002167 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0002167	DOHH2	cell_line	adult	H3K4me3	encode	single	False	0.7785306572914124
+EFO:0002234 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0002234	MG63	cell_line	child	H3K4me3	encode	paired	False	0.7054553627967834
+EFO:0002330 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0002330	SJSA1	cell_line	adult	H3K4me3	encode	paired	False	0.636623203754425
+EFO:0002713 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0002713	Panc1	cell_line	adult	H3K4me3	encode	single	False	1.0108050107955933
+EFO:0002779 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0002779	BJ	cell_line	newborn	H3K4me3	encode	single	False	2.0215272903442383
+EFO:0002783 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0002783	GM06990	cell_line	unknown	H3K4me3	encode	single	False	2.12255859375
+EFO:0002784 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0002784	GM12878	cell_line	adult	H3K4me3	encode	single	False	0.7356247305870056
+EFO:0002791 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0002791	HeLa-S3	cell_line	adult	H3K4me3	encode	single	False	0.7833877205848694
+EFO:0002793 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0002793	HL-60	cell_line	adult	H3K4me3	encode	single	False	3.4567317962646484
+EFO:0002798 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0002798	NB4	cell_line	adult	H3K4me3	encode	single	False	2.6263296604156494
+EFO:0002824 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0002824	HCT116	cell_line	adult	H3K4me3	encode	single	False	0.7914097905158997
+EFO:0002847 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0002847	PC-9	cell_line	unknown	H3K4me3	encode	single	False	0.7847661972045898
+EFO:0002860 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0002860	SK-N-MC	cell_line	child	H3K4me3	encode	single	False	0.766095757484436
+EFO:0003042 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0003042	H1	cell_line	embryonic	H3K4me3	encode	single	False	0.8046759366989136
+EFO:0003045 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0003045	H9	cell_line	embryonic	H3K4me3	encode	single	False	2.0365102291107178
+EFO:0003072 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0003072	SK-N-SH	cell_line	child	H3K4me3	encode	paired	False	0.876600980758667
+EFO:0005236 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0005236	NT2/D1	cell_line	unknown	H3K4me3	encode	single	False	1.227253794670105
+EFO:0005333 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0005333	GM08714	cell_line	unknown	H3K4me3	encode	single	False	0.6614753007888794
+EFO:0005337 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0005337	GM12864	cell_line	unknown	H3K4me3	encode	single	False	1.0027735233306885
+EFO:0005338 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0005338	GM12865	cell_line	unknown	H3K4me3	encode	single	False	0.9344316124916077
+EFO:0005710 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0005710	HFF-Myc	cell_line	newborn	H3K4me3	encode	single	False	2.5824942588806152
+EFO:0005715 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0005715	WERI-Rb-1	cell_line	child	H3K4me3	encode	single	False	1.21775484085083
+EFO:0005719 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0005719	Karpas-422	cell_line	adult	H3K4me3	encode	single	False	0.7700881958007812
+EFO:0005722 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0005722	SJCRH30	cell_line	child	H3K4me3	encode	paired	False	0.6206855177879333
+EFO:0005723 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0005723	GM23248	cell_line	adult	H3K4me3	encode	single	False	0.7785521745681763
+EFO:0005724 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0005724	MM.1S	cell_line	adult	H3K4me3	encode	single	False	0.7837072014808655
+EFO:0005725 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0005725	BE2C	cell_line	child	H3K4me3	encode	single	False	1.0527292490005493
+EFO:0005726 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0005726	LNCaP clone FGC	cell_line	adult	H3K4me3	encode	single	False	1.5429073572158813
+EFO:0005904 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0005904	H7	cell_line	embryonic	H3K4me3	encode	single	False	2.94527268409729
+EFO:0005907 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0005907	OCI-LY1	cell_line	adult	H3K4me3	encode	single	False	0.9543201923370361
+EFO:0006270 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0006270	AG04450	cell_line	embryonic	H3K4me3	encode	single	False	1.9831632375717163
+EFO:0006710 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0006710	OCI-LY3	cell_line	adult	H3K4me3	encode	single	False	0.7242121696472168
+EFO:0006711 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0006711	OCI-LY7	cell_line	adult	H3K4me3	encode	single	False	1.0456187725067139
+EFO:0007070 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0007070	ACC112	cell_line	adult	H3K4me3	encode	single	False	0.7788870334625244
+EFO:0007074 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0007074	DND-41	cell_line	child	H3K4me3	encode	single	False	0.7011074423789978
+EFO:0007083 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0007083	HUES48	cell_line	embryonic	H3K4me3	encode	single	False	1.015495777130127
+EFO:0007086 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0007086	HUES6	cell_line	embryonic	H3K4me3	encode	single	False	1.0370745658874512
+EFO:0007089 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0007089	HUES64	cell_line	embryonic	H3K4me3	encode	single	False	1.1050348281860352
+EFO:0007096 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0007096	iPS DF 19.11	cell_line	newborn	H3K4me3	encode	single	False	1.4535536766052246
+EFO:0007098 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0007098	iPS DF 6.9	cell_line	newborn	H3K4me3	encode	single	False	0.8723101019859314
+EFO:0007099 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0007099	iPS-11a	cell_line	adult	H3K4me3	encode	single	False	1.8062061071395874
+EFO:0007102 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0007102	iPS-15b	cell_line	adult	H3K4me3	encode	single	False	1.4930837154388428
+EFO:0007105 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0007105	iPS-18a	cell_line	adult	H3K4me3	encode	single	False	1.1476532220840454
+EFO:0007107 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0007107	iPS-18c	cell_line	adult	H3K4me3	encode	single	False	1.324804663658142
+EFO:0007108 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0007108	iPS-20b	cell_line	adult	H3K4me3	encode	single	False	0.8902922868728638
+EFO:0007112 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0007112	Loucy	cell_line	adult	H3K4me3	encode	single	False	0.8072449564933777
+EFO:0007116 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0007116	UCSF-4	cell_line	embryonic	H3K4me3	encode	single	False	0.9728504419326782
+EFO:0007598 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0007598	HAP-1	cell_line	adult	H3K4me3	encode	paired	False	0.7728875279426575
+EFO:0007610 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0007610	RWPE2	cell_line	unknown	H3K4me3	encode	paired	False	0.6467007398605347
+EFO:0007950 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0007950	GM23338	cell_line	adult	H3K4me3	encode	single	False	0.8339612483978271
+EFO:0030018 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	EFO:0030018	BLaER1	cell_line	unknown	H3K4me3	encode	single	False	0.866553783416748
+NTR:0000427 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	NTR:0000427	neurosphere	primary_cell	embryonic	H3K4me3	encode	paired	False	1.0345739126205444
+NTR:0000493 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	NTR:0000493	left ventricle myocardium inferior	tissue	adult	H3K4me3	encode	single	False	1.0564485788345337
+NTR:0000856 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	NTR:0000856	mesendoderm	in_vitro_differentiated_cells	embryonic	H3K4me3	encode	single	False	0.7826849222183228
+NTR:0001226 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	NTR:0001226	parathyroid adenoma	tissue	adult	H3K4me3	encode	single	False	1.165473461151123
+NTR:0001407 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	NTR:0001407	germinal matrix	tissue	embryonic	H3K4me3	encode	single	False	1.1096848249435425
+NTR:0003079 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	NTR:0003079	fibroblast of breast	primary_cell	adult	H3K4me3	encode	single	False	0.8202831149101257
+UBERON:0000016 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0000016	endocrine pancreas	tissue	adult	H3K4me3	encode	single	False	1.4818469285964966
+UBERON:0000059 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0000059	large intestine	tissue	embryonic	H3K4me3	encode	single	False	1.3408679962158203
+UBERON:0000305 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0000305	amnion	tissue	embryonic	H3K4me3	encode	single	False	0.9844587445259094
+UBERON:0000317 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0000317	colonic mucosa	tissue	adult	H3K4me3	encode	single	False	0.739352285861969
+UBERON:0000320 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0000320	duodenal mucosa	tissue	adult	H3K4me3	encode	single	False	0.9015464782714844
+UBERON:0000473 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0000473	testis	tissue	adult	H3K4me3	encode	single	False	0.8049049973487854
+UBERON:0000945 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0000945	stomach	tissue	adult	H3K4me3	encode	single	False	0.7691627740859985
+UBERON:0000947 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0000947	aorta	tissue	adult	H3K4me3	encode	single	False	0.8130810856819153
+UBERON:0000948 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0000948	heart	tissue	embryonic	H3K4me3	encode	single	False	1.5036487579345703
+UBERON:0000955 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0000955	brain	tissue	embryonic	H3K4me3	encode	single	False	1.043258786201477
+UBERON:0000992 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0000992	ovary	tissue	adult	H3K4me3	encode	single	False	0.7095605134963989
+UBERON:0000995 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0000995	uterus	tissue	adult	H3K4me3	encode	single	False	0.8103049397468567
+UBERON:0000996 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0000996	vagina	tissue	adult	H3K4me3	encode	single	False	0.8425154089927673
+UBERON:0001003 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0001003	skin epidermis	tissue	adult	H3K4me3	encode	single	False	0.7833503484725952
+UBERON:0001043 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0001043	esophagus	tissue	adult	H3K4me3	encode	single	False	0.9049034118652344
+UBERON:0001114 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0001114	right lobe of liver	tissue	adult	H3K4me3	encode	single	False	0.7803559899330139
+UBERON:0001134 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0001134	skeletal muscle tissue	tissue	adult	H3K4me3	encode	single	False	0.8837461471557617
+UBERON:0001150 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0001150	body of pancreas	tissue	adult	H3K4me3	encode	single	False	0.8380602598190308
+UBERON:0001157 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0001157	transverse colon	tissue	adult	H3K4me3	encode	single	False	0.8056944012641907
+UBERON:0001159 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0001159	sigmoid colon	tissue	adult	H3K4me3	encode	single	False	0.9082852602005005
+UBERON:0001199 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0001199	mucosa of stomach	tissue	adult	H3K4me3	encode	single	False	0.9022591710090637
+UBERON:0001211 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0001211	Peyer's patch	tissue	adult	H3K4me3	encode	single	False	0.8059539198875427
+UBERON:0001255 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0001255	urinary bladder	tissue	adult	H3K4me3	encode	single	False	1.249588966369629
+UBERON:0001264 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0001264	pancreas	tissue	adult	H3K4me3	encode	single	False	0.7248829007148743
+UBERON:0001323 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0001323	tibial nerve	tissue	adult	H3K4me3	encode	single	False	0.9945918917655945
+UBERON:0001383 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0001383	muscle of leg	tissue	embryonic	H3K4me3	encode	single	False	1.1692146062850952
+UBERON:0001496 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0001496	ascending aorta	tissue	adult	H3K4me3	encode	single	False	1.0133315324783325
+UBERON:0001515 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0001515	thoracic aorta	tissue	adult	H3K4me3	encode	single	False	0.7468891739845276
+UBERON:0001621 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0001621	coronary artery	tissue	adult	H3K4me3	encode	single	False	0.8368509411811829
+UBERON:0001774 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0001774	muscle of trunk	tissue	embryonic	H3K4me3	encode	single	False	1.0175188779830933
+UBERON:0001871 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0001871	temporal lobe	tissue	adult	H3K4me3	encode	single	False	0.8694230914115906
+UBERON:0001873 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0001873	caudate nucleus	tissue	adult	H3K4me3	encode	single	False	0.8766636848449707
+UBERON:0001987 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0001987	placenta	tissue	embryonic	H3K4me3	encode	single	False	0.7686141729354858
+UBERON:0002037 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0002037	cerebellum	tissue	adult	H3K4me3	encode	single	False	1.2195651531219482
+UBERON:0002038 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0002038	substantia nigra	tissue	adult	H3K4me3	encode	single	False	0.8325366973876953
+UBERON:0002046 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0002046	thyroid gland	tissue	adult	H3K4me3	encode	single	False	1.038463830947876
+UBERON:0002048 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0002048	lung	tissue	adult	H3K4me3	encode	single	False	1.4228606224060059
+UBERON:0002078 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0002078	right cardiac atrium	tissue	adult	H3K4me3	encode	single	False	0.9993526339530945
+UBERON:0002080 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0002080	heart right ventricle	tissue	adult	H3K4me3	encode	single	False	0.7453254461288452
+UBERON:0002084 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0002084	heart left ventricle	tissue	adult	H3K4me3	encode	single	False	0.7315558195114136
+UBERON:0002106 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0002106	spleen	tissue	adult	H3K4me3	encode	single	False	0.7977772951126099
+UBERON:0002107 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0002107	liver	tissue	adult	H3K4me3	encode	single	False	0.7054669857025146
+UBERON:0002108 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0002108	small intestine	tissue	adult	H3K4me3	encode	single	False	0.9390207529067993
+UBERON:0002113 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0002113	kidney	tissue	adult	H3K4me3	encode	single	False	0.7985708117485046
+UBERON:0002168 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0002168	left lung	tissue	adult	H3K4me3	encode	single	False	0.9501997828483582
+UBERON:0002170 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0002170	upper lobe of right lung	tissue	adult	H3K4me3	encode	single	False	0.9516236186027527
+UBERON:0002171 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0002171	lower lobe of right lung	tissue	adult	H3K4me3	encode	single	False	0.9574486017227173
+UBERON:0002240 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0002240	spinal cord	tissue	embryonic	H3K4me3	encode	single	False	1.6200331449508667
+UBERON:0002305 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0002305	layer of hippocampus	tissue	adult	H3K4me3	encode	single	False	0.7843244075775146
+UBERON:0002367 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0002367	prostate gland	tissue	adult	H3K4me3	encode	single	False	0.827519953250885
+UBERON:0002369 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0002369	adrenal gland	tissue	adult	H3K4me3	encode	single	False	0.9138931035995483
+UBERON:0002370 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0002370	thymus	tissue	embryonic	H3K4me3	encode	single	False	1.1562947034835815
+UBERON:0002686 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0002686	angular gyrus	tissue	adult	H3K4me3	encode	single	False	0.8224157094955444
+UBERON:0002967 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0002967	cingulate gyrus	tissue	adult	H3K4me3	encode	single	False	0.8354508876800537
+UBERON:0003124 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0003124	chorion	tissue	embryonic	H3K4me3	encode	single	False	1.0205134153366089
+UBERON:0003346 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0003346	mucosa of rectum	tissue	adult	H3K4me3	encode	single	False	0.9614381790161133
+UBERON:0004222 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0004222	stomach smooth muscle	tissue	adult	H3K4me3	encode	single	False	0.9053452610969543
+UBERON:0004550 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0004550	gastroesophageal sphincter	tissue	adult	H3K4me3	encode	single	False	0.7414591312408447
+UBERON:0004648 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0004648	esophagus muscularis mucosa	tissue	adult	H3K4me3	encode	single	False	0.7969858050346375
+UBERON:0004992 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0004992	mucosa of descending colon	tissue	adult	H3K4me3	encode	single	False	0.9843800067901611
+UBERON:0006631 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0006631	right atrium auricular region	tissue	adult	H3K4me3	encode	single	False	1.0309559106826782
+UBERON:0006920 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0006920	esophagus squamous epithelium	tissue	adult	H3K4me3	encode	single	False	0.8070417642593384
+UBERON:0007610 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0007610	tibial artery	tissue	adult	H3K4me3	encode	single	False	0.7735725045204163
+UBERON:0008367 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0008367	breast epithelium	tissue	adult	H3K4me3	encode	single	False	0.8072652816772461
+UBERON:0008450 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0008450	psoas muscle	tissue	adult	H3K4me3	encode	single	False	0.7766005396842957
+UBERON:0008952 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0008952	upper lobe of left lung	tissue	adult	H3K4me3	encode	single	False	0.8021848201751709
+UBERON:0008953 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0008953	lower lobe of left lung	tissue	adult	H3K4me3	encode	single	False	0.8252076506614685
+UBERON:0009834 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0009834	dorsolateral prefrontal cortex	tissue	adult	H3K4me3	encode	single	False	0.795435905456543
+UBERON:0011907 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0011907	gastrocnemius medialis	tissue	adult	H3K4me3	encode	single	False	0.7359679341316223
+UBERON:0012488 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0012488	muscle layer of duodenum	tissue	adult	H3K4me3	encode	single	False	0.8497915267944336
+UBERON:0012489 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0012489	muscle layer of colon	tissue	adult	H3K4me3	encode	single	False	0.8421162962913513
+UBERON:0014455 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0014455	subcutaneous abdominal adipose tissue	tissue	adult	H3K4me3	encode	single	False	0.7925373911857605
+UBERON:0018112 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0018112	rectal smooth muscle tissue	tissue	adult	H3K4me3	encode	single	False	1.2279937267303467
+UBERON:0036149 Histone ChIP-seq H3K4me3	.	Histone ChIP-seq	UBERON:0036149	suprapubic skin	tissue	adult	H3K4me3	encode	single	False	0.9653574824333191

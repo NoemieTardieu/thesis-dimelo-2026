@@ -1,0 +1,14 @@
+{
+  "alpha": "outputs/benchmark_200bp/alphagenome_test_200bp.tsv",
+  "dimelo": "outputs/benchmark_200bp/dimelo_test_200bp.tsv",
+  "hyena": "outputs/benchmark_200bp/hyenadna_test_200bp.tsv",
+  "bigwigs": {
+    "GSM2421502_ENCFF987FCK": "external_tracks/GSE91218/GSM2421502_ENCFF987FCK_signal_of_unique_reads_GRCh38.bigWig",
+    "GSM2421503_ENCFF374BHV": "external_tracks/GSE91218/GSM2421503_ENCFF374BHV_signal_of_unique_reads_GRCh38.bigWig",
+    "GSM2421504_ENCFF997ANB": "external_tracks/GSE91218/GSM2421504_ENCFF997ANB_signal_of_unique_reads_GRCh38.bigWig"
+  },
+  "bin_size": 200,
+  "minimum_unique_reads": 2,
+  "minimum_observed_positions": 3,
+  "note": "External bigWig signal was used only for population-level evaluation/visualization, not for HyenaDNA training."
+}

@@ -1,0 +1,55 @@
+{
+  "npz": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.test.npz",
+  "metadata": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.test.metadata.tsv",
+  "split_name": "test",
+  "checkpoint": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_region_split_sampleid_shared_conv128_k9_smoke_2epochs_100batches.pt",
+  "model_name": "hyenadna-small-32k-seqlen",
+  "device": "cuda",
+  "reads": 1877,
+  "reads_evaluated": 1877,
+  "batches_evaluated": 1877,
+  "max_batches": null,
+  "batch_size": 1,
+  "max_length_used": 32768,
+  "num_samples": 2,
+  "sample_embedding_dim": 16,
+  "decoder_type": "conv",
+  "decoder_hidden_dim": 128,
+  "decoder_dropout": 0.1,
+  "decoder_kernel_size": 9,
+  "thresholds": {
+    "5mC": 0.5,
+    "6mA": 0.5
+  },
+  "metrics": {
+    "5mC": {
+      "valid_positions": 1094769,
+      "bce": 0.6343753933906555,
+      "mse": 0.14002889394760132,
+      "mae": 0.3332829177379608,
+      "mean_pred": 0.5071961879730225,
+      "mean_target": 0.6011877059936523,
+      "pearson": 0.4107838273048401,
+      "spearman": 0.32156526793253754,
+      "auroc": 0.6908301927458904,
+      "auprc": 0.7348809481008268,
+      "positive_fraction": 0.6067617917569825
+    },
+    "6mA": {
+      "valid_positions": 10193258,
+      "bce": 0.2826773524284363,
+      "mse": 0.036710504442453384,
+      "mae": 0.11502379924058914,
+      "mean_pred": 0.08009380847215652,
+      "mean_target": 0.08454174548387527,
+      "pearson": 0.17887428402900696,
+      "spearman": 0.1372493117386804,
+      "auroc": 0.6696426591440221,
+      "auprc": 0.10821394841559034,
+      "positive_fraction": 0.052536195983659
+    }
+  },
+  "per_region_metrics": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_shared_conv128_k9_smoke.test.per_region_metrics.tsv",
+  "per_sample_metrics": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_shared_conv128_k9_smoke.test.per_sample_metrics.tsv",
+  "per_chrom_metrics": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_shared_conv128_k9_smoke.test.per_chrom_metrics.tsv"
+}

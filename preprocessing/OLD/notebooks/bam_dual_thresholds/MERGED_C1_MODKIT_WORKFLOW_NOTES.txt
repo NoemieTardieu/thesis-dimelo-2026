@@ -1,0 +1,730 @@
+Efficient modkit workflow for merged_c1.sorted.bam
+
+File
+- /staging/leuven/stg_00118/ONT_BAM_Noemie/bam_files/merged_c1.sorted.bam
+
+Environment-corrected working commands
+
+This section records the commands that actually worked in the current environment during debugging on 2026-04-15.
+
+What was confirmed
+- The BAM header matches canonical GRCh38 / hg38 chromosome lengths.
+- The accessible reference on this machine is:
+  - `/data/leuven/383/vsc38330/thesis_dimelo/src/data/hg38.fa`
+- The BAM index was not next to the BAM by default.
+- The existing BAM index was found at:
+  - `/scratch/leuven/383/vsc38330/merged_c1_bam/merged_c1.sorted.bam.bai`
+- `modkit extract calls` had already been run successfully with:
+  - `A:0.9`
+  - `C:0.8`
+
+Working shell setup
+```bash
+source /data/leuven/383/vsc38330/.venv/bin/activate
+
+export PATH="/data/leuven/383/vsc38330/bin/dist_modkit_v0.6.1_481e3c9:$PATH"
+
+bam="/staging/leuven/stg_00118/ONT_BAM_Noemie/bam_files/merged_c1.sorted.bam"
+ref="/data/leuven/383/vsc38330/thesis_dimelo/src/data/hg38.fa"
+scratch_preproc="/scratch/leuven/383/vsc38330/modkit_preproc/merged_c1"
+scratch_pileup="/scratch/leuven/383/vsc38330/pileup_tracks/merged_c1"
+final_dir="/data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/merged_c1"
+
+mkdir -p "$scratch_preproc"
+mkdir -p "$scratch_pileup"
+mkdir -p "$final_dir"
+```
+
+Working BAM index fix
+```bash
+ln -s /scratch/leuven/383/vsc38330/merged_c1_bam/merged_c1.sorted.bam.bai \
+  /staging/leuven/stg_00118/ONT_BAM_Noemie/bam_files/merged_c1.sorted.bam.bai
+```
+
+Check:
+```bash
+ls -lh /staging/leuven/stg_00118/ONT_BAM_Noemie/bam_files/merged_c1.sorted.bam*
+```
+
+What was already done before pileup
+- `modkit modbam check-tags`
+- `modkit summary`
+- `modkit sample-probs`
+- `modkit extract calls`
+
+Existing outputs already present
+- `/data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/merged_c1/check_tags.stderr.txt`
+- `/data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/merged_c1/summary.tsv`
+- `/data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/merged_c1/sample_probs.tsv`
+- `/data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/merged_c1/extract_calls.tsv.gz`
+
+Working pileup command for all A:a
+```bash
+modkit pileup "$bam" "$scratch_pileup/merged_c1_A_a_all.bed.gz" \
+  --modified-bases A:a \
+  --reference "$ref" \
+  --bgzf \
+  --filter-threshold A:0.9 \
+  --filter-threshold C:0.8 \
+  --log-filepath "$scratch_pileup/merged_c1_A_a_all.log"
+```
+
+Working pileup command for combined CpG-only C
+```bash
+modkit pileup "$bam" "$scratch_pileup/merged_c1_C_combined_cpg.bed.gz" \
+  --modified-bases C \
+  --combine-mods \
+  --cpg \
+  --reference "$ref" \
+  --bgzf \
+  --filter-threshold A:0.9 \
+  --filter-threshold C:0.8 \
+  --log-filepath "$scratch_pileup/merged_c1_C_combined_cpg.log"
+```
+
+Important practical notes
+- In a new shell window, reset `bam`, `ref`, and `scratch_pileup` before running commands.
+- In this environment, `modkit pileup` required `--reference` even for the A-only command.
+- The older reference path under `/omics/groups/...` was not accessible here and should not be used in this environment.
+
+Overall goal
+For this BAM, the final desired outputs are:
+- read-level outputs from modkit extract calls
+- position-level outputs from modkit pileup
+
+but only for:
+- all A-associated modification calls at threshold 0.9
+- CpG-only C-associated modification calls at threshold 0.8
+
+This means we do not want:
+- genome-wide C outputs at all cytosines
+
+That is important because generating all C outputs first and then filtering to CpGs later is much more expensive in disk space and compute time.
+
+What we learned from inspecting the BAM
+
+1. modBAM tags
+From:
+- modkit modbam check-tags "$bam" --head 1000
+
+the observed tag structure is:
+- A+a.
+- C+h?
+- C+m?
+
+This means:
+- adenine modifications are encoded as A:a
+- cytosine modifications are represented by two mod codes:
+  - C:m
+  - C:h
+
+This BAM therefore does not use the same codes as the earlier histone-mark BAMs that used A:Y and C:Z.
+
+2. Reference genome
+From the BAM header:
+- /omics/groups/OE0219/internal/Etienne/data/reference/GRCh38/GRCh38.d1.vd1.fa
+
+So this BAM was basecalled/aligned against:
+- GRCh38.d1.vd1
+
+This is the correct reference family to use for CpG filtering and later browser-track work.
+
+3. Sample metadata
+From the read-group and program records:
+- sample / library label: A549_ROY_C1
+- platform: ONT PromethION
+- basecaller: dorado
+- modbase models:
+  - 5mCG_5hmCG
+  - 6mA
+
+4. Practical interpretation of the mod codes
+- A:a corresponds to the adenine modification model output
+- C:m and C:h correspond to cytosine modification classes from the 5mCG_5hmCG model
+
+In standard nanopore terminology, these are most naturally interpreted as:
+- m = 5mC
+- h = 5hmC
+
+Biological decision for the cytosine signal
+You now have a real choice:
+- keep C:m and C:h separate
+- or combine them into one total CpG cytosine-modification signal
+
+Recommended default
+Because your stated goal is:
+- all A
+- CpG-only C
+
+and you did not say that 5mC and 5hmC must remain separated, the most practical default is:
+- use A:a for adenine
+- combine the C classes with --combine-mods
+- restrict the C output to CpG positions with --cpg
+
+This is the cleanest and most efficient workflow if the final desired C output is one CpG methylation-style signal.
+
+Recommended strategy
+Use separate modkit runs for A and C:
+- one run for all A calls
+- one run for combined CpG-only C calls
+
+This is the most efficient workflow for the final biological objective.
+
+Why separate runs are needed
+modkit can restrict output to CpGs using:
+- --cpg
+
+However, motif filtering applies to the whole command, not only to the C channel.
+
+So if we tried to do both A and C in one CpG-filtered command:
+- the C output would be CpG-only
+- but the A output would also be restricted by the motif filtering
+
+That is not what we want.
+
+Therefore, the clean approach is:
+1. extract calls for A only
+2. extract calls for combined C at CpGs only
+3. pileup for A only
+4. pileup for combined C at CpGs only
+
+Thresholds
+Use:
+- A threshold = 0.9
+- C threshold = 0.8
+
+These thresholds are kept explicit in all commands for consistency.
+
+Suggested output layout
+Because the modkit outputs can become very large, it is reasonable to store the heavy intermediate files in scratch.
+
+Recommended layout for merged_c1:
+- read-level modkit outputs in:
+  - /scratch/leuven/383/vsc38330/modkit_preproc/merged_c1
+- chromosome-wise pileups in:
+  - /scratch/leuven/383/vsc38330/pileup_tracks/merged_c1
+
+Then, after the workflow finishes, you can copy only the smaller final files that you want to preserve back into /data.
+
+This is often more practical than writing all large intermediate outputs directly into /data.
+
+Set variables
+Run these first:
+
+export PATH="/data/leuven/383/vsc38330/bin/dist_modkit_v0.6.1_481e3c9:$PATH"
+bam="/staging/leuven/stg_00118/ONT_BAM_Noemie/bam_files/merged_c1.sorted.bam"
+ref="/omics/groups/OE0219/internal/Etienne/data/reference/GRCh38/GRCh38.d1.vd1.fa"
+preproc="/scratch/leuven/383/vsc38330/modkit_preproc/merged_c1"
+pileup_dir="/scratch/leuven/383/vsc38330/pileup_tracks/merged_c1"
+
+mkdir -p "$preproc"
+mkdir -p "$pileup_dir"
+
+Step 1. Check modBAM tags
+This confirms the BAM has valid modification tags and shows which modification codes are present.
+
+Recommended command:
+modkit modbam check-tags "$bam" --head 1000
+
+If you want to save the output:
+modkit modbam check-tags "$bam" --head 1000 > "$preproc/check_tags.stdout.txt" 2> "$preproc/check_tags.stderr.txt"
+
+Note
+For this command, the human-readable summary may appear on stderr rather than stdout, so an empty stdout file is not necessarily a problem.
+
+Expected result for this BAM
+- A:a
+- C:h
+- C:m
+
+Step 2. Optional overall modkit summaries
+These are not restricted to A-only or CpG-only C.
+They are optional, but useful for quick QC and standard reporting.
+
+Commands:
+modkit summary "$bam" > "$preproc/summary.tsv" 2> "$preproc/summary.log"
+
+modkit sample-probs "$bam" > "$preproc/sample_probs.tsv" 2> "$preproc/sample_probs.log"
+
+Step 3. Read-level output for all A calls
+Important limitation
+Unlike modkit pileup, modkit extract calls does not support:
+- --modified-bases
+
+So for read-level output, you cannot ask modkit to emit only A:a directly.
+
+The practical solution is:
+- run extract calls once genome-wide with the thresholds
+- keep the A rows downstream by filtering on canonical_base = A
+
+This still gives the correct read-level A table, but the A-only selection happens after extraction rather than inside the modkit command.
+
+This produces the genome-wide modkit extract-calls table from which the A-associated rows can be retained downstream.
+
+Command:
+modkit extract calls "$bam" "$preproc/extract_calls_all.tsv.gz" \
+  --ignore-index \
+  --bgzf \
+  --filter-threshold A:0.9 \
+  --filter-threshold C:0.8 \
+  --log-filepath "$preproc/extract_calls_all.log"
+
+What this gives
+- read-level calls genome-wide
+- with the chosen A and C thresholds explicitly applied
+
+How to obtain the A-only component
+Downstream, keep only rows where:
+- canonical_base = A
+
+The previous per-read summary script already uses canonical_base, so this is a natural split point.
+
+Step 4. Read-level output for combined CpG-only C calls
+For CpG-restricted read-level output, modkit extract calls can restrict to CpGs, but it still does not support --modified-bases.
+
+So this command produces CpG-restricted extract-calls rows, and the downstream C-only selection should again be done using canonical_base = C.
+
+This produces the modkit extract-calls table restricted to CpG sites only.
+
+Command:
+modkit extract calls "$bam" "$preproc/extract_calls_cpg.tsv.gz" \
+  --ignore-index \
+  --bgzf \
+  --cpg \
+  --reference "$ref" \
+  --filter-threshold A:0.9 \
+  --filter-threshold C:0.8 \
+  --log-filepath "$preproc/extract_calls_cpg.log"
+
+What this gives
+- read-level CpG-restricted calls
+- no non-CpG output
+
+How to obtain the CpG-only C component
+Downstream, keep only rows where:
+- canonical_base = C
+
+Then combine or summarize the C:h and C:m rows together at the downstream analysis step if that is your preferred biological interpretation.
+
+If you ever want to keep C:m and C:h separate instead
+You do not separate them at the modkit extract-calls command itself.
+Instead, after extracting CpG-restricted rows, distinguish:
+- call_code = m
+- call_code = h
+
+or combine them downstream if you want one total CpG cytosine-modification signal.
+
+Important consequence for downstream read-level summarization
+The previous read-level summary workflow used a single combined extract-calls table.
+
+For merged_c1, if the goal is:
+- all A
+- combined CpG-only C
+
+then the downstream per-read summary should combine:
+- the A rows from extract_calls_all.tsv.gz
+- the C rows from extract_calls_cpg.tsv.gz
+
+This is preferable to generating a larger combined all-A plus all-C table and discarding non-CpG C later.
+
+Step 5. Position-level pileup for all A calls
+This generates position-level pileup output for A-associated modifications across all genomic positions.
+
+Single whole-genome command:
+modkit pileup "$bam" "$pileup_dir/merged_c1_A_a_all.bed.gz" \
+  --modified-bases A:a \
+  --bgzf \
+  --filter-threshold A:0.9 \
+  --filter-threshold C:0.8 \
+  --log-filepath "$pileup_dir/merged_c1_A_a_all.log"
+
+If chromosome-wise pileup is preferred, use:
+for chrom in chr1 chr2 chr3 chr4 chr5 chr6 chr7 chr8 chr9 chr10 chr11 chr12 chr13 chr14 chr15 chr16 chr17 chr18 chr19 chr20 chr21 chr22 chrX; do
+  base="$pileup_dir/merged_c1_A_a_${chrom}"
+  modkit pileup "$bam" "${base}.bed.gz" \
+    --modified-bases A:a \
+    --region "$chrom" \
+    --bgzf \
+    --filter-threshold A:0.9 \
+    --filter-threshold C:0.8 \
+    --log-filepath "${base}.log"
+done
+
+Step 6. Position-level pileup for combined CpG-only C calls
+This generates position-level pileup output only for cytosine-associated CpG positions, with C:m and C:h combined.
+
+Single whole-genome command:
+modkit pileup "$bam" "$pileup_dir/merged_c1_C_combined_cpg.bed.gz" \
+  --modified-bases C \
+  --combine-mods \
+  --cpg \
+  --reference "$ref" \
+  --bgzf \
+  --filter-threshold A:0.9 \
+  --filter-threshold C:0.8 \
+  --log-filepath "$pileup_dir/merged_c1_C_combined_cpg.log"
+
+If chromosome-wise pileup is preferred, use:
+for chrom in chr1 chr2 chr3 chr4 chr5 chr6 chr7 chr8 chr9 chr10 chr11 chr12 chr13 chr14 chr15 chr16 chr17 chr18 chr19 chr20 chr21 chr22 chrX; do
+  base="$pileup_dir/merged_c1_C_combined_cpg_${chrom}"
+  modkit pileup "$bam" "${base}.bed.gz" \
+    --modified-bases C \
+    --combine-mods \
+    --cpg \
+    --reference "$ref" \
+    --region "$chrom" \
+    --bgzf \
+    --filter-threshold A:0.9 \
+    --filter-threshold C:0.8 \
+    --log-filepath "${base}.log"
+done
+
+If you ever want to keep C:m and C:h separate instead
+Use separate C:m and C:h pileup commands rather than the combined one.
+
+Step 7. Optional conversion of chromosome-wise pileups into merged tracks
+If pileup was produced chromosome by chromosome, the resulting files can be concatenated in chromosome order after checking that all chromosomes finished successfully.
+
+For A:
+ls "$pileup_dir"/merged_c1_A_a_chr*.bed.gz
+
+For combined CpG-only C:
+ls "$pileup_dir"/merged_c1_C_combined_cpg_chr*.bed.gz
+
+If conversion to bedGraph or bigWig is needed later, first make sure:
+- chromosome files are complete
+- the merged file is sorted correctly
+- the chromosome sizes file matches GRCh38.d1.vd1
+
+Optional final copy-back to /data
+If you want to preserve only the finished key outputs in your project directory after the run, create a smaller final destination such as:
+- /data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/merged_c1
+
+Example:
+final_dir="/data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/merged_c1"
+mkdir -p "$final_dir"
+
+cp "$preproc"/check_tags.stderr.txt "$final_dir"/ 2>/dev/null || true
+cp "$preproc"/summary.tsv "$final_dir"/ 2>/dev/null || true
+cp "$preproc"/sample_probs.tsv "$final_dir"/ 2>/dev/null || true
+cp "$preproc"/extract_calls_A_all.tsv.gz "$final_dir"/ 2>/dev/null || true
+cp "$preproc"/extract_calls_C_combined_cpg.tsv.gz "$final_dir"/ 2>/dev/null || true
+
+This way:
+- bulky working files are produced in scratch
+- selected final outputs can still be archived in /data
+
+Useful metadata summary for this BAM
+- sample / library label: A549_ROY_C1
+- platform: ONT PromethION
+- basecaller: dorado
+- read names map cleanly to chr1 at the start of the file
+- reference from header: GRCh38.d1.vd1.fa
+
+What this workflow avoids
+This efficient workflow avoids:
+- generating genome-wide C extract-calls output
+- generating genome-wide C pileup output at all cytosines
+- storing large intermediate non-CpG cytosine files that are not needed biologically
+
+Why this is the preferred workflow here
+This workflow is better aligned with the actual downstream question:
+- A modifications are wanted genome-wide
+- C modifications are only wanted at CpGs
+
+So the computational workflow should mirror the biological target directly.
+
+Summary
+For merged_c1, the most efficient standard workflow is:
+1. check tags
+2. optionally run summary and sample-probs
+3. extract calls for all A using A:a
+4. extract calls genome-wide, then keep A rows downstream
+5. extract calls at CpG positions, then keep C rows downstream
+5. pileup for all A using A:a
+6. pileup for combined CpG-only C using C plus --combine-mods
+
+This gives both:
+- read-level modkit outputs
+- position-level modkit outputs
+
+while avoiding unnecessary non-CpG cytosine files.
+
+Addendum: later troubleshooting for whole-genome extract tables and CNN preparation
+
+This section records what was learned after the first merged_c1 CNN-preparation attempt.
+
+What the old merged_c1 extract-calls file looked like
+- The original file:
+  - `/data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/merged_c1/extract_calls.tsv.gz`
+  was found to contain only:
+  - `chr1`
+- This was checked by counting the `chrom` column directly from the TSV.
+- That explained why the first derived event-level CNN dataset also contained only:
+  - `chr1`
+
+Important comparison: BAM content versus extract-calls output
+- The BAM itself is not chr1-only.
+- A direct read scan on:
+  - `/staging/leuven/stg_00118/ONT_BAM_Noemie/bam_files/merged_c1.sorted.bam`
+  showed reads on at least:
+  - `chr1`
+  - `chr2`
+- So the chr1-only behavior was not caused by the BAM content itself.
+
+What we tried with modkit extract calls
+
+1. Rerun without index, whole genome
+- Command pattern used:
+  - `modkit extract calls ... --ignore-index --bgzf --filter-threshold A:0.9 --filter-threshold C:0.8`
+- Output file became very large, but final inspection still showed only:
+  - `chr1`
+- This run is therefore not trustworthy for whole-genome modeling use.
+
+2. Rerun with BAM index, without --ignore-index
+- The BAM was indexed and `modkit extract calls` was retried without `--ignore-index`.
+- In OnDemand this run was repeatedly killed very early.
+- Staging space was checked and was not the limiting factor:
+  - `/staging/leuven/stg_00118` had plenty of free space
+- Because the run died quickly, produced only a partial file, and did not leave a modkit-level error in the log, the most likely explanation is:
+  - memory or session-level kill
+
+3. Rerun in SLURM batch
+- A true SLURM batch submission behaved better and showed active indexed processing such as:
+  - `found BAM index, processing reads in 100000 base pair chunks`
+  - genome-position progress
+  - rows written
+- However, one run still ended with:
+  - `Killed`
+- With:
+  - enough staging space
+  - correct threshold parsing
+  - no walltime issue
+  the most likely explanation again was:
+  - insufficient memory
+- So for indexed whole-genome `modkit extract calls` on `merged_c1`, memory should be treated as a likely bottleneck and higher `--mem` should be requested for future SLURM retries.
+
+Key interpretation
+- The BAM is multi-chromosome.
+- The old `extract_calls.tsv.gz` is chr1-only.
+- The naive whole-genome rerun with `extract calls` and `--ignore-index` still ended up chr1-only.
+- Indexed reruns were unstable and were killed before completion.
+- Therefore, the current merged_c1 `extract calls` outputs should not yet be treated as a reliable whole-genome source for CNN/event-table preparation.
+
+Important modkit command distinction
+
+This is an important conceptual point for future debugging and workflow design:
+- `modkit extract calls`
+  - outputs the predicted modification state for each position in each read
+  - for a site with multiple candidate modification classes, there is only one resulting call state per record:
+    - modified class 1
+    - modified class 2
+    - or canonical
+- `modkit extract full`
+  - produces a table translation of the values stored in the `MM` and `ML` tags
+  - keeps the underlying per-modification probabilities
+  - so if a read position carries probabilities for both:
+    - `5hmC`
+    - `5mC`
+    both probabilities can be represented in the output
+
+Practical implication for merged_c1
+- Because `extract calls` gave repeated trouble for reliable whole-genome merged_c1 extraction, `modkit extract full` became a reasonable fallback candidate to test.
+- This is especially relevant because:
+  - the BAM is indexed
+  - `extract full` is documented to parallelize across aligned genome intervals when an index is present
+- If `extract full` is used instead, downstream CNN-preparation code may need slight adaptation because the output schema is not identical to `extract calls`.
+
+Useful reminder for the first CNN data-prep attempt
+- The first merged_c1 CNN-prep dataset that was built from the old chr1-only `extract_calls.tsv.gz` is only a:
+  - `chr1`
+  dataset
+- It should not be treated as a true genome-wide train/validation/test dataset.
+- That first dataset can still be useful as a small debugging artifact, but not as the final intended modeling input.
+
+Current best-practice recommendation
+- Keep the older notes in this file for the pileup and merged_c1 modification workflow.
+- For whole-genome read-level event extraction to support CNN modeling:
+  - verify chromosome distribution immediately after any new extract run
+  - prefer running heavy all-genome jobs in SLURM batch rather than OnDemand
+  - request more memory for indexed `extract calls` retries
+  - if instability continues, test:
+    - `modkit extract full`
+  as an alternative standardized input for later modeling preparation
+
+Addendum: extract full memory diagnosis and working batch configuration
+
+1. Why previous `extract full` batch runs were killed
+- A SLURM `sacct` check on job `59132448` showed:
+  - `State = OUT_OF_MEMORY`
+  - `MaxRSS = 134218332K`
+- This confirms the earlier `Killed` message was a true OOM event, not:
+  - staging disk exhaustion
+  - walltime expiration
+  - a bad `modkit` command syntax
+- The partial output from that run should therefore be treated as invalid/incomplete.
+
+2. Why larger memory requests like `192G` or `256G` initially failed to submit
+- Cluster inspection on `genius` `batch` showed:
+  - `DefMemPerCPU=5000`
+  - `MaxMemPerCPU=5000`
+- Node inventory showed each `batch` node has:
+  - `36` CPUs
+  - `180000 MB` total memory
+- Practical consequence:
+  - memory requests above the physical node memory cannot be scheduled
+  - `256G` can never fit on these nodes
+  - `192G` also exceeds the node memory
+- To get the maximum available RAM on one batch node, the job must request the full node shape:
+  - `--cpus-per-task=36`
+  - `--mem=180000M`
+
+3. Working SLURM batch configuration for `modkit extract full`
+- The following script submission succeeded:
+
+```bash
+#!/bin/bash
+#SBATCH --job-name=merged_c1_extract_full
+#SBATCH -M genius
+#SBATCH -A intro_vsc38330
+#SBATCH --partition=batch
+#SBATCH --time=12:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=36
+#SBATCH --mem=180000M
+#SBATCH --output=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/slurm-%j.out
+#SBATCH --error=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/slurm-%j.err
+
+/data/leuven/383/vsc38330/bin/dist_modkit_v0.6.1_481e3c9/modkit extract full \
+  /staging/leuven/stg_00118/ONT_BAM_Noemie/bam_files/merged_c1.sorted.bam \
+  /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/extract_full_allchr.tsv.gz \
+  --bgzf \
+  --ref /data/leuven/383/vsc38330/thesis_dimelo/src/data/hg38.fa
+```
+
+- After removing the previous partial output and resubmitting, the cluster accepted the job:
+  - `Submitted batch job 59132463 on cluster genius`
+
+4. Monitoring command for the current run
+- To check whether the current job is still pending or running:
+  - `squeue -j 59132463`
+- To inspect live SLURM output:
+  - `tail -n 50 /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/slurm-59132463.out`
+  - `tail -n 50 /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/slurm-59132463.err`
+- To check whether the output file is growing:
+  - `ls -lh /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/extract_full_allchr.tsv.gz`
+
+5. Current interpretation
+- The cleanest supported route for whole-genome merged_c1 extraction currently appears to be:
+  - `modkit extract full`
+  - indexed BAM
+  - run through SLURM batch
+  - full-node memory request on `genius`
+- Once the run completes, chromosome distribution must still be verified before using the file for downstream modeling prep.
+
+Addendum: chunked `extract full` strategy that actually worked
+
+1. Why the whole-genome `extract full` route was abandoned
+- Even after moving from `batch` to `bigmem`, whole-genome `modkit extract full` on `merged_c1` continued to hit OOM:
+  - one run reached about `314 GB`
+  - a later run reached about `419 GB`
+  - another later run reached about `575 GB`
+- Because of this, single-shot whole-genome extraction was judged too unstable for `merged_c1`.
+
+2. Working fallback: split by chromosome, then split only failed chromosomes into smaller chunks
+- A first SLURM array was run chromosome-by-chromosome on `genius` `batch`:
+
+```bash
+#!/bin/bash
+#SBATCH --job-name=merged_c1_full_chr
+#SBATCH -M genius
+#SBATCH -A intro_vsc38330
+#SBATCH --partition=batch
+#SBATCH --time=12:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=36
+#SBATCH --mem=180000M
+#SBATCH --array=1-23%2
+#SBATCH --output=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/slurm-%A_%a.out
+#SBATCH --error=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/slurm-%A_%a.err
+
+CHROMS=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/chromosomes.txt
+REGION=$(sed -n "${SLURM_ARRAY_TASK_ID}p" "$CHROMS")
+OUTDIR=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/by_chrom
+mkdir -p "$OUTDIR"
+
+/data/leuven/383/vsc38330/bin/dist_modkit_v0.6.1_481e3c9/modkit extract full \
+  /staging/leuven/stg_00118/ONT_BAM_Noemie/bam_files/merged_c1.sorted.bam \
+  "$OUTDIR/extract_full_${REGION}.tsv.gz" \
+  --bgzf \
+  --region "$REGION" \
+  --ref /data/leuven/383/vsc38330/thesis_dimelo/src/data/hg38.fa
+```
+
+- Final result of that chromosome-level run:
+  - completed successfully:
+    - `chr4`, `chr6`, `chr9`, `chr10`, `chr11`, `chr12`, `chr13`, `chr14`, `chr15`, `chr16`, `chr17`, `chr18`, `chr19`, `chr20`, `chr21`, `chr22`, `chrX`
+  - failed with OOM:
+    - `chr1`, `chr2`, `chr3`, `chr5`, `chr7`, `chr8`
+
+3. Working chunked rerun for failed chromosomes
+- Failed chromosomes were then split into smaller intervals and rerun with `modkit extract full --region`.
+- This succeeded for:
+  - all missing `chr1` chunks
+  - all missing `chr2` chunks, after `chr2:1-100000000` was split further into `25 Mb` pieces
+  - all missing `chr3` chunks
+  - all missing `chr5` chunks
+  - all missing `chr7` chunks
+  - all missing `chr8` chunks
+
+4. Important data-trust rule for merged output assembly
+- Do not trust chromosome-level `by_chrom` files for chromosomes that had OOM at the chromosome stage:
+  - `chr1`, `chr2`, `chr3`, `chr5`, `chr7`, `chr8`
+- For those chromosomes, only the recovered `by_chunk` files should be used.
+- Trusted sources are therefore:
+  - `by_chunk`:
+    - `chr1`, `chr2`, `chr3`, `chr5`, `chr7`, `chr8`
+  - `by_chrom`:
+    - `chr4`, `chr6`, `chr9-22`, `chrX`
+
+5. Practical conclusion
+- For `merged_c1`, the operationally successful route was not:
+  - one whole-genome `extract full`
+- It was:
+  - chromosome-level extraction first
+  - followed by chunk-level rescue for only the chromosomes that OOMed
+- This is the strategy to reuse if a similarly large sample or mark fails on whole-genome extraction.
+
+Generalization to other marks
+
+- The same `extract full` logic can be reused for:
+  - `h3k27ac`
+  - `h3k4me3`
+  - `h3k27me3`
+- Practical lesson from `h3k27ac`:
+  - even whole-genome chunk arrays can still OOM if chunks are too large for the requested memory
+  - a first-pass `50 Mb` chunking strategy on `batch` with `100000M` was still too large for many `h3k27ac` chunks
+  - a second-pass retry strategy should therefore split failed `50 Mb` regions into `25 Mb` regions
+- This means the reusable operational pattern is:
+  1. try whole-genome `extract full` only if the mark is expected to be much smaller than `merged_c1`
+  2. if whole-genome fails, switch to chunked extraction
+  3. if some chunks still OOM, keep successful chunks and rerun only the failed ones at smaller chunk size
+
+Template command pattern used for all `extract full` jobs
+
+```bash
+/data/leuven/383/vsc38330/bin/dist_modkit_v0.6.1_481e3c9/modkit extract full \
+  <input.bam> \
+  <output.tsv.gz> \
+  --bgzf \
+  --region <optional_region> \
+  --ref /data/leuven/383/vsc38330/thesis_dimelo/src/data/hg38.fa
+```
+
+- Important reminders:
+  - `--region` is omitted for whole-genome jobs
+  - `--region chrN:start-end` is used for chromosome/chunk rescue jobs
+  - output files from failed OOM jobs should be removed before reruns
+  - successful chromosome/chunk outputs should be kept and reused in the final merge

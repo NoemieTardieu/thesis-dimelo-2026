@@ -1,0 +1,299 @@
+General preprocessing workflow for ONT DiMeLo-seq modBAM files
+
+Purpose
+This note records the practical workflow that worked for the GM12878 DiMeLo-seq BAM files in this project.
+It is meant to be reused on other similar files so the same reference-genome and pileup mistakes can be avoided.
+
+Core principle
+Do not choose the reference FASTA only from paper text, filenames, or memory.
+Always first check which reference the BAM coordinates actually match.
+
+Why this matters
+`modkit extract calls` can often run without a reference.
+`modkit pileup` is reference-sensitive.
+If the FASTA does not match the BAM contig lengths, `modkit pileup` can fail with:
+- `failed to fetch sequence, invalid-reference-coordinates`
+- empty output files
+- incomplete chromosome coverage
+- truncated or unusable downstream `.bw` tracks
+
+What we learned on these files
+For the three raw BAMs:
+- `GSM6337767_gm12878_h3k27ac.mod_mappings.sorted.bam`
+- `GSM6337768_gm12878_h3k27me3.mod_mappings.sorted.bam`
+- `GSM6337769_gm12878_h3k4me3.mod_mappings.sorted.bam`
+
+the BAM header chromosome lengths matched:
+- `/data/leuven/383/vsc38330/thesis_dimelo/src/data/hs1.fa`
+
+and did not match:
+- `/data/leuven/383/vsc38330/thesis_dimelo/src/data/hg38.fa`
+
+So for these BAMs, use `hs1.fa` for `modkit pileup`.
+
+Step 1. Inspect BAM metadata
+
+Check the BAM header:
+```bash
+samtools view -H /path/to/input.bam
+```
+
+Useful filtered views:
+```bash
+samtools view -H /path/to/input.bam | rg '^@SQ'
+samtools view -H /path/to/input.bam | rg '^@RG'
+samtools view -H /path/to/input.bam | rg '^@PG'
+```
+
+Why
+- `@SQ` gives chromosome names and lengths
+- `@RG` gives sample/read-group metadata
+- `@PG` may show tool history
+
+Step 2. Validate modBAM tags
+
+Check that the modification tags are present and valid:
+```bash
+modkit modbam check-tags /path/to/input.bam --head 20
+```
+
+Why
+- confirms the BAM is a valid modBAM
+- shows the modification codes present
+
+For the GM12878 files here, the valid record tag headers were:
+- `A+Y`
+- `C+Z`
+
+So the corresponding `modkit pileup` arguments are:
+- `--modified-bases A:Y`
+- `--modified-bases C:Z`
+
+Step 3. Match BAM header lengths to candidate FASTA files
+
+Check a few chromosome lengths from the BAM:
+```bash
+samtools view -H /path/to/input.bam | rg '^@SQ\tSN:(chr1|chr2|chr15|chr16|chrX|chrM)\b'
+```
+
+Compare with candidate FASTA indexes:
+```bash
+grep -E '^(chr1|chr2|chr15|chr16|chrX|chrM)\b' /path/to/reference.fa.fai
+```
+
+Rule
+- the reference FASTA used for `modkit pileup` must have the same chromosome lengths as the BAM header
+
+If the lengths do not match:
+- do not use that FASTA for `modkit pileup`
+
+Step 4. Run modkit extract calls
+
+Why
+`modkit extract calls` gives read-position-level modified-base calls.
+These outputs are useful for:
+- read-level modeling
+- per-read summaries
+- keeping the original call probabilities
+
+General command:
+```bash
+modkit extract calls /path/to/input.bam /path/to/out/extract_calls.tsv.gz \
+  --bgzf \
+  --filter-threshold A:0.9 \
+  --filter-threshold C:0.8 \
+  --log-filepath /path/to/out/extract_calls.log
+```
+
+Notes
+- this command does not need a reference unless motif restriction is requested
+- keep this file, because it preserves per-call information such as `call_prob`
+
+CpG-restricted extract calls:
+```bash
+modkit extract calls /path/to/input.bam /path/to/out/extract_calls_cpg.tsv.gz \
+  --bgzf \
+  --cpg \
+  --reference /path/to/matching_reference.fa \
+  --filter-threshold A:0.9 \
+  --filter-threshold C:0.8 \
+  --log-filepath /path/to/out/extract_calls_cpg.log
+```
+
+Use only when CpG-restricted read-level output is explicitly needed.
+
+Step 5. Summarize extract-calls output per read
+
+Why
+The raw extract-calls table is huge and contains one row per call.
+For many downstream analyses, a per-read table is easier to work with.
+
+The summary script in this folder:
+- reads the `extract calls` table
+- aggregates A and C calls per read
+- writes one row per read
+
+Command:
+```bash
+python3 /data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/summarize_modkit_extract_calls.py
+```
+
+Result
+- one per-read summary TSV per mark
+
+Important limitation
+- the summary TSV does not keep the full vector of `call_prob` values
+- if a model needs read-level float vectors, go back to the raw `extract_calls.tsv.gz`
+
+Step 6. Run modkit pileup for positional tracks
+
+Why
+`modkit pileup` creates genome-position-level signal files that are suitable for bedGraph/bigWig track generation.
+
+Important practical correction
+For these GM12878 BAMs, the command pattern that actually produced rows reliably was the older no-reference-style workflow using the bundled:
+- `/data/leuven/383/vsc38330/bin/dist_modkit_v0.6.1_481e3c9`
+
+This workflow:
+- runs `modkit pileup` once on the whole BAM
+- writes a combined bedMethyl-style `.bed.gz`
+- then splits A:Y and C:Z signal into separate bedGraph files downstream
+
+This is different from trying to run a direct reference-forced `A:Y` pileup command on newer `modkit`, which in our debugging session could produce `0 rows written`.
+
+Working setup
+```bash
+export PATH="/data/leuven/383/vsc38330/bin/dist_modkit_v0.6.1_481e3c9:$PATH"
+
+bam=/path/to/input.bam
+outdir=/path/to/output_dir
+base="$outdir/sample_noref_allchr"
+```
+
+Whole-genome pileup:
+```bash
+modkit pileup \
+  "$bam" \
+  "${base}.bed.gz" \
+  --bgzf \
+  --filter-threshold A:0.9 \
+  --filter-threshold C:0.8 \
+  --log-filepath "${base}.log"
+```
+
+Split A:Y signal into bedGraph:
+```bash
+gzip -cd "${base}.bed.gz" \
+  | awk 'BEGIN{OFS="\t"} $4=="Y" {print $1,$2,$3,$11}' \
+  > "$outdir/sample_A_Y_percent.bedGraph"
+```
+
+Split C:Z signal into bedGraph:
+```bash
+gzip -cd "${base}.bed.gz" \
+  | awk 'BEGIN{OFS="\t"} $4=="Z" {print $1,$2,$3,$11}' \
+  > "$outdir/sample_C_Z_percent.bedGraph"
+```
+
+Recommended interpretation
+- Use the split `A:Y` bedGraph to make the A bigWig track
+- Only keep the all-C split bedGraph if it is biologically useful
+- If the goal is CpG-only cytosine methylation, perform a separate CpG-restricted step or downstream CpG filtering rather than assuming the all-C split track is the final product
+
+Reference caveat
+We also learned that reference identity still matters in this project.
+The BAM header lengths for these three GM12878 files matched `hs1.fa`, not the local `hg38.fa`.
+So if a later step truly requires a reference-aware command, first match the BAM header lengths to the FASTA `.fai`.
+However, for the positional A-track generation that was actually working during this debugging session, the no-reference bundled `modkit v0.6.1` workflow was the reliable approach.
+
+Step 7. Sort bedGraph outputs
+
+Why
+`bedGraphToBigWig` expects chromosome-sorted input.
+
+Commands:
+```bash
+sort -k1,1 -k2,2n /path/to/sample_A_Y_percent.bedGraph > /path/to/sample_A_Y_percent.sorted.bedGraph
+sort -k1,1 -k2,2n /path/to/sample_C_Z_percent.bedGraph > /path/to/sample_C_Z_percent.sorted.bedGraph
+```
+
+Step 8. Convert bedGraph to bigWig
+
+Why
+BigWig is compact and convenient for IGV and browser-style visualization.
+
+You need:
+- sorted bedGraph
+- a chromosome sizes file matching the same reference
+
+General form:
+```bash
+bedGraphToBigWig /path/to/input.sorted.bedGraph /path/to/chrom.sizes /path/to/output.bw
+```
+
+Example output names:
+- `sample_A_mod_percent.bw`
+- `sample_C_Z_percent.bw`
+- or, if separately derived, `sample_CpG_methylation_percent.bw`
+
+Step 9. Perform quick integrity checks before IGV
+
+Check that important chromosomes are present in the bedGraph:
+```bash
+rg -n -m 3 '^chr15\t' /path/to/sample_C_Z_percent.bedGraph
+rg -n -m 3 '^chr16\t' /path/to/sample_C_Z_percent.bedGraph
+```
+
+Check the A bedGraph is not truncated:
+```bash
+rg -n -m 3 '^chr5\t' /path/to/sample_A_Y_percent.bedGraph
+tail -n 5 /path/to/sample_A_Y_percent.bedGraph
+```
+
+Red flags
+- no matches for chromosomes that should exist
+- file ends mid-line
+- `0 rows written`
+- repeated `invalid-reference-coordinates`
+
+If those appear, discard the pileup-derived outputs and rerun with the correct reference.
+
+Practical retention policy
+
+Keep:
+- raw BAM
+- BAM index
+- `modkit extract calls` outputs
+- per-read summaries
+
+Replace if corrupted, empty, or incomplete:
+- pileup bedGraph files
+- sorted bedGraph files
+- `.bw` files made from bad bedGraphs
+
+Safe habit
+- do not delete old pileup outputs until a rerun succeeds
+- if space is tight and the files are clearly invalid, delete only the pileup-derived outputs, not the BAM or extract-calls tables
+
+Minimal checklist for a new file
+
+1. Run `samtools view -H` and inspect `@SQ`
+2. Run `modkit modbam check-tags`
+3. Match BAM header lengths to the correct FASTA `.fai`
+4. Run `modkit extract calls`
+5. Optionally summarize per read
+6. Run bundled `modkit v0.6.1` no-reference whole-genome `pileup`
+7. Split the combined `.bed.gz` into:
+   - `A:Y` bedGraph
+   - `C:Z` bedGraph
+8. Sort bedGraphs
+9. Convert to bigWig
+10. Check chromosome presence before IGV
+
+Main lesson from this debugging session
+
+The reference genome name in a paper, note, or memory is not enough.
+For `modkit pileup`, the only safe rule is:
+- use the FASTA whose contig lengths match the BAM header
+
+That single check prevents the most expensive failures.

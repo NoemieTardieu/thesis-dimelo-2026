@@ -1,0 +1,5 @@
+model	task	reads	valid_positions	mae	pearson	spearman	auroc	auprc	mean_pred	mean_target	pos_frac	notes
+nosample_window_level	5mC	1877	1094769	0.2970	0.4633	0.3930	0.7236	0.7671	0.5840	0.6012	0.6068	window-level, duplicates possible
+nosample_window_level	6mA	1877	10193258	0.1203	0.2238	0.2191	0.6822	0.1176	0.0965	0.0845	0.0525	window-level, duplicates possible
+nosample_overlap_aggregated	5mC	1877	624546	0.2979	0.4627	0.3925	0.7231	0.7706	0.5866	0.6052	0.6117	aggregated by sample/read_id/read_position
+nosample_overlap_aggregated	6mA	1877	5869663	0.1196	0.2222	0.2127	0.6833	0.1174	0.0956	0.0832	0.0519	aggregated by sample/read_id/read_position

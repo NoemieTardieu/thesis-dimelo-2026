@@ -1,0 +1,57 @@
+{
+  "dataset_a": {
+    "name": "chr16_chr19_chr11",
+    "reads": 21098,
+    "npz": "outputs/merged_e5b_c1_chr16_chr19_chr11_selected_top100_even50_region_split.train.npz",
+    "metadata": "outputs/merged_e5b_c1_chr16_chr19_chr11_selected_top100_even50_region_split.train.metadata.tsv"
+  },
+  "dataset_b": {
+    "name": "chr17",
+    "reads": 6949,
+    "npz": "outputs/merged_e5b_c1_chr17_selected_top100_even50_region_split.train.npz",
+    "metadata": "outputs/merged_e5b_c1_chr17_selected_top100_even50_region_split.train.metadata.tsv"
+  },
+  "combined_reads": 28047,
+  "arrays": {
+    "input_ids": [
+      28047,
+      32768
+    ],
+    "target_5mC": [
+      28047,
+      32768
+    ],
+    "mask_5mC": [
+      28047,
+      32768
+    ],
+    "target_6mA": [
+      28047,
+      32768
+    ],
+    "mask_6mA": [
+      28047,
+      32768
+    ],
+    "sample_id": [
+      28047
+    ]
+  },
+  "valid_5mC_targets": 9086594,
+  "valid_6mA_targets": 91418391,
+  "chrom_counts": {
+    "chr16": 6940,
+    "chr19": 7008,
+    "chr11": 7150,
+    "chr17": 6949
+  },
+  "sample_counts": {
+    "merged_e5b": 13982,
+    "merged_c1": 14065
+  },
+  "outputs": {
+    "npz": "outputs/merged_e5b_c1_chr16_chr19_chr11_chr17_selected_top100_even50_region_split.train.npz",
+    "metadata": "outputs/merged_e5b_c1_chr16_chr19_chr11_chr17_selected_top100_even50_region_split.train.metadata.tsv",
+    "summary": "outputs/merged_e5b_c1_chr16_chr19_chr11_chr17_selected_top100_even50_region_split.train.summary.json"
+  }
+}

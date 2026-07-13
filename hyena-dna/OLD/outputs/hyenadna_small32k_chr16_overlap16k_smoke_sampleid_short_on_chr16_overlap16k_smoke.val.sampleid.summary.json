@@ -1,0 +1,51 @@
+{
+  "npz": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_smoke1000_region_split.val.npz",
+  "metadata": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_smoke1000_region_split.val.metadata.tsv",
+  "split_name": "val",
+  "checkpoint": "outputs/hyenadna_small32k_chr16_overlap16k_smoke1000_region_split_sampleid_short_2epochs_100batches.pt",
+  "model_name": "hyenadna-small-32k-seqlen",
+  "device": "cuda",
+  "reads": 237,
+  "reads_evaluated": 237,
+  "batches_evaluated": 237,
+  "max_batches": null,
+  "batch_size": 1,
+  "max_length_used": 32768,
+  "num_samples": 2,
+  "sample_embedding_dim": 16,
+  "thresholds": {
+    "5mC": 0.5,
+    "6mA": 0.5
+  },
+  "metrics": {
+    "5mC": {
+      "valid_positions": 162924,
+      "bce": 0.6177056431770325,
+      "mse": 0.14291541278362274,
+      "mae": 0.32708901166915894,
+      "mean_pred": 0.5999405980110168,
+      "mean_target": 0.6264613270759583,
+      "pearson": 0.3695046305656433,
+      "spearman": 0.26327762727186477,
+      "auroc": 0.6635540797047514,
+      "auprc": 0.7395833862169625,
+      "positive_fraction": 0.6373094203432275
+    },
+    "6mA": {
+      "valid_positions": 1479948,
+      "bce": 0.24487359821796417,
+      "mse": 0.035234514623880386,
+      "mae": 0.11212746053934097,
+      "mean_pred": 0.08033675700426102,
+      "mean_target": 0.06795982271432877,
+      "pearson": 0.13751062750816345,
+      "spearman": 0.10853636657854031,
+      "auroc": 0.6394903653527831,
+      "auprc": 0.0836468572099712,
+      "positive_fraction": 0.04715233237924576
+    }
+  },
+  "per_region_metrics": "outputs/hyenadna_small32k_chr16_overlap16k_smoke_sampleid_short_on_chr16_overlap16k_smoke.val.sampleid.per_region_metrics.tsv",
+  "per_sample_metrics": "outputs/hyenadna_small32k_chr16_overlap16k_smoke_sampleid_short_on_chr16_overlap16k_smoke.val.sampleid.per_sample_metrics.tsv",
+  "per_chrom_metrics": "outputs/hyenadna_small32k_chr16_overlap16k_smoke_sampleid_short_on_chr16_overlap16k_smoke.val.sampleid.per_chrom_metrics.tsv"
+}

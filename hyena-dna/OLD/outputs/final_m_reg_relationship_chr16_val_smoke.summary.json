@@ -1,0 +1,18 @@
+{
+  "datasets": [
+    {
+      "npz": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.val.npz",
+      "metadata": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.val.metadata.tsv",
+      "label": "chr16_val"
+    }
+  ],
+  "outputs": {
+    "window": "outputs/final_m_reg_relationship_chr16_val_smoke.window.tsv",
+    "read_overlap_collapsed": null,
+    "region": "outputs/final_m_reg_relationship_chr16_val_smoke.region.tsv",
+    "correlation_summary": "outputs/final_m_reg_relationship_chr16_val_smoke.correlation_summary.tsv",
+    "window_cooccurrence": "outputs/final_m_reg_relationship_chr16_val_smoke.window.cooccurrence.tsv",
+    "read_overlap_collapsed_cooccurrence": null,
+    "plot": "outputs/final_m_reg_relationship_chr16_val_smoke.hexbin.png"
+  }
+}

@@ -1,0 +1,197 @@
+THESIS WORKFLOW (REVISED AFTER PROMOTER FEEDBACK)
+=================================================
+
+Scope
+- Keep existing Phase 1/2 outputs.
+- Add revised analyses/plots for Phase 1.
+- Add revised preprocessing strategy for Phase 2 (1 kb + smarter segmentation).
+
+Project root
+- /data/leuven/383/vsc38330/thesis_dimelo
+
+-----------------------------------------------------------------
+1) WHAT THE FEEDBACK MEANS (ACTIONABLE INTERPRETATION)
+-----------------------------------------------------------------
+1. "not a lot of 6mA"
+- Your A-mod (Reg proxy) signal is sparse/noisy.
+- Do not over-claim biological conclusions from raw A-mod counts.
+
+2. "use original value of M (easy mark only 0 or 1)"
+- Prefer binary methylation labels (methylated/unmethylated) instead of transformed continuous M when possible.
+- Keep unknown as missing mask, not as numeric value.
+
+3. "normalize reg to 0..1 and correlate with M"
+- Convert Reg feature to a bounded scale (per-bin or per-read normalization).
+- Then compute correlation/joint clustering against binary or fraction M.
+
+4. "need to understand log1 in contour"
+- `log1p(x)` means `log(1+x)`.
+- It compresses long tails so high-count outliers do not dominate.
+- You must state this clearly in figure caption.
+
+5. "use window of 1 kb and not 1 Mb; cut genome more intelligently"
+- Keep 1 Mb as context container only if needed for model context.
+- For analysis/visualization, compute features on 1 kb bins.
+- Prefer filtering to informative bins (coverage + variance/homogeneity criteria).
+
+6. "contour plots, add histograms"
+- Use joint plot style: center = scatter/KDE contours, top/right = marginal distributions.
+
+7. "on contour plot do topographic maps"
+- Use density contour levels like elevation lines (KDE contour map).
+
+8. "legend each sample/mark"
+- Overlay marks in one panel with clear legend and distinct colors.
+- Ensure h3k27ac is visually separated from me3 marks.
+
+-----------------------------------------------------------------
+2) PHASE 1 REVISED VISUALIZATION PLAN
+-----------------------------------------------------------------
+Goal
+- Produce promoter-ready plots with interpretable axes and marginals.
+
+2A) Data representation updates
+- M axis:
+  - primary: binary M (0/1) at read/bin level when label is known
+  - secondary: methylated fraction only for descriptive QC
+- Reg axis:
+  - normalize to [0,1], e.g. min-max on filtered data or rank-percentile
+
+2B) Required new figures
+1. Joint distribution with marginals by mark
+- center: scatter (subsample) + KDE contours (topographic)
+- top/right: hist/KDE marginals
+- per-mark color + legend
+
+2. Overlay contour map for all 3 marks
+- one panel, three contour colors, legend visible
+- objective: show h3k27ac separation from me3 marks
+
+3. Correlation summary table
+- Spearman rho, mutual information, and n
+- computed for:
+  - all reads
+  - long reads only (optional robustness)
+
+4. Figure-note panel
+- explicitly define `log1p` and why used
+- explicitly define M and Reg normalization
+
+-----------------------------------------------------------------
+3) PHASE 2 REVISED ANALYSIS STRATEGY
+-----------------------------------------------------------------
+Goal
+- Keep long-context compatibility for modeling, but perform statistical analysis at 1 kb scale.
+
+3A) Bin size and filtering
+- Use 1 kb bins for O/E and joint distribution analyses.
+- Keep only bins with sufficient C coverage.
+- Add optional "informative bin" filter (exclude near-constant bins).
+
+3B) Segmentation refinement ("more intelligent cuts")
+- Instead of treating every 1 Mb equally, annotate bins/segments by:
+  - local variance of M/Reg
+  - coverage stability
+  - optional genomic annotations (later: peaks, chromatin state)
+- Analyze homogeneous segments separately from heterogeneous segments.
+
+3C) Keep 1 Mb for model context, 1 kb for features
+- This resolves the apparent contradiction:
+  - model can still ingest long context windows
+  - statistical plots use biologically/local meaningful 1 kb bins
+
+-----------------------------------------------------------------
+4) UPDATED PRACTICAL RUN ORDER
+-----------------------------------------------------------------
+1. Complete Phase 2 backend build (already ongoing).
+2. Run windowed analysis at 1 kb (`--bin-size 1000`) with resume/checkpoint.
+3. Generate revised joint plots with marginals + contour topography.
+4. Generate mark-overlay contour figure + legend.
+5. Export correlation summary table.
+6. Update thesis Results captions with:
+   - binary M definition
+   - Reg normalization to [0,1]
+
+Commands
+- Phase 2 windowed analysis at 1 kb (resumable):
+  /data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_oe_enrichment_heatmap.py \
+    --intervals-tsv /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/intervals_long_context.tsv \
+    --manifest-glob "/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_*_C/manifest_*_C.tsv" \
+    --out-dir /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb \
+    --bin-size 1000 \
+    --n-quantiles 10 \
+    --min-mapq 20 \
+    --ml-threshold 128 \
+    --min-bin-c-coverage 30 \
+    --reg-mode a_mod_per_kb \
+    --m-mode c_meth_frac \
+    --progress-every 25 \
+    --checkpoint-every 25 \
+    --resume
+
+for H3K27ac:
+/data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_oe_enrichment_heatmap.py \
+  --intervals-tsv /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/intervals_long_context.tsv \
+  --manifest-glob "/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_h3k27ac_C/manifest_h3k27ac_C.tsv" \
+  --out-dir /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_h3k27ac \
+  --bin-size 1000 \
+  --n-quantiles 10 \
+  --min-mapq 20 \
+  --ml-threshold 128 \
+  --min-bin-c-coverage 30 \
+  --reg-mode a_mod_per_kb \
+  --m-mode c_meth_frac \
+  --progress-every 25 \
+  --checkpoint-every 25 \
+  --resume
+
+for H3K27me3
+/data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_oe_enrichment_heatmap.py \
+  --intervals-tsv /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/intervals_long_context.tsv \
+  --manifest-glob "/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_h3k27me3_C/manifest_h3k27me3_C.tsv" \
+  --out-dir /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_h3k27me3 \
+  --bin-size 1000 \
+  --n-quantiles 10 \
+  --min-mapq 20 \
+  --ml-threshold 128 \
+  --min-bin-c-coverage 30 \
+  --reg-mode a_mod_per_kb \
+  --m-mode c_meth_frac \
+  --progress-every 25 \
+  --checkpoint-every 25 \
+  --resume
+
+for H3K4me3
+/data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_oe_enrichment_heatmap.py \
+  --intervals-tsv /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/intervals_long_context.tsv \
+  --manifest-glob "/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_h3k4me3_C/manifest_h3k4me3_C.tsv" \
+  --out-dir /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_h3k4me3 \
+  --bin-size 1000 \
+  --n-quantiles 10 \
+  --min-mapq 20 \
+  --ml-threshold 128 \
+  --min-bin-c-coverage 30 \
+  --reg-mode a_mod_per_kb \
+  --m-mode c_meth_frac \
+  --progress-every 25 \
+  --checkpoint-every 25 \
+  --resume
+
+
+- Revised Phase 1 feedback figures/tables:
+  /data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase_1_visualization/phase1_feedback_viz.py
+
+Expected revised outputs
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase_1_visualization/output_feedback/feedback_joint_marginal_<mark>.svg
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase_1_visualization/output_feedback/feedback_overlay_topographic_contours_by_mark.svg
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase_1_visualization/output_feedback/feedback_correlation_summary.tsv
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase_1_visualization/output_feedback/feedback_notes.md
+   - log1p explanation
+
+-----------------------------------------------------------------
+5) THESIS POSITIONING (WHAT TO SAY)
+-----------------------------------------------------------------
+- "We preserve 1 Mb context for long-range modeling readiness, while deriving 1 kb local features for robust distributional and correlation analyses."
+- "Methylation labels are handled as binary known states with unknowns masked."
+- "Reg is normalized to a bounded scale to support cross-mark comparability."
+- "Joint structure is shown with KDE topographic contours and marginal distributions, plus scalar dependence metrics."

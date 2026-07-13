@@ -1,0 +1,702 @@
+Preparation note for read-level modeling of P(M | D, C)
+
+
+Purpose of this note
+This file describes the next practical steps needed before training a read-level model for:
+- P(M | D, C)
+
+where:
+- M = CpG methylation state
+- D = DNA sequence context
+- C = cell type
+
+The goal is to move from preprocessing outputs and modkit extract-calls tables to a model-ready supervised dataset.
+
+Current status on disk checked on 2026-04-18
+
+Important distinction
+- There is a split already present for the three mark-specific long-context/window-level backends.
+- There is not yet a completed event-level modeling dataset in the dedicated `src/modeling_prep` location described below.
+
+What is already done for the three marks
+- A chromosome-based split exists in:
+  - `/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/intervals_long_context.tsv`
+  - `/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_h3k27ac_C/manifest_h3k27ac_C.tsv`
+  - `/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_h3k27me3_C/manifest_h3k27me3_C.tsv`
+  - `/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/backends_all_marks/backend_h3k4me3_C/manifest_h3k4me3_C.tsv`
+  - `/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase3_hyena/phase3_training_index.tsv`
+- Current split counts are:
+  - train = 2505 windows
+  - valid = 164 windows
+  - test = 377 windows
+- Current chromosome assignment is:
+  - train = chr1-16
+  - valid = chr17-18
+  - test = chr19-22 and chrX
+
+What is not yet done in the event-level modeling-prep workflow
+- No files were found yet under:
+  - `/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep`
+- So the following planned outputs do not appear to exist yet:
+  - `sample_manifest.tsv`
+  - `cell_type_to_id.tsv`
+  - `modeling_split_manifest.tsv`
+  - `cpg_event_dataset.tsv.gz`
+  - `cpg_event_dataset.parquet`
+  - separate train / validation / test event-level files
+
+Status for merged_c1 / C1_merged
+- I found preprocessing outputs for `merged_c1`, including:
+  - `/data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/merged_c1/extract_calls.tsv.gz`
+- I did not find a corresponding split manifest or Phase 3 training index entry for `merged_c1`.
+- So, at the moment, the clear on-disk split is present for the three marks, but not for `merged_c1` in this modeling-prep workflow.
+
+Core idea
+For a first clean modeling setup, define each training example as:
+- one CpG event on one read
+
+and store:
+- M = methylated / unmethylated label or probability
+- D = fixed sequence window around that CpG
+- C = cell type label
+
+Recommended first version
+- target M:
+  - binary methylated / unmethylated
+- unit:
+  - one CpG call per row
+- D:
+  - centered sequence window, e.g. 101 bp or 201 bp
+- C:
+  - categorical cell-type label
+
+Why this is the best first step
+- easiest to debug
+- easiest to balance across cell types
+- easiest to evaluate with standard baselines
+- later extendable to probability regression or longer-context models
+
+What to prepare before modeling
+
+1. Standardize the modeling unit
+- One row should represent one CpG call on one read.
+- Do not start from per-read summaries if the model is meant to predict CpG methylation.
+- Keep the raw extract-calls rows as the source of truth.
+
+2. Restrict to CpG cytosine calls
+- Keep only canonical cytosines in CpG context.
+- Use the CpG-restricted extract-calls outputs when available.
+- If needed, re-filter downstream to canonical_base = C and CpG-only positions.
+
+3. Define the target M
+Recommended first target:
+- binary methylated / unmethylated
+
+Practical definition:
+- methylated = call_prob >= threshold
+- unmethylated = call_prob < threshold
+
+Alternative later versions:
+- continuous probability target
+- multi-class bins
+
+4. Extract sequence context D
+- For each CpG event, extract a fixed DNA window around the genomic position.
+- Recommended window sizes:
+  - 101 bp for a fast first model
+  - 201 bp for more context
+  - 501 bp later if needed
+
+5. Encode the cell type C
+- Store cell type as a label string now.
+- Also keep a mapping file:
+  - cell_type_to_id.tsv
+- This is important because more cell types will be added later.
+
+6. Avoid leakage in train/validation/test splits
+Do not randomly split rows without thinking about leakage.
+
+Preferred strategies:
+- split by chromosome
+- or by genomic blocks
+- or by sample-aware genomic partitions
+
+Good first split:
+- train: chr1-16
+- validation: chr17-19
+- test: chr20-22 and chrX
+
+7. Check balance and coverage
+Before training, summarize:
+- methylated vs unmethylated counts
+- counts per cell type
+- counts per chromosome
+- counts per sequence context
+
+If the data are imbalanced:
+- use weighted loss
+- balanced sampling
+- or cap overrepresented groups
+
+8. Save a modeling-ready table
+Recommended columns:
+- sample_id
+- cell_type
+- read_id
+- chrom
+- pos
+- strand
+- seq_window
+- m_label
+- m_prob
+- split
+
+Useful optional columns:
+- mod_code
+- canonical_base
+- ref_kmer
+- mapq
+- source_file
+
+9. Start with simple baselines before large neural models
+Recommended baseline sequence:
+- cell-type-only baseline
+- sequence-only baseline
+- sequence + cell-type logistic baseline
+- shallow neural model
+
+This tells you:
+- how much signal is in C alone
+- how much signal is in D alone
+- whether D and C together improve prediction
+
+10. Future-proof the workflow for more cell types
+- Do not hardcode the current three marks.
+- Treat every sample as:
+  - sample_id
+  - cell_type
+  - BAM / extract-calls source
+  - reference build
+- Keep metadata in one manifest file.
+
+Recommended dataset structure
+
+Project-level files:
+- sample_manifest.tsv
+- cell_type_to_id.tsv
+- modeling_split_manifest.tsv
+
+Event-level modeling table:
+- cpg_event_dataset.tsv.gz
+or:
+- cpg_event_dataset.parquet
+
+Recommended sample manifest schema
+- sample_id
+- cell_type
+- extract_calls_path
+- bam_path
+- reference_fasta
+- reference_name
+- thresholds
+- notes
+
+Example:
+sample_id	cell_type	extract_calls_path	bam_path	reference_fasta	reference_name	thresholds	notes
+h3k27ac	h3k27ac	/path/to/extract_calls.tsv.gz	/path/to/bam	/path/to/hs1.fa	hs1	A:0.9;C:0.8	raw mark sample
+h3k27me3	h3k27me3	/path/to/extract_calls.tsv.gz	/path/to/bam	/path/to/hs1.fa	hs1	A:0.9;C:0.8	raw mark sample
+h3k4me3	h3k4me3	/path/to/extract_calls.tsv.gz	/path/to/bam	/path/to/hs1.fa	hs1	A:0.9;C:0.8	raw mark sample
+merged_c1	merged_c1	/path/to/extract_calls.tsv.gz	/path/to/bam	/path/to/hg38.fa	hg38	A:0.9;C:0.8	merged sample
+
+Important assembly note
+- Your current data are not all on the same reference.
+- The three mark BAMs were matched to hs1 in the earlier workflow note.
+- merged_c1 was handled on hg38/GRCh38-style coordinates.
+
+This matters a lot for modeling.
+Before combining all samples into one training dataset, decide one of:
+- model each reference build separately
+- liftover coordinates and re-check sequence windows
+- only combine after harmonizing the genomic coordinate system
+
+For the first pass, the cleanest choice is:
+- build one hs1 dataset for the three marks
+- build one hg38 dataset for merged_c1
+
+Only merge later if you explicitly harmonize assemblies.
+
+Commands to inspect the raw inputs
+
+1. Check where the workflow note lives
+```bash
+ls -lh /data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/preprocessing_worflow.txt
+```
+
+2. Find extract-calls files
+```bash
+find /data/leuven/383/vsc38330 /staging/leuven/stg_00118 /scratch/leuven/383/vsc38330 -type f 2>/dev/null \
+  | rg 'extract_calls.*tsv.gz$'
+```
+
+3. Preview an extract-calls file
+```bash
+gzip -cd /path/to/extract_calls.tsv.gz | head -n 5
+```
+
+4. Count rows quickly
+```bash
+gzip -cd /path/to/extract_calls.tsv.gz | awk 'END{print NR}'
+```
+
+5. Check likely columns
+```bash
+gzip -cd /path/to/extract_calls.tsv.gz | head -n 1
+```
+
+Suggested directory for modeling preparation
+```bash
+mkdir -p /data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep
+mkdir -p /data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/scripts
+mkdir -p /data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/manifests
+mkdir -p /data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/datasets
+```
+
+Suggested manifest to create now
+Save this as:
+- /data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/manifests/sample_manifest.tsv
+
+Template:
+```tsv
+sample_id	cell_type	extract_calls_path	bam_path	reference_fasta	reference_name	c_threshold	note
+h3k27ac	h3k27ac	/path/to/h3k27ac_extract_calls.tsv.gz	/path/to/h3k27ac.bam	/path/to/hs1.fa	hs1	0.8	raw mark
+h3k27me3	h3k27me3	/path/to/h3k27me3_extract_calls.tsv.gz	/path/to/h3k27me3.bam	/path/to/hs1.fa	hs1	0.8	raw mark
+h3k4me3	h3k4me3	/path/to/h3k4me3_extract_calls.tsv.gz	/path/to/h3k4me3.bam	/path/to/hs1.fa	hs1	0.8	raw mark
+merged_c1	merged_c1	/path/to/merged_c1_extract_calls.tsv.gz	/path/to/merged_c1.bam	/path/to/hg38.fa	hg38	0.8	merged sample
+```
+
+Starter Python script for building a model-ready CpG-event table
+Save this as:
+- /data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/scripts/build_cpg_event_dataset.py
+
+Code:
+```python
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+import csv
+import gzip
+from pathlib import Path
+
+import pysam
+
+
+def parse_args() -> argparse.Namespace:
+    p = argparse.ArgumentParser(description="Build CpG event dataset for P(M | D, C).")
+    p.add_argument("--manifest", required=True)
+    p.add_argument("--out", required=True)
+    p.add_argument("--window", type=int, default=101)
+    p.add_argument("--min-prob", type=float, default=0.8)
+    return p.parse_args()
+
+
+def open_textmaybe_gz(path: str):
+    if path.endswith(".gz"):
+        return gzip.open(path, "rt", encoding="utf-8")
+    return open(path, "r", encoding="utf-8")
+
+
+def assign_split(chrom: str) -> str:
+    if chrom in {f"chr{i}" for i in range(1, 17)}:
+        return "train"
+    if chrom in {"chr17", "chr18", "chr19"}:
+        return "val"
+    return "test"
+
+
+def centered_window(fasta: pysam.FastaFile, chrom: str, pos0: int, width: int) -> str:
+    half = width // 2
+    start = max(0, pos0 - half)
+    end = pos0 + half + 1
+    seq = fasta.fetch(chrom, start, end).upper()
+    return seq
+
+
+def main() -> None:
+    args = parse_args()
+    half = args.window // 2
+
+    with open(args.manifest, "r", encoding="utf-8") as handle:
+        manifest = list(csv.DictReader(handle, delimiter="\t"))
+
+    out_path = Path(args.out)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with gzip.open(out_path, "wt", encoding="utf-8", newline="") as out_handle:
+        writer = csv.writer(out_handle, delimiter="\t")
+        writer.writerow([
+            "sample_id",
+            "cell_type",
+            "chrom",
+            "pos0",
+            "strand",
+            "read_id",
+            "m_prob",
+            "m_label",
+            "seq_window",
+            "split",
+            "reference_name",
+        ])
+
+        for row in manifest:
+            fasta = pysam.FastaFile(row["reference_fasta"])
+            sample_id = row["sample_id"]
+            cell_type = row["cell_type"]
+            ref_name = row["reference_name"]
+
+            with open_textmaybe_gz(row["extract_calls_path"]) as in_handle:
+                reader = csv.DictReader(in_handle, delimiter="\t")
+                for rec in reader:
+                    chrom = rec.get("chrom") or rec.get("ref_name") or rec.get("reference_name")
+                    if not chrom:
+                        continue
+                    canonical_base = rec.get("canonical_base", "")
+                    if canonical_base != "C":
+                        continue
+
+                    ref_kmer = rec.get("ref_kmer", "")
+                    if "CG" not in ref_kmer:
+                        continue
+
+                    try:
+                        pos0 = int(rec.get("ref_position", rec.get("pos", "-1")))
+                    except ValueError:
+                        continue
+                    if pos0 < 0:
+                        continue
+
+                    try:
+                        prob = float(rec.get("call_prob", rec.get("prob", "nan")))
+                    except ValueError:
+                        continue
+
+                    if prob != prob:
+                        continue
+
+                    strand = rec.get("strand", ".")
+                    read_id = rec.get("read_id", rec.get("qname", ""))
+                    seq = centered_window(fasta, chrom, pos0, args.window)
+                    if len(seq) < half + 2:
+                        continue
+
+                    label = 1 if prob >= args.min_prob else 0
+                    split = assign_split(chrom)
+
+                    writer.writerow([
+                        sample_id,
+                        cell_type,
+                        chrom,
+                        pos0,
+                        strand,
+                        read_id,
+                        f"{prob:.6f}",
+                        label,
+                        seq,
+                        split,
+                        ref_name,
+                    ])
+
+
+if __name__ == "__main__":
+    main()
+```
+
+Command to run the starter dataset builder
+```bash
+/data/leuven/383/vsc38330/.venv/bin/python \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/scripts/build_cpg_event_dataset.py \
+  --manifest /data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/manifests/sample_manifest.tsv \
+  --out /data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/datasets/cpg_event_dataset.tsv.gz \
+  --window 101 \
+  --min-prob 0.8
+```
+
+Quick checks after building
+
+1. Preview the output
+```bash
+gzip -cd /data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/datasets/cpg_event_dataset.tsv.gz | head -n 5
+```
+
+2. Count rows
+```bash
+gzip -cd /data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/datasets/cpg_event_dataset.tsv.gz | awk 'END{print NR}'
+```
+
+3. Count rows per cell type
+```bash
+gzip -cd /data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/datasets/cpg_event_dataset.tsv.gz \
+  | awk 'NR>1{n[$2]++} END{for(k in n) print k, n[k]}' | sort
+```
+
+4. Count label balance
+```bash
+gzip -cd /data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/datasets/cpg_event_dataset.tsv.gz \
+  | awk 'NR>1{n[$8]++} END{for(k in n) print k, n[k]}' | sort
+```
+
+5. Count by split
+```bash
+gzip -cd /data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/datasets/cpg_event_dataset.tsv.gz \
+  | awk 'NR>1{n[$10]++} END{for(k in n) print k, n[k]}' | sort
+```
+
+Suggested immediate next milestone
+Before any complex model, aim to produce:
+- a clean cpg_event_dataset.tsv.gz
+- summary counts by cell type and split
+- a simple baseline notebook or script
+
+Recommended first baseline
+- one-hot encode sequence window
+- one-hot encode cell type
+- predict binary M
+
+This can be done with:
+- logistic regression
+- small MLP
+- or a shallow CNN later
+
+Final practical advice
+- First make the dataset correct.
+- Then verify that splits are leakage-safe.
+- Then check class balance.
+- Only after that start training models.
+
+For this project, the dataset-building step is the true next step before read-level P(M | D, C) modeling.
+
+
+CNN compatibility
+
+Yes, the dataset design in this note is fully compatible with a CNN.
+
+In fact, a CNN is one of the most natural first models for:
+- P(M | D, C)
+
+because:
+- D is a short DNA sequence window
+- CNNs are good at learning local motifs and short-range sequence patterns
+- C can be added as a one-hot vector or an embedding
+- M can be predicted as a binary label first, then as a probability later
+
+How the modeling variables map to a CNN
+
+- D:
+  - one-hot encoded DNA sequence window around the CpG event
+  - shape example for a 101 bp window:
+    - 101 x 4
+- C:
+  - cell type identity
+  - simplest first version:
+    - one-hot encoded cell-type vector
+  - later version:
+    - learned embedding
+- M:
+  - first version:
+    - binary methylated / unmethylated label
+  - later version:
+    - continuous methylation probability
+
+Recommended first CNN setup
+
+Use:
+- one CpG event per row
+- one centered sequence window per event
+- one cell-type label per event
+- binary target first
+
+Recommended first hyperparameters
+- sequence window:
+  - 101 bp first
+- target:
+  - binary methylated / unmethylated
+- split:
+  - chromosome-based split
+- loss:
+  - binary cross-entropy
+- metrics:
+  - AUROC
+  - AUPRC
+  - accuracy
+  - per-cell-type AUROC
+
+First CNN architecture idea
+
+Input 1:
+- one-hot DNA sequence window
+
+Input 2:
+- cell type vector
+
+Network:
+1. Conv1D over the sequence
+2. ReLU
+3. Optional second Conv1D
+4. Global max-pooling or average-pooling
+5. Concatenate pooled sequence features with cell-type vector
+6. One or two dense layers
+7. Output sigmoid for binary M
+
+Example architecture sketch
+- input sequence:
+  - 101 x 4
+- conv block 1:
+  - 64 filters
+  - kernel size 7
+- conv block 2:
+  - 64 filters
+  - kernel size 5
+- pooling:
+  - global max pool
+- cell type:
+  - one-hot vector of size n_cell_types
+- concatenate:
+  - pooled sequence features + cell-type vector
+- dense:
+  - 64 units
+- dropout:
+  - 0.2
+- output:
+  - 1 sigmoid unit
+
+Why this is a good first model
+
+- simpler than transformers or large hybrid models
+- good for motif learning
+- fast enough to train and debug
+- easy to compare against logistic regression and MLP baselines
+- extendable when more cell types arrive
+
+What this first CNN will and will not capture
+
+It will capture:
+- local sequence context around the CpG
+- motif combinations
+- cell-type-specific shifts in methylation prediction
+
+It will not directly capture:
+- neighboring methylation calls on the same read
+- longer-range chromatin structure
+- interactions among multiple CpGs on a read
+
+So for the first pass, this CNN is a model for:
+- local P(M | D, C)
+
+and not yet a full model of:
+- read-path dependence across many CpGs
+
+If you later want true read-context modeling
+
+Possible extensions later:
+- add neighboring CpG methylation states on the same read as extra features
+- add CpG density or local GC content
+- add track-level chromatin covariates
+- use a hybrid CNN + recurrent model
+- use a transformer later if longer sequence context becomes important
+
+Recommended modeling progression
+
+Do not jump directly to the final CNN.
+Use this progression:
+
+1. Build and validate the dataset
+2. Run a cell-type-only baseline
+3. Run a sequence-only baseline
+4. Run a sequence + cell-type logistic baseline
+5. Train the first CNN
+6. Evaluate per cell type and per chromosome split
+7. Only then consider more complex architectures
+
+Why binary M is recommended first
+
+- easiest target to debug
+- simpler loss function
+- easier to inspect false positives and false negatives
+- easier to measure whether D and C contain predictive signal
+
+Later, if needed, switch to:
+- regression on call probability
+- ordinal bins
+- uncertainty-aware targets
+
+Suggested model-ready dataset fields for the CNN
+
+Required:
+- sample_id
+- cell_type
+- chrom
+- pos0
+- strand
+- read_id
+- seq_window
+- m_label
+- split
+
+Useful optional additions:
+- m_prob
+- ref_kmer
+- mapq
+- read_length
+- reference_name
+
+Minimal PyTorch-style pseudocode sketch
+
+```python
+seq_input = one_hot_encode(seq_window)      # [L, 4]
+cell_input = one_hot_encode(cell_type_id)   # [n_cell_types]
+
+seq_feat = CNN(seq_input)                   # learned sequence features
+joint = concat(seq_feat, cell_input)
+pred = sigmoid(MLP(joint))
+```
+
+Training objective:
+
+```python
+loss = binary_cross_entropy(pred, m_label)
+```
+
+Practical first training checklist
+
+Before training the CNN, confirm:
+- sequence windows have constant length
+- only CpG events are included
+- labels are balanced enough to train
+- train/val/test are chromosome-based
+- cell types are encoded consistently
+- hs1 and hg38 data are not mixed unintentionally
+
+Important reference-build reminder for the CNN
+
+Your current data are on at least two builds:
+- hs1 for the three histone-mark samples
+- hg38 for merged_c1
+
+For the first CNN experiments, keep them separate:
+- one hs1 dataset
+- one hg38 dataset
+
+Only combine them later if you explicitly harmonize coordinates and sequence extraction.
+
+Practical conclusion
+
+Yes, the plan in this note works with a CNN and supports your original idea well.
+
+The clean first version is:
+- one CpG event per row
+- one fixed DNA sequence window as D
+- one cell-type label as C
+- one binary methylation label as M
+- one CNN over sequence plus cell-type input
+
+That is a strong and coherent first model for P(M | D, C).

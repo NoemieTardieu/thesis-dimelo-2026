@@ -1,0 +1,57 @@
+{
+  "npz": "outputs/merged_e5b_c1_chr11_selected_top100_overlap16k_full5000_region_split.test.npz",
+  "metadata": "outputs/merged_e5b_c1_chr11_selected_top100_overlap16k_full5000_region_split.test.metadata.tsv",
+  "split_name": "test",
+  "checkpoint": "outputs/hyenadna_small32k_4chrom_overlap16k_full5000_region_split_nosample_short_2epochs_1000batches.pt",
+  "model_name": "hyenadna-small-32k-seqlen",
+  "device": "cuda",
+  "reads": 1393,
+  "batch_size": 1,
+  "max_length_used": 32768,
+  "aggregation_unit": "sample/read_id/read_position",
+  "thresholds": {
+    "5mC": 0.5,
+    "6mA": 0.5
+  },
+  "aggregation": {
+    "5mC": {
+      "raw_window_valid_positions": 737013,
+      "aggregated_read_positions": 437087,
+      "duplicate_overlap_observations_removed": 299926
+    },
+    "6mA": {
+      "raw_window_valid_positions": 7387341,
+      "aggregated_read_positions": 4390732,
+      "duplicate_overlap_observations_removed": 2996609
+    }
+  },
+  "metrics": {
+    "5mC": {
+      "valid_positions": 437087,
+      "bce": 0.6156590580940247,
+      "mse": 0.1339874267578125,
+      "mae": 0.3037678897380829,
+      "mean_pred": 0.6159299612045288,
+      "mean_target": 0.5880777835845947,
+      "pearson": 0.43941599130630493,
+      "spearman": 0.3700575224682048,
+      "auroc": 0.7150842747870516,
+      "auprc": 0.751485823655321,
+      "positive_fraction": 0.5931084658203059
+    },
+    "6mA": {
+      "valid_positions": 4390732,
+      "bce": 0.2700861692428589,
+      "mse": 0.035967350006103516,
+      "mae": 0.1150442585349083,
+      "mean_pred": 0.08447809517383575,
+      "mean_target": 0.08072997629642487,
+      "pearson": 0.21244269609451294,
+      "spearman": 0.1838865893003523,
+      "auroc": 0.6891697934630049,
+      "auprc": 0.11984557660556537,
+      "positive_fraction": 0.051994063859966855
+    }
+  },
+  "per_region_metrics": "outputs/hyenadna_small32k_4chrom_overlap16k_full5000_nosample_short_on_chr11_overlapagg_test.per_region_metrics.tsv"
+}

@@ -1,0 +1,747 @@
+THESIS WORKFLOW (HISTONE-MARK INTERPLAY AND CpG CONTEXT)
+========================================================
+
+Purpose
+- Test whether H3K27me3 and H3K4me3 are segregated in the Phase 2 data.
+- Build three figures that directly address mark exclusivity and promoter/TSS organization.
+- Test what can already be supported about CpG methylation antagonism from the existing Phase 2 tracks.
+- State clearly what still requires an external CpG-island / CpG-density annotation.
+
+Important interpretation note
+- In this project, the histone-mark-specific signal track is the assay-derived A-mod / regulatory proxy:
+  - `*.reg_a_mod_per_kb.bw`
+- The CpG-methylation track is:
+  - `*.meth_c_meth_frac.bw`
+- So:
+  - `reg_a_mod_per_kb` = histone-mark-associated A-mod signal
+  - `meth_c_meth_frac` = CpG methylation fraction
+
+Files already available
+- Histone-mark A-mod bigWigs:
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27ac.reg_a_mod_per_kb.bw
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27me3.reg_a_mod_per_kb.bw
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k4me3.reg_a_mod_per_kb.bw
+- CpG methylation bigWigs:
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27ac.meth_c_meth_frac.bw
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27me3.meth_c_meth_frac.bw
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k4me3.meth_c_meth_frac.bw
+- TSS BED:
+  - /lustre1/scratch/383/vsc38330/TSS.bed
+- Promoter BED:
+  - /lustre1/scratch/383/vsc38330/promoters_2kb_clean.bed
+- Phase 2 feature caches:
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_combined/feature_cache_h3k27ac_bin1000_a_mod_per_kb_c_meth_frac_cov30.npz
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_combined/feature_cache_h3k27me3_bin1000_a_mod_per_kb_c_meth_frac_cov30.npz
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_combined/feature_cache_h3k4me3_bin1000_a_mod_per_kb_c_meth_frac_cov30.npz
+
+New helper scripts
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/plot_phase2_mark_relationships.py
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/split_tss_by_expression.py
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/split_bed_by_overlap.py
+
+------------------------------------------------------------
+1) FIGURE 1: GLOBAL H3K27me3 VS H3K4me3 JOINT-DENSITY
+------------------------------------------------------------
+Biological question
+- Are H3K27me3 and H3K4me3 globally segregated across genomic bins?
+
+Why this figure
+- This is the clearest first test of mutual exclusivity.
+- If the marks are strongly segregated, the density should favor:
+  - low/low bins
+  - high-H3K4me3 / low-H3K27me3 bins
+  - high-H3K27me3 / low-H3K4me3 bins
+- It should disfavor co-high bins.
+
+Command
+/data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/plot_phase2_mark_relationships.py joint-density \
+  --cache-a /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_combined/feature_cache_h3k4me3_bin1000_a_mod_per_kb_c_meth_frac_cov30.npz \
+  --cache-b /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_combined/feature_cache_h3k27me3_bin1000_a_mod_per_kb_c_meth_frac_cov30.npz \
+  --label-a H3K4me3_Amod_per_kb \
+  --label-b H3K27me3_Amod_per_kb \
+  --use-cov-intersection \
+  --sample-size 500000 \
+  --out-png /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/h3k4me3_vs_h3k27me3_joint_density.png \
+  --out-tsv /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/h3k4me3_vs_h3k27me3_joint_density_stats.tsv
+
+Expected outputs
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/h3k4me3_vs_h3k27me3_joint_density.png
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/h3k4me3_vs_h3k27me3_joint_density_stats.tsv
+
+Interpretation
+- Strong negative Pearson/Spearman or a clear depletion of co-high bins supports segregation.
+- This is not proof of absolute mutual exclusivity, but it is strong global evidence.
+
+------------------------------------------------------------
+2) FIGURE 2: TSS-CENTERED PROFILE SPLIT BY GENE CLASS
+------------------------------------------------------------
+Biological question
+- Do active-like genes show high H3K4me3 and H3K27ac, while inactive/repressed genes show more H3K27me3?
+
+Why this figure
+- This is the most biologically interpretable figure.
+- It ties the mark behavior to promoter/TSS biology rather than only genome-wide bins.
+
+Requirement
+- This figure needs an expression table.
+- If no expression table is available locally, skip this step for now and go directly to Figure 3.
+
+Step 2A: split the TSS BED by expression
+/data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/split_tss_by_expression.py \
+  --tss-bed /lustre1/scratch/383/vsc38330/TSS.bed \
+  --expression-tsv /path/to/expression_table.tsv \
+  --id-column gene_id \
+  --value-column TPM \
+  --bed-id-mode auto \
+  --mode binary \
+  --expressed-threshold 1.0 \
+  --out-prefix /lustre1/scratch/383/vsc38330/tss_by_expression
+
+Outputs
+- /lustre1/scratch/383/vsc38330/tss_by_expression.expressed.bed
+- /lustre1/scratch/383/vsc38330/tss_by_expression.non_expressed.bed
+
+Step 2B: build a TSS-centered matrix using H3K27ac, H3K4me3, and H3K27me3 A-mod tracks
+/data/leuven/383/vsc38330/.venv/bin/computeMatrix reference-point \
+  -S \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27ac.reg_a_mod_per_kb.bw \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k4me3.reg_a_mod_per_kb.bw \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27me3.reg_a_mod_per_kb.bw \
+  -R \
+  /lustre1/scratch/383/vsc38330/tss_by_expression.expressed.bed \
+  /lustre1/scratch/383/vsc38330/tss_by_expression.non_expressed.bed \
+  --referencePoint TSS \
+  -b 3000 \
+  -a 3000 \
+  --binSize 50 \
+  --skipZeros \
+  --missingDataAsZero \
+  -o /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_mark_expr_matrix.gz
+
+Step 2C: plot the profile
+/data/leuven/383/vsc38330/.venv/bin/plotProfile \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_mark_expr_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_mark_expr_profile.png \
+  --samplesLabel h3k27ac h3k4me3 h3k27me3 \
+  --regionsLabel Expressed Non_expressed \
+  --perGroup
+
+Expected outputs
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_mark_expr_matrix.gz
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_mark_expr_profile.png
+
+Interpretation
+- Expressed genes should favor H3K27ac/H3K4me3 over H3K27me3.
+- Non-expressed genes should show the opposite trend.
+
+------------------------------------------------------------
+3) FIGURE 3: TSS HEATMAP SORTED BY ONE MARK
+------------------------------------------------------------
+Biological question
+- Across the same TSSs, do rows high in H3K4me3 tend to be low in H3K27me3?
+
+Why this figure
+- It is the most visually convincing way to show segregation across loci.
+- It avoids averaging away locus-level structure.
+
+Command
+/data/leuven/383/vsc38330/.venv/bin/computeMatrix reference-point \
+  -S \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k4me3.reg_a_mod_per_kb.bw \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27me3.reg_a_mod_per_kb.bw \
+  -R /lustre1/scratch/383/vsc38330/TSS.bed \
+  --referencePoint TSS \
+  -b 3000 \
+  -a 3000 \
+  --binSize 50 \
+  --skipZeros \
+  --missingDataAsZero \
+  -o /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k4me3_h3k27me3_matrix.gz
+
+/data/leuven/383/vsc38330/.venv/bin/plotHeatmap \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k4me3_h3k27me3_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k4me3_h3k27me3_heatmap_sorted.png \
+  --samplesLabel h3k4me3 h3k27me3 \
+  --sortUsingSamples 1 \
+  --sortUsing mean \
+  --sortRegions descend \
+  --whatToShow "plot, heatmap and colorbar"
+
+Expected outputs
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k4me3_h3k27me3_matrix.gz
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k4me3_h3k27me3_heatmap_sorted.png
+
+Interpretation
+- If the top rows are high for H3K4me3 and low for H3K27me3, while lower rows show the reverse, that is strong visual support for segregation.
+
+------------------------------------------------------------
+4) WHAT YOU CAN TEST NOW ABOUT CpG CONTEXT
+------------------------------------------------------------
+You can already test:
+- whether CpG methylation is low where the histone-mark A-mod signal is high
+- whether CpG methylation and each histone-mark proxy are antagonistic
+
+You cannot yet directly test:
+- whether a region is CpG-rich
+
+Why not
+- `CpG-rich` is about CpG density or CpG island membership.
+- That requires one of:
+  - a CpG-island BED annotation
+  - or the hg38 genome sequence to compute CpG density
+- No local CpG-island BED was found in the current workspace/scratch locations.
+
+------------------------------------------------------------
+5) FIGURE 4: HISTONE MARK VS CpG METHYLATION ANTAGONISM
+------------------------------------------------------------
+Biological question
+- Does CpG methylation antagonize H3K27ac, H3K4me3, and H3K27me3 in these data?
+
+Why this figure
+- It directly tests the last sentence of your biological statement using your own Phase 2 arrays.
+- It does not require any extra annotation file.
+
+Command
+/data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/plot_phase2_mark_relationships.py mark-vs-cpg \
+  --cache h3k27ac=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_combined/feature_cache_h3k27ac_bin1000_a_mod_per_kb_c_meth_frac_cov30.npz \
+  --cache h3k27me3=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_combined/feature_cache_h3k27me3_bin1000_a_mod_per_kb_c_meth_frac_cov30.npz \
+  --cache h3k4me3=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_combined/feature_cache_h3k4me3_bin1000_a_mod_per_kb_c_meth_frac_cov30.npz \
+  --out-hexbin-png /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/marks_vs_cpg_methylation_hexbin.png \
+  --out-deciles-png /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/marks_vs_cpg_methylation_deciles.png \
+  --out-tsv /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/marks_vs_cpg_methylation_stats.tsv
+
+Expected outputs
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/marks_vs_cpg_methylation_hexbin.png
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/marks_vs_cpg_methylation_deciles.png
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/marks_vs_cpg_methylation_stats.tsv
+
+Interpretation
+- Negative or decreasing mark signal as CpG methylation rises supports the antagonism model.
+- This figure addresses `methylated vs unmethylated CpG context`.
+- It does not by itself address `CpG-richness`.
+
+------------------------------------------------------------
+6) HOW TO TEST CpG-RICHNESS DIRECTLY ONCE YOU HAVE A CGI BED
+------------------------------------------------------------
+Needed input
+- A CpG-island BED for hg38, for example:
+  - `/path/to/hg38_cpg_islands.bed`
+
+Step 6A: split promoters into CGI-overlap and non-overlap groups
+/data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/split_bed_by_overlap.py \
+  --query-bed /lustre1/scratch/383/vsc38330/promoters_2kb_clean.bed \
+  --target-bed /data/leuven/383/vsc38330/thesis_dimelo/src/data/hg38_cpg_islands.txt \
+  --out-overlap /lustre1/scratch/383/vsc38330/promoters_2kb_CGI_overlap.bed \
+  --out-nonoverlap /lustre1/scratch/383/vsc38330/promoters_2kb_CGI_nonoverlap.bed
+
+
+Step 6B: compare mark signal over CGI-overlap vs non-overlap promoters
+/data/leuven/383/vsc38330/.venv/bin/computeMatrix reference-point \
+  -S \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27ac.reg_a_mod_per_kb.bw \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k4me3.reg_a_mod_per_kb.bw \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27me3.reg_a_mod_per_kb.bw \
+  -R \
+  /lustre1/scratch/383/vsc38330/promoters_2kb_CGI_overlap.bed \
+  /lustre1/scratch/383/vsc38330/promoters_2kb_CGI_nonoverlap.bed \
+  --referencePoint center \
+  -b 3000 \
+  -a 3000 \
+  --binSize 50 \
+  --skipZeros \
+  --missingDataAsZero \
+  -o /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_cgi_mark_matrix.gz
+
+/data/leuven/383/vsc38330/.venv/bin/plotProfile \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_cgi_mark_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_cgi_mark_profile.png \
+  --samplesLabel h3k27ac h3k4me3 h3k27me3 \
+  --regionsLabel CGI_overlap CGI_nonoverlap \
+  --perGroup
+
+Interpretation
+- This is the direct test for preferential localization to CpG-rich / CpG-island promoters.
+- If H3K4me3/H3K27ac/H3K27me3 are enriched in CGI-overlap promoters, that supports the CpG-rich statement.
+
+------------------------------------------------------------
+7) WHAT YOU CAN CLAIM FROM CURRENT DATA
+------------------------------------------------------------
+Supported now
+- H3K27me3 vs H3K4me3 segregation across bins
+- TSS-centered segregation patterns
+- antagonism between CpG methylation fraction and mark-associated A-mod signal
+
+Not yet supported without extra annotation
+- direct enrichment in CpG-rich / CpG-island regions
+
+Recommended order
+1. Make Figure 1 (joint-density).
+2. Make Figure 3 (sorted TSS heatmap).
+3. If expression data becomes available, make Figure 2.
+4. Make Figure 4 (mark vs CpG methylation antagonism).
+5. Only then add the CpG-island overlap test once a CGI BED is available.
+
+END
+
+ADDENDUM: EXTRA FIGURES TO COMPLETE THE PER-MARK ASSOCIATION SET
+===============================================================
+
+------------------------------------------------------------
+A1) OPTIONAL MATCHING HEATMAP FOR THE EXISTING CGI A-MOD ANALYSIS
+------------------------------------------------------------
+/data/leuven/383/vsc38330/.venv/bin/plotHeatmap \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_cgi_mark_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_cgi_mark_heatmap.png \
+  --samplesLabel h3k27ac h3k4me3 h3k27me3 \
+  --regionsLabel CGI_overlap CGI_nonoverlap \
+  --whatToShow "plot, heatmap and colorbar"
+
+------------------------------------------------------------
+A2) PER-MARK PAIRED TSS PROFILES (CpG METHYLATION + A-MOD)
+------------------------------------------------------------
+Purpose
+- Build one matched CpG-methylation profile and one matched A-mod profile for each mark separately.
+- Use the same TSS-centered geometry for both signals.
+
+Common geometry
+- Regions: /lustre1/scratch/383/vsc38330/TSS.bed
+- Window: -3 kb to +3 kb around TSS
+- Bin size: 50 bp
+
+H3K27ac
+/data/leuven/383/vsc38330/.venv/bin/computeMatrix reference-point \
+  -S /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27ac.meth_c_meth_frac.bw \
+  -R /lustre1/scratch/383/vsc38330/TSS.bed \
+  --referencePoint TSS \
+  -b 3000 \
+  -a 3000 \
+  --binSize 50 \
+  --skipZeros \
+  --missingDataAsZero \
+  -o /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k27ac_meth_matrix.gz
+
+/data/leuven/383/vsc38330/.venv/bin/plotProfile \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k27ac_meth_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k27ac_meth_profile.png \
+  --samplesLabel h3k27ac
+
+/data/leuven/383/vsc38330/.venv/bin/computeMatrix reference-point \
+  -S /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27ac.reg_a_mod_per_kb.bw \
+  -R /lustre1/scratch/383/vsc38330/TSS.bed \
+  --referencePoint TSS \
+  -b 3000 \
+  -a 3000 \
+  --binSize 50 \
+  --skipZeros \
+  --missingDataAsZero \
+  -o /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k27ac_amod_matrix.gz
+
+/data/leuven/383/vsc38330/.venv/bin/plotProfile \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k27ac_amod_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k27ac_amod_profile.png \
+  --samplesLabel h3k27ac
+
+H3K27me3
+/data/leuven/383/vsc38330/.venv/bin/computeMatrix reference-point \
+  -S /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27me3.meth_c_meth_frac.bw \
+  -R /lustre1/scratch/383/vsc38330/TSS.bed \
+  --referencePoint TSS \
+  -b 3000 \
+  -a 3000 \
+  --binSize 50 \
+  --skipZeros \
+  --missingDataAsZero \
+  -o /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k27me3_meth_matrix.gz
+
+
+/data/leuven/383/vsc38330/.venv/bin/plotProfile \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k27me3_meth_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k27me3_meth_profile.png \
+  --samplesLabel h3k27me3
+
+
+/data/leuven/383/vsc38330/.venv/bin/computeMatrix reference-point \
+  -S /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27me3.reg_a_mod_per_kb.bw \
+  -R /lustre1/scratch/383/vsc38330/TSS.bed \
+  --referencePoint TSS \
+  -b 3000 \
+  -a 3000 \
+  --binSize 50 \
+  --skipZeros \
+  --missingDataAsZero \
+  -o /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k27me3_amod_matrix.gz
+
+/data/leuven/383/vsc38330/.venv/bin/plotProfile \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k27me3_amod_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k27me3_amod_profile.png \
+  --samplesLabel h3k27me3
+
+
+H3K4me3
+/data/leuven/383/vsc38330/.venv/bin/computeMatrix reference-point \
+  -S /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k4me3.meth_c_meth_frac.bw \
+  -R /lustre1/scratch/383/vsc38330/TSS.bed \
+  --referencePoint TSS \
+  -b 3000 \
+  -a 3000 \
+  --binSize 50 \
+  --skipZeros \
+  --missingDataAsZero \
+  -o /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k4me3_meth_matrix.gz
+
+
+/data/leuven/383/vsc38330/.venv/bin/plotProfile \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k4me3_meth_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k4me3_meth_profile.png \
+  --samplesLabel h3k4me3
+
+
+/data/leuven/383/vsc38330/.venv/bin/computeMatrix reference-point \
+  -S /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k4me3.reg_a_mod_per_kb.bw \
+  -R /lustre1/scratch/383/vsc38330/TSS.bed \
+  --referencePoint TSS \
+  -b 3000 \
+  -a 3000 \
+  --binSize 50 \
+  --skipZeros \
+  --missingDataAsZero \
+  -o /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k4me3_amod_matrix.gz
+
+/data/leuven/383/vsc38330/.venv/bin/plotProfile \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k4me3_amod_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k4me3_amod_profile.png \
+  --samplesLabel h3k4me3
+
+Interpretation
+- Compare each mark's CpG-methylation profile to its matched A-mod profile.
+- This gives the clearest per-mark view of association between CpG context and mark-linked A-mod signal.
+------------------------------------------------------------
+A3) CpG METHYLATION OVER CGI-OVERLAP VS NON-OVERLAP PROMOTERS
+------------------------------------------------------------
+Purpose
+- Complete the CGI analysis by adding the matched CpG-methylation view for the same CGI promoter classes used in the A-mod analysis.
+
+/data/leuven/383/vsc38330/.venv/bin/computeMatrix reference-point \
+  -S \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27ac.meth_c_meth_frac.bw \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k27me3.meth_c_meth_frac.bw \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_1kb/h3k4me3.meth_c_meth_frac.bw \
+  -R \
+  /lustre1/scratch/383/vsc38330/promoters_2kb_CGI_overlap.bed \
+  /lustre1/scratch/383/vsc38330/promoters_2kb_CGI_nonoverlap.bed \
+  --referencePoint center \
+  -b 3000 \
+  -a 3000 \
+  --binSize 50 \
+  --skipZeros \
+  --missingDataAsZero \
+  -o /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_cgi_meth_matrix.gz
+
+
+/data/leuven/383/vsc38330/.venv/bin/plotProfile \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_cgi_meth_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_cgi_meth_profile.png \
+  --samplesLabel h3k27ac h3k27me3 h3k4me3 \
+  --regionsLabel CGI_overlap CGI_nonoverlap \
+  --perGroup
+
+/data/leuven/383/vsc38330/.venv/bin/plotHeatmap \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_cgi_meth_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_cgi_meth_heatmap.png \
+  --samplesLabel h3k27ac h3k27me3 h3k4me3 \
+  --regionsLabel CGI_overlap CGI_nonoverlap \
+  --whatToShow "plot, heatmap and colorbar"
+
+Interpretation
+- Read this together with the existing A-mod CGI figure.
+- A-mod over CGI classes plus CpG methylation over the same CGI classes gives the matched promoter-class view you were missing.
+
+Recommended complete figure set
+1. Figure 4: global mark-vs-CpG antagonism.
+2. Figure 3: sorted TSS heatmap.
+3. A2: per-mark paired TSS profiles.
+4. Step 6B plus A3: CGI-overlap vs CGI-nonoverlap A-mod and CpG-methylation views.
+
+ADDENDUM: 200 BP GROUPED PROFILES FOR CGI CLASSES AND ACTIVE/INACTIVE TSSs
+==========================================================================
+
+Why this addendum
+- Several earlier profile figures used 1 kb signal tracks and were only displayed at finer bin sizes.
+- If the goal is to make biologically cleaner grouped comparisons, the underlying signal resolution should match the plotting resolution more closely.
+- This section therefore uses:
+  - 200 bp source tracks from `signal_tracks_200bp`
+  - 200 bp `computeMatrix` binning
+- This is the correct setup when you want real 200 bp underlying information, rather than 1 kb tracks displayed at 50 bp.
+
+Concept
+- To put multiple biological groups on the same graph, use:
+  - one signal track with `-S`
+  - multiple BED files with `-R`
+  - `plotProfile --perGroup`
+- Then the different lines represent region classes, not different marks.
+
+Required inputs
+- 200 bp bigWigs:
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_200bp/h3k27ac.reg_a_mod_per_kb.bw
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_200bp/h3k27ac.meth_c_meth_frac.bw
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_200bp/h3k27me3.reg_a_mod_per_kb.bw
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_200bp/h3k27me3.meth_c_meth_frac.bw
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_200bp/h3k4me3.reg_a_mod_per_kb.bw
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_200bp/h3k4me3.meth_c_meth_frac.bw
+- CGI promoter BEDs:
+  - /lustre1/scratch/383/vsc38330/promoters_2kb_CGI_overlap.bed
+  - /lustre1/scratch/383/vsc38330/promoters_2kb_CGI_nonoverlap.bed
+- TSS BED:
+  - /lustre1/scratch/383/vsc38330/TSS.bed
+
+------------------------------------------------------------
+B1) HOW TO CREATE ACTIVE VS INACTIVE TSS BED FILES
+------------------------------------------------------------
+Why
+- Claims about active transcription or repression require a real expression-based split.
+- Without expression data, you cannot justify `active` vs `inactive` labels.
+
+Input needed
+- An expression table with at least:
+  - one identifier column matching the TSS BED ids
+  - one numeric expression column (for example TPM)
+
+# stop here and continue
+Command
+/data/leuven/383/vsc38330/.venv/bin/python \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/split_tss_by_expression.py \
+  --tss-bed /lustre1/scratch/383/vsc38330/TSS.bed \
+  --expression-tsv /path/to/expression_table.tsv \
+  --id-column gene_id \
+  --value-column TPM \
+  --bed-id-mode auto \
+  --mode binary \
+  --expressed-threshold 1.0 \
+  --out-prefix /lustre1/scratch/383/vsc38330/tss
+
+Outputs
+- /lustre1/scratch/383/vsc38330/tss.expressed.bed
+- /lustre1/scratch/383/vsc38330/tss.non_expressed.bed
+
+Optional renaming
+cp /lustre1/scratch/383/vsc38330/tss.expressed.bed /lustre1/scratch/383/vsc38330/tss_active.bed
+cp /lustre1/scratch/383/vsc38330/tss.non_expressed.bed /lustre1/scratch/383/vsc38330/tss_inactive.bed
+
+Interpretation
+- These BEDs allow the same mark to be profiled over two transcriptional classes in the same graph.
+- Use them only if the expression table is real and the id matching is validated.
+
+------------------------------------------------------------
+B2) TRUE 200 BP CGI-OVERLAP VS CGI-NONOVERLAP PROMOTER PROFILES
+------------------------------------------------------------
+Why
+- This is the cleanest way to compare CpG-island promoter classes while keeping the source resolution at 200 bp.
+- It avoids the earlier mismatch of 1 kb source tracks displayed at a finer plotting grid.
+
+How
+- One mark-specific 200 bp bigWig is supplied with `-S`.
+- The two promoter classes are supplied with `-R`.
+- `plotProfile --perGroup` draws the two classes as separate lines.
+
+H3K27ac A-mod
+/data/leuven/383/vsc38330/.venv/bin/computeMatrix reference-point \
+  -S /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_200bp/h3k27ac.reg_a_mod_per_kb.bw \
+  -R \
+  /lustre1/scratch/383/vsc38330/promoters_2kb_CGI_overlap.bed \
+  /lustre1/scratch/383/vsc38330/promoters_2kb_CGI_nonoverlap.bed \
+  --referencePoint center \
+  -b 3000 \
+  -a 3000 \
+  --binSize 200 \
+  --skipZeros \
+  --missingDataAsZero \
+  -o /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_h3k27ac_amod_cgi_200bp_matrix.gz
+
+
+/data/leuven/383/vsc38330/.venv/bin/plotProfile \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_h3k27ac_amod_cgi_200bp_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_h3k27ac_amod_cgi_200bp_profile.png \
+  --samplesLabel h3k27ac \
+  --regionsLabel CGI_overlap CGI_nonoverlap \
+  --perGroup
+
+
+H3K27ac CpG methylation
+/data/leuven/383/vsc38330/.venv/bin/computeMatrix reference-point \
+  -S /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_200bp/h3k27ac.meth_c_meth_frac.bw \
+  -R \
+  /lustre1/scratch/383/vsc38330/promoters_2kb_CGI_overlap.bed \
+  /lustre1/scratch/383/vsc38330/promoters_2kb_CGI_nonoverlap.bed \
+  --referencePoint center \
+  -b 3000 \
+  -a 3000 \
+  --binSize 200 \
+  --skipZeros \
+  --missingDataAsZero \
+  -o /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_h3k27ac_meth_cgi_200bp_matrix.gz
+
+
+/data/leuven/383/vsc38330/.venv/bin/plotProfile \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_h3k27ac_meth_cgi_200bp_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_h3k27ac_meth_cgi_200bp_profile.png \
+  --samplesLabel h3k27ac \
+  --regionsLabel CGI_overlap CGI_nonoverlap \
+  --perGroup
+
+
+H3K27me3 A-mod
+/data/leuven/383/vsc38330/.venv/bin/computeMatrix reference-point \
+  -S /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_200bp/h3k27me3.reg_a_mod_per_kb.bw \
+  -R \
+  /lustre1/scratch/383/vsc38330/promoters_2kb_CGI_overlap.bed \
+  /lustre1/scratch/383/vsc38330/promoters_2kb_CGI_nonoverlap.bed \
+  --referencePoint center \
+  -b 3000 \
+  -a 3000 \
+  --binSize 200 \
+  --skipZeros \
+  --missingDataAsZero \
+  -o /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_h3k27me3_amod_cgi_200bp_matrix.gz
+
+
+/data/leuven/383/vsc38330/.venv/bin/plotProfile \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_h3k27me3_amod_cgi_200bp_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_h3k27me3_amod_cgi_200bp_profile.png \
+  --samplesLabel h3k27me3 \
+  --regionsLabel CGI_overlap CGI_nonoverlap \
+  --perGroup
+
+H3K27me3 CpG methylation
+/data/leuven/383/vsc38330/.venv/bin/computeMatrix reference-point \
+  -S /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_200bp/h3k27me3.meth_c_meth_frac.bw \
+  -R \
+  /lustre1/scratch/383/vsc38330/promoters_2kb_CGI_overlap.bed \
+  /lustre1/scratch/383/vsc38330/promoters_2kb_CGI_nonoverlap.bed \
+  --referencePoint center \
+  -b 3000 \
+  -a 3000 \
+  --binSize 200 \
+  --skipZeros \
+  --missingDataAsZero \
+  -o /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_h3k27me3_meth_cgi_200bp_matrix.gz
+
+
+/data/leuven/383/vsc38330/.venv/bin/plotProfile \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_h3k27me3_meth_cgi_200bp_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_h3k27me3_meth_cgi_200bp_profile.png \
+  --samplesLabel h3k27me3 \
+  --regionsLabel CGI_overlap CGI_nonoverlap \
+  --perGroup
+
+H3K4me3 A-mod
+/data/leuven/383/vsc38330/.venv/bin/computeMatrix reference-point \
+  -S /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_200bp/h3k4me3.reg_a_mod_per_kb.bw \
+  -R \
+  /lustre1/scratch/383/vsc38330/promoters_2kb_CGI_overlap.bed \
+  /lustre1/scratch/383/vsc38330/promoters_2kb_CGI_nonoverlap.bed \
+  --referencePoint center \
+  -b 3000 \
+  -a 3000 \
+  --binSize 200 \
+  --skipZeros \
+  --missingDataAsZero \
+  -o /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_h3k4me3_amod_cgi_200bp_matrix.gz
+
+
+/data/leuven/383/vsc38330/.venv/bin/plotProfile \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_h3k4me3_amod_cgi_200bp_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_h3k4me3_amod_cgi_200bp_profile.png \
+  --samplesLabel h3k4me3 \
+  --regionsLabel CGI_overlap CGI_nonoverlap \
+  --perGroup
+
+H3K4me3 CpG methylation
+/data/leuven/383/vsc38330/.venv/bin/computeMatrix reference-point \
+  -S /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_200bp/h3k4me3.meth_c_meth_frac.bw \
+  -R \
+  /lustre1/scratch/383/vsc38330/promoters_2kb_CGI_overlap.bed \
+  /lustre1/scratch/383/vsc38330/promoters_2kb_CGI_nonoverlap.bed \
+  --referencePoint center \
+  -b 3000 \
+  -a 3000 \
+  --binSize 200 \
+  --skipZeros \
+  --missingDataAsZero \
+  -o /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_h3k4me3_meth_cgi_200bp_matrix.gz
+
+
+/data/leuven/383/vsc38330/.venv/bin/plotProfile \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_h3k4me3_meth_cgi_200bp_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/promoter_h3k4me3_meth_cgi_200bp_profile.png \
+  --samplesLabel h3k4me3 \
+  --regionsLabel CGI_overlap CGI_nonoverlap \
+  --perGroup
+
+Interpretation
+- For each mark, the two lines represent CGI-overlap and CGI-nonoverlap promoter classes.
+- Read the A-mod and CpG-methylation versions together for the same mark.
+- This is the strongest promoter-class comparison available before expression-stratified active/inactive TSS splits are added.
+
+------------------------------------------------------------
+B3) TRUE 200 BP ACTIVE VS INACTIVE TSS PROFILES
+------------------------------------------------------------
+Why
+- These figures are needed if you want to support claims about active transcription and repression.
+- They should only be run once the BED files from B1 exist.
+
+How
+- One mark-specific 200 bp bigWig is supplied with `-S`.
+- The active and inactive TSS BEDs are supplied with `-R`.
+- `plotProfile --perGroup` draws Active and Inactive as separate lines.
+
+Example: H3K27ac A-mod over active vs inactive TSSs
+/data/leuven/383/vsc38330/.venv/bin/computeMatrix reference-point \
+  -S /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_200bp/h3k27ac.reg_a_mod_per_kb.bw \
+  -R \
+  /lustre1/scratch/383/vsc38330/tss_active.bed \
+  /lustre1/scratch/383/vsc38330/tss_inactive.bed \
+  --referencePoint TSS \
+  -b 3000 \
+  -a 3000 \
+  --binSize 200 \
+  --skipZeros \
+  --missingDataAsZero \
+  -o /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k27ac_amod_active_inactive_200bp_matrix.gz
+
+/data/leuven/383/vsc38330/.venv/bin/plotProfile \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k27ac_amod_active_inactive_200bp_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k27ac_amod_active_inactive_200bp_profile.png \
+  --samplesLabel h3k27ac \
+  --regionsLabel Active Inactive \
+  --perGroup
+
+Example: H3K27ac CpG methylation over active vs inactive TSSs
+/data/leuven/383/vsc38330/.venv/bin/computeMatrix reference-point \
+  -S /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/signal_tracks_200bp/h3k27ac.meth_c_meth_frac.bw \
+  -R \
+  /lustre1/scratch/383/vsc38330/tss_active.bed \
+  /lustre1/scratch/383/vsc38330/tss_inactive.bed \
+  --referencePoint TSS \
+  -b 3000 \
+  -a 3000 \
+  --binSize 200 \
+  --skipZeros \
+  --missingDataAsZero \
+  -o /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k27ac_meth_active_inactive_200bp_matrix.gz
+
+/data/leuven/383/vsc38330/.venv/bin/plotProfile \
+  -m /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k27ac_meth_active_inactive_200bp_matrix.gz \
+  -out /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/tss_h3k27ac_meth_active_inactive_200bp_profile.png \
+  --samplesLabel h3k27ac \
+  --regionsLabel Active Inactive \
+  --perGroup
+
+How to generalize to the other marks
+- Replace `h3k27ac` in the input bigWig and output names by:
+  - `h3k27me3`
+  - `h3k4me3`
+- Keep the same `tss_active.bed` and `tss_inactive.bed` region files.
+
+Interpretation
+- These are the figures needed to connect mark-associated signal to transcriptional status.
+- The expected active-promoter pattern is stronger H3K27ac/H3K4me3-associated signal in Active genes, while H3K27me3-associated signal should be stronger in Inactive genes if repression is captured in the data.

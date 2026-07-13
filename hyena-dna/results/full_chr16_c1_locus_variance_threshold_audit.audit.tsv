@@ -1,0 +1,45 @@
+mark	metric	value	numerator	denominator	percent
+5mC	total_genomic_loci_before_filtering	90338345			
+5mC	loci_at_least_one_observation	3721755			
+5mC	loci_at_least_two_contributing_reads	1508851			
+5mC	loci_passing_min_read_coverage_threshold	1185506			
+5mC	loci_included_in_variance_histogram	1185506			
+5mC	reported_loci_from_summary_json	1185506			
+5mC	histogram_array_matches_reported_loci	True			
+5mC	mean_variance	0.08805636226760351			
+5mC	median_variance	0.07954734249370596			
+5mC	q25	0.04165417807442801			
+5mC	q75	0.12897507764291072			
+5mC	q90	0.18315945898352232			
+5mC	q95	0.20064351102639894			
+5mC	q99	0.22306922742081173			
+5mC	variance_equal_zero		13	1185506	0.001096578169996609
+5mC	variance_greater_than_zero		1185493	1185506	99.99890342183
+5mC	variance_ge_0.001		1120357	1185506	94.50454067714546
+5mC	variance_ge_0.005		1056424	1185506	89.11165358926905
+5mC	variance_ge_0.01		1031958	1185506	87.04789347333544
+5mC	variance_ge_0.02		1000433	1185506	84.38869141109366
+5mC	variance_ge_0.05		833341	1185506	70.29411913562647
+5mC	variance_ge_0.1		437187	1185506	36.8776708004852
+6mA	total_genomic_loci_before_filtering	90338345			
+6mA	loci_at_least_one_observation	57465954			
+6mA	loci_at_least_two_contributing_reads	49286996			
+6mA	loci_passing_min_read_coverage_threshold	45226270			
+6mA	loci_included_in_variance_histogram	45226270			
+6mA	reported_loci_from_summary_json	45226270			
+6mA	histogram_array_matches_reported_loci	True			
+6mA	mean_variance	0.02078837333720861			
+6mA	median_variance	0.008028765909032884			
+6mA	q25	0.002273014613560268			
+6mA	q75	0.028133716966727135			
+6mA	q90	0.06011154806650829			
+6mA	q95	0.08111761114099511			
+6mA	q99	0.1310391662234354			
+6mA	variance_equal_zero		1859609	45226270	4.111789453342051
+6mA	variance_greater_than_zero		43366661	45226270	95.88821054665794
+6mA	variance_ge_0.001		38837289	45226270	85.87329664816488
+6mA	variance_ge_0.005		27184875	45226270	60.10859396540993
+6mA	variance_ge_0.01		20503463	45226270	45.33529517247387
+6mA	variance_ge_0.02		14151115	45226270	31.289591204403987
+6mA	variance_ge_0.05		6340309	45226270	14.019084483420807
+6mA	variance_ge_0.1		1236438	45226270	2.733893376570741

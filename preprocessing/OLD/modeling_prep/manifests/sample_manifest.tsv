@@ -1,0 +1,2 @@
+sample_id	cell_type	extract_calls_path	bam_path	reference_fasta	reference_name	c_threshold	note
+merged_c1	merged_c1	/data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/merged_c1/extract_calls.tsv.gz	/staging/leuven/stg_00118/ONT_BAM_Noemie/bam_files/merged_c1.sorted.bam	/data/leuven/383/vsc38330/thesis_dimelo/src/data/hg38.fa	hg38	0.8	first CNN debug dataset from merged sample only

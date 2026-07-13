@@ -1,0 +1,5 @@
+sample	task	mae	pearson	spearman	auroc	auprc	mean_pred	mean_target
+merged_e5b	5mC	0.3036	0.4333	0.3294	0.6952	0.7458	0.5979	0.6091
+merged_e5b	6mA	0.1227	0.1888	0.1443	0.6660	0.1125	0.0966	0.0815
+merged_c1	5mC	0.3096	0.4623	0.3482	0.7083	0.7556	0.5906	0.6131
+merged_c1	6mA	0.1110	0.1852	0.1313	0.6740	0.1095	0.0768	0.0781

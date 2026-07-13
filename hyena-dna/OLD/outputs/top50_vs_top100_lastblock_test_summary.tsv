@@ -1,0 +1,5 @@
+dataset	task	mae	pearson	spearman	auroc	auprc	mean_pred	mean_target
+top50_lastblock_test	5mC	0.3059	0.3582	0.2338	0.6429	0.7552	0.6282	0.6584
+top50_lastblock_test	6mA	0.1122	0.1424	0.1181	0.6469	0.0900	0.0776	0.0778
+top100_lastblock_test	5mC	0.3036	0.4333	0.3294	0.6952	0.7458	0.5979	0.6091
+top100_lastblock_test	6mA	0.1227	0.1888	0.1443	0.6660	0.1125	0.0966	0.0815

@@ -1,0 +1,4 @@
+experimental_sample	scope	number_of_bins	positive_fraction	alpha_pearson	hyena_pearson	delta_hyena_minus_alpha_pearson	winner_pearson	alpha_spearman	hyena_spearman	delta_hyena_minus_alpha_spearman	winner_spearman	alpha_auroc	hyena_auroc	delta_hyena_minus_alpha_auroc	winner_auroc	alpha_auprc	hyena_auprc	delta_hyena_minus_alpha_auprc	winner_auprc
+merged_c1	pooled	14105	0.120	0.568	0.673	0.106	HyenaDNA	0.362	0.520	0.158	HyenaDNA	0.867	0.856	-0.011	AlphaGenome	0.622	0.557	-0.066	AlphaGenome
+merged_e5b	pooled	11854	0.131	0.585	0.685	0.101	HyenaDNA	0.347	0.570	0.223	HyenaDNA	0.837	0.853	0.017	HyenaDNA	0.645	0.571	-0.074	AlphaGenome
+pooled	pooled	16720	0.117	0.581	0.693	0.112	HyenaDNA	0.375	0.573	0.198	HyenaDNA	0.873	0.865	-0.008	similar	0.641	0.565	-0.076	AlphaGenome

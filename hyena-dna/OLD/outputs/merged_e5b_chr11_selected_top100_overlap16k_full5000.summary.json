@@ -1,0 +1,51 @@
+{
+  "bam": "/staging/leuven/stg_00118/ONT_BAM_Noemie/bam_files/merged_e5b.sorted.bam",
+  "extract_full": "/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/by_chunk_merged_per_chrom/extract_full_chr11.tsv.gz",
+  "chrom": "chr11",
+  "regions_bed": "regions/merged_e5b_chr11_selected_100kb_top100.bed",
+  "max_length": 32768,
+  "long_read_mode": "overlap",
+  "window_stride": 16384,
+  "max_reads": 5000,
+  "max_reads_per_region": 50,
+  "n_reads": 5000,
+  "input_ids_shape": [
+    5000,
+    32768
+  ],
+  "target_5mC_shape": [
+    5000,
+    32768
+  ],
+  "target_6mA_shape": [
+    5000,
+    32768
+  ],
+  "valid_5mC_targets": 2444455,
+  "valid_6mA_targets": 29489756,
+  "reads_with_5mC_targets": 4993,
+  "reads_with_6mA_targets": 5000,
+  "counters": {
+    "regions_seen": 100,
+    "bam_records_seen": 2100,
+    "reads_collected": 5000,
+    "windows_collected": 5000,
+    "long_read_windows_collected": 3836,
+    "regions_reached_read_cap": 99,
+    "skip_secondary_supplementary": 49,
+    "skip_low_mapq": 4,
+    "extract_rows_seen": 2180730898,
+    "target_6ma_set": 29489756,
+    "skip_mod_code_C_h": 2444473,
+    "rows_seen_for_selected_windows_but_no_target_set": 1339330,
+    "target_5mc_cpg_set": 2444455,
+    "skip_c_non_cpg": 18,
+    "skip_position_out_of_range": 39504,
+    "early_stop_after_alignment_start": 130543913
+  },
+  "outputs": {
+    "npz": "outputs/merged_e5b_chr11_selected_top100_overlap16k_full5000.npz",
+    "metadata": "outputs/merged_e5b_chr11_selected_top100_overlap16k_full5000.metadata.tsv",
+    "summary": "outputs/merged_e5b_chr11_selected_top100_overlap16k_full5000.summary.json"
+  }
+}

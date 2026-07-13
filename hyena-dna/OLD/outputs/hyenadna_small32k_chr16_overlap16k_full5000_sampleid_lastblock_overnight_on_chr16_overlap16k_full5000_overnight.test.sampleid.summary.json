@@ -1,0 +1,51 @@
+{
+  "npz": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.test.npz",
+  "metadata": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.test.metadata.tsv",
+  "split_name": "test",
+  "checkpoint": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_region_split_sampleid_lastblock_overnight_5epochs_1000batches.pt",
+  "model_name": "hyenadna-small-32k-seqlen",
+  "device": "cuda",
+  "reads": 1877,
+  "reads_evaluated": 1877,
+  "batches_evaluated": 1877,
+  "max_batches": null,
+  "batch_size": 1,
+  "max_length_used": 32768,
+  "num_samples": 2,
+  "sample_embedding_dim": 16,
+  "thresholds": {
+    "5mC": 0.5,
+    "6mA": 0.5
+  },
+  "metrics": {
+    "5mC": {
+      "valid_positions": 1094769,
+      "bce": 0.6039217710494995,
+      "mse": 0.12591128051280975,
+      "mae": 0.3069160580635071,
+      "mean_pred": 0.5525817275047302,
+      "mean_target": 0.6011877059936523,
+      "pearson": 0.4661578834056854,
+      "spearman": 0.39049143255788027,
+      "auroc": 0.7234128007044592,
+      "auprc": 0.7670914922416443,
+      "positive_fraction": 0.6067617917569825
+    },
+    "6mA": {
+      "valid_positions": 10193258,
+      "bce": 0.28017762303352356,
+      "mse": 0.03620348125696182,
+      "mae": 0.10903995484113693,
+      "mean_pred": 0.07237359881401062,
+      "mean_target": 0.08454174548387527,
+      "pearson": 0.22308732569217682,
+      "spearman": 0.19231968032587507,
+      "auroc": 0.6940030876090217,
+      "auprc": 0.12443619082080601,
+      "positive_fraction": 0.052536195983659
+    }
+  },
+  "per_region_metrics": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_sampleid_lastblock_overnight_on_chr16_overlap16k_full5000_overnight.test.sampleid.per_region_metrics.tsv",
+  "per_sample_metrics": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_sampleid_lastblock_overnight_on_chr16_overlap16k_full5000_overnight.test.sampleid.per_sample_metrics.tsv",
+  "per_chrom_metrics": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_sampleid_lastblock_overnight_on_chr16_overlap16k_full5000_overnight.test.sampleid.per_chrom_metrics.tsv"
+}

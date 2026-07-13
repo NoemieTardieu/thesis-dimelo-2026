@@ -1,0 +1,48 @@
+{
+  "bam": "/staging/leuven/stg_00118/ONT_BAM_Noemie/bam_files/merged_c1.sorted.bam",
+  "extract_full": "/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/by_chrom/extract_full_chr16.tsv.gz",
+  "chrom": "chr16",
+  "regions_bed": "regions/chr16_centromere_36300000_46400000.bed",
+  "max_length": 32768,
+  "long_read_mode": "overlap",
+  "window_stride": 16384,
+  "max_reads": 1000,
+  "max_reads_per_region": null,
+  "n_reads": 1000,
+  "input_ids_shape": [
+    1000,
+    32768
+  ],
+  "target_5mC_shape": [
+    1000,
+    32768
+  ],
+  "target_6mA_shape": [
+    1000,
+    32768
+  ],
+  "valid_5mC_targets": 64838,
+  "valid_6mA_targets": 1260192,
+  "reads_with_5mC_targets": 256,
+  "reads_with_6mA_targets": 256,
+  "counters": {
+    "regions_seen": 1,
+    "bam_records_seen": 52411,
+    "skip_secondary_supplementary": 42788,
+    "reads_collected": 1000,
+    "windows_collected": 1000,
+    "skip_low_mapq": 8966,
+    "long_read_windows_collected": 439,
+    "extract_rows_seen": 454489380,
+    "target_6ma_set": 1260192,
+    "skip_mod_code_C_h": 64838,
+    "rows_seen_for_selected_windows_but_no_target_set": 46884,
+    "target_5mc_cpg_set": 64838,
+    "early_stop_after_alignment_start": 46600144
+  },
+  "outputs": {
+    "npz": "outputs/merged_c1_chr16_centromere_overlap16k_first1000.npz",
+    "metadata": "outputs/merged_c1_chr16_centromere_overlap16k_first1000.metadata.tsv",
+    "summary": "outputs/merged_c1_chr16_centromere_overlap16k_first1000.summary.json"
+  }
+}

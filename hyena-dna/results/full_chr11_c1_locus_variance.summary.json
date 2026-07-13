@@ -1,0 +1,81 @@
+{
+  "chrom": "chr11",
+  "chrom_length": 135086622,
+  "extract_full": {
+    "merged_c1": "/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/by_chrom/extract_full_chr11.tsv.gz"
+  },
+  "min_reads": 5,
+  "threshold": 0.5,
+  "counters": {
+    "merged_c1": {
+      "rows_seen": 1405842461,
+      "mapped_rows": 1324789239,
+      "5mC_rows_used": 40916589,
+      "6mA_rows_used": 1242956061
+    }
+  },
+  "groups": {
+    "merged_c1": {
+      "5mC": {
+        "reported_loci": 2614776,
+        "observations_at_reported_loci": 37231095,
+        "median_coverage": 14.0,
+        "median_variance": 0.07543331585465557,
+        "mean_variance": 0.08499349849491124,
+        "variance_q90": 0.19321461846851415,
+        "variance_q95": 0.21681361915625966,
+        "global_mean": 0.5785669567833105,
+        "within_locus_fraction_of_total_variation": 0.4324828994857168,
+        "between_locus_fraction_of_total_variation": 0.5675171005142832
+      },
+      "6mA": {
+        "reported_loci": 77810474,
+        "observations_at_reported_loci": 1214387389,
+        "median_coverage": 15.0,
+        "median_variance": 0.0063170298822544674,
+        "mean_variance": 0.01852699851685497,
+        "variance_q90": 0.05623606639919092,
+        "variance_q95": 0.07805009553890675,
+        "global_mean": 0.05000304630164643,
+        "within_locus_fraction_of_total_variation": 0.8790547249354652,
+        "between_locus_fraction_of_total_variation": 0.12094527506453477
+      }
+    },
+    "all": {
+      "5mC": {
+        "reported_loci": 2614776,
+        "observations_at_reported_loci": 37231095,
+        "median_coverage": 14.0,
+        "median_variance": 0.07543331585465557,
+        "mean_variance": 0.08499349849491124,
+        "variance_q90": 0.19321461846851415,
+        "variance_q95": 0.21681361915625966,
+        "global_mean": 0.5785669567833105,
+        "within_locus_fraction_of_total_variation": 0.4324828994857168,
+        "between_locus_fraction_of_total_variation": 0.5675171005142832
+      },
+      "6mA": {
+        "reported_loci": 77810474,
+        "observations_at_reported_loci": 1214387389,
+        "median_coverage": 15.0,
+        "median_variance": 0.0063170298822544674,
+        "mean_variance": 0.01852699851685497,
+        "variance_q90": 0.05623606639919092,
+        "variance_q95": 0.07805009553890675,
+        "global_mean": 0.05000304630164643,
+        "within_locus_fraction_of_total_variation": 0.8790547249354652,
+        "between_locus_fraction_of_total_variation": 0.12094527506453477
+      }
+    }
+  },
+  "notes": {
+    "5mC_locus": "Only mod_code=m calls at query-sequence CpGs; reverse-strand calls are shifted to the cytosine coordinate of the CpG dyad.",
+    "6mA_locus": "All mapped mod_code=a adenine calls.",
+    "labels": "Uses modkit extract-full probabilities, including inferred zero-probability calls, matching the tensor-label source."
+  },
+  "outputs": {
+    "per_locus_variance": "outputs/full_chr11_c1_locus_variance.per_locus_variance.tsv.gz",
+    "variance_plots": "outputs/full_chr11_c1_locus_variance.variance_plots.png",
+    "summary": "outputs/full_chr11_c1_locus_variance.summary.json"
+  }
+}

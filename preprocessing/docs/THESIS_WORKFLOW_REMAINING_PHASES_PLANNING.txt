@@ -1,0 +1,268 @@
+THESIS WORKFLOW (REMAINING PHASES - PLANNING ONLY)
+==================================================
+
+Purpose
+- This document is a planning roadmap for the thesis after Phase 2.
+- It does not contain commands or code.
+- It is meant to help organize the remaining modeling, evaluation, interpretation, and writing work.
+
+Project status at this point
+- Phase 1 completed:
+  - DiMeLo-seq QC
+  - per-read and per-mark visualization
+  - promoter-feedback-driven exploratory analysis
+- Phase 2 completed:
+  - long-context interval generation
+  - backend construction for methylation labels
+  - 1 kb window-based feature analysis inside long genomic context
+
+Central thesis logic from this point onward
+- Phase 1 established that the raw modBAM data are of usable quality.
+- Phase 2 transformed the data into structured long-context training-ready inputs.
+- The remaining phases test whether long-context sequence models can learn meaningful relationships between DNA sequence, methylation, and regulatory proxy signals.
+
+-----------------------------------------------------------------
+PHASE 3 - FIRST MODELING STAGE: P(M | D, C)
+-----------------------------------------------------------------
+Main question
+- Can methylation state be predicted from DNA sequence and biological context?
+
+Goal
+- Build the first supervised modeling task using methylation as the prediction target.
+- Use this phase to validate that the dataset and training setup are working before moving to more ambitious tasks.
+
+Inputs
+- D:
+  - DNA sequence
+- C:
+  - biological context such as mark identity, cell type, or sample identity
+- M:
+  - methylation labels from Phase 2 backends
+
+Planned modeling idea
+- Start with a simple and stable baseline.
+- Then connect the task to HyenaDNA once the environment is ready.
+- Treat this phase as the first proof that the processed data support predictive modeling.
+
+Outputs to generate
+- train/validation/test split definition
+- model-ready training index
+- baseline metrics for methylation prediction
+- first HyenaDNA-compatible dataset interface
+- short interpretation of what the model learns and where it fails
+
+What success looks like
+- The task runs end-to-end without data leakage.
+- Metrics are above trivial baseline.
+- Performance can be compared across marks or contexts.
+
+What to discuss in the thesis
+- Why methylation prediction is a useful first benchmark
+- Why this task is simpler and safer than directly predicting sparse A-mod signal
+- How this phase validates the preprocessing pipeline
+
+-----------------------------------------------------------------
+PHASE 4 - HYENADNA ADAPTATION FOR METHYLATION-AWARE INPUT
+-----------------------------------------------------------------
+Main question
+- How can HyenaDNA be modified so it can use both sequence and methylation information in long genomic context?
+
+Goal
+- Adapt the model architecture so methylation becomes an additional aligned input channel.
+- Keep the HyenaDNA backbone conceptually intact and only modify the input/output interfaces.
+
+Planned architecture direction
+- preserve the original DNA token embedding
+- add one or more methylation embeddings or projections
+- combine sequence and methylation representations before entering the backbone
+- keep long-range context as the main architectural advantage
+
+Main technical tasks
+- environment setup on compatible GPU stack
+- inspect and validate original HyenaDNA training pipeline
+- define new dataset output format for joint sequence+methylation input
+- adapt embedding layer
+- add prediction head(s)
+- define masking strategy for unknown methylation positions
+
+Outputs to generate
+- design note describing the architectural changes
+- implementation of methylation-aware input handling
+- smoke test proving the modified model can run
+- first training run on a limited subset
+
+What success looks like
+- The modified model trains without breaking the base pipeline.
+- Input shapes, masks, and losses are all consistent.
+- The code remains extensible for later downstream tasks.
+
+What to discuss in the thesis
+- Why long-context modeling matters biologically
+- Why HyenaDNA is more suitable than short-bin models for this project
+- Why methylation is added as an input modality rather than only as a prediction target
+
+-----------------------------------------------------------------
+PHASE 5 - SECOND MODELING STAGE: P(Reg | D, M, C)
+-----------------------------------------------------------------
+Main question
+- Can the directed adenine signal or regulatory proxy be predicted from DNA sequence plus methylation and context?
+
+Goal
+- Move from the easier methylation-prediction task to the more biologically ambitious task.
+- Test whether methylation adds predictive value for regulatory proxy inference.
+
+Inputs
+- D:
+  - DNA sequence
+- M:
+  - CpG methylation information
+- C:
+  - biological/sample context
+- Reg target:
+  - A-mod derived regulatory proxy or normalized regulatory signal
+
+Why this phase matters
+- This is closer to the central biological motivation of the thesis.
+- It tests whether methylation and sequence jointly capture information relevant to chromatin-associated signal.
+
+Planned comparisons
+- sequence-only model
+- sequence + context model
+- sequence + methylation + context model
+- optional short-context versus long-context comparison
+
+Outputs to generate
+- prediction metrics for Reg
+- ablation study showing effect of methylation input
+- per-mark comparison
+- qualitative examples of success and failure regions
+
+What success looks like
+- The model performs better than naive baselines.
+- Adding methylation improves or changes predictive behavior in an interpretable way.
+- Long context is either beneficial or its limitations are clearly documented.
+
+What to discuss in the thesis
+- biological meaning of Reg as a proxy
+- sparsity limitations of A-mod signal
+- what predictive gain from methylation would imply biologically
+
+-----------------------------------------------------------------
+PHASE 6 - EVALUATION, ABLATIONS, AND BIOLOGICAL INTERPRETATION
+-----------------------------------------------------------------
+Main question
+- Which parts of the system actually matter, and are the conclusions biologically plausible?
+
+Goal
+- Turn modeling results into defensible thesis conclusions.
+- Separate engineering success from biological insight.
+
+Recommended evaluation blocks
+- by histone mark
+- by chromosome split
+- by known-label fraction / coverage
+- by read length or confidence thresholds
+- by peak-like versus background regions if external annotations become available
+- by context length where possible
+
+Recommended ablations
+- no methylation input
+- no context input
+- different methylation representations:
+  - binary
+  - fraction
+  - masked unknown handling
+- different Reg definitions:
+  - fraction
+  - normalized density
+- short versus long context
+
+Interpretation layer
+- identify where the model does well
+- identify where it systematically fails
+- connect performance patterns to mark biology and data sparsity
+
+Outputs to generate
+- final performance tables
+- ablation summary table
+- selected figures for Results section
+- concise biological interpretation notes
+
+What success looks like
+- Results are reproducible and interpretable.
+- Negative results, if any, are still informative and framed clearly.
+- The thesis can argue what worked, what did not, and why.
+
+-----------------------------------------------------------------
+PHASE 7 - THESIS WRITING AND FINAL INTEGRATION
+-----------------------------------------------------------------
+Goal
+- Convert the pipeline and model results into a coherent thesis narrative.
+
+Suggested writing structure
+- Introduction:
+  - biological motivation
+  - DiMeLo-seq background
+  - why long-context modeling
+- Methods:
+  - Phase 1 QC
+  - Phase 2 preprocessing and backend generation
+  - modeling tasks and data splits
+  - HyenaDNA adaptation
+- Results:
+  - QC validation
+  - exploratory Phase 1 findings
+  - Phase 2 long-context data preparation
+  - P(M | D, C) results
+  - P(Reg | D, M, C) results
+  - ablations and interpretation
+- Discussion:
+  - strengths
+  - limitations
+  - future work
+
+Recommended final deliverables
+- clean figure set for presentation and manuscript
+- final summary tables
+- clear description of all targets and representations
+- reproducible workflow notes
+
+-----------------------------------------------------------------
+PRACTICAL PRIORITY ORDER
+-----------------------------------------------------------------
+1. Stabilize the Phase 3 modeling dataset and split definition.
+2. Set up a compatible HyenaDNA environment on GPU.
+3. Run the first methylation-prediction baseline.
+4. Adapt HyenaDNA for methylation-aware input.
+5. Run first long-context model experiments.
+6. Move to Reg prediction once the first modeling phase is stable.
+7. Perform ablations and interpretation.
+8. Finalize thesis writing around the completed results.
+
+-----------------------------------------------------------------
+KEY DECISION POINTS TO TRACK DURING PLANNING
+-----------------------------------------------------------------
+1. Target definition
+- exact methylation target representation
+- exact Reg target representation
+
+2. Context definition
+- which biological context variables are included
+- whether context is explicit metadata or implicit through mark-specific datasets
+
+3. Model scope
+- baseline models before HyenaDNA
+- full long-context HyenaDNA fine-tuning versus lighter proof-of-concept runs
+
+4. Evaluation scope
+- which metrics matter most
+- what counts as a meaningful improvement
+
+5. Thesis scope control
+- prioritize one strong modeling story over too many side experiments
+- avoid expanding beyond what can be evaluated rigorously
+
+-----------------------------------------------------------------
+SHORT THESIS NARRATIVE IN ONE LINE
+-----------------------------------------------------------------
+- Phase 1 validated the DiMeLo-seq data, Phase 2 structured it into long-context model-ready inputs, and the remaining phases test whether long-context sequence models can learn biologically meaningful relationships between DNA, methylation, and regulatory proxy signal.

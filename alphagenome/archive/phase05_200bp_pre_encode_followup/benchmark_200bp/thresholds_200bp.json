@@ -1,0 +1,8 @@
+{
+  "bin_size": 200,
+  "threshold_name": "top_10_percent_primary_200bp",
+  "threshold": 0.148506403068899,
+  "minimum_unique_reads": 2,
+  "minimum_observed_positions": 3,
+  "note": "AlphaGenome native 128 bp output was overlap-weighted onto 200 bp genomic evaluation bins."
+}

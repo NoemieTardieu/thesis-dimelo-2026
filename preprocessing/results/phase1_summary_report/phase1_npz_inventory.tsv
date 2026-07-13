@@ -1,0 +1,4 @@
+mark	file	a_tracks_shape	c_tracks_shape	bin_size_shape	ml_threshold_shape
+h3k27ac	h3k27ac.binned_tracks.npz	dtype=|O shape=(2000,)	dtype=|O shape=(2000,)	dtype=<i8 shape=()	dtype=<i8 shape=()
+h3k27me3	h3k27me3.binned_tracks.npz	dtype=|O shape=(2000,)	dtype=|O shape=(2000,)	dtype=<i8 shape=()	dtype=<i8 shape=()
+h3k4me3	h3k4me3.binned_tracks.npz	dtype=|O shape=(2000,)	dtype=|O shape=(2000,)	dtype=<i8 shape=()	dtype=<i8 shape=()

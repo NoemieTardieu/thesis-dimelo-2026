@@ -1,0 +1,25 @@
+{
+  "n_loci_with_profiles": 1,
+  "n_profiles": 5,
+  "n_eligible_pairs": 10,
+  "n_selected_pairs": 0,
+  "outputs": {
+    "all_pairs": "outputs/chr16_c1_paired_read_interpretability_observed_small.all_pairs.tsv",
+    "selected_pairs": "outputs/chr16_c1_paired_read_interpretability_observed_small.selected_pairs.tsv",
+    "report": "outputs/chr16_c1_paired_read_interpretability_observed_small.report.md",
+    "params": "outputs/chr16_c1_paired_read_interpretability_observed_small.params.json",
+    "plot1_png": "outputs/chr16_c1_paired_read_interpretability_observed_small.plot1_dna_vs_observed6ma.png",
+    "plot1_svg": "outputs/chr16_c1_paired_read_interpretability_observed_small.plot1_dna_vs_observed6ma.svg",
+    "plot2_png": "outputs/chr16_c1_paired_read_interpretability_observed_small.plot2_observed_vs_predicted6ma.png",
+    "plot2_svg": "outputs/chr16_c1_paired_read_interpretability_observed_small.plot2_observed_vs_predicted6ma.svg",
+    "plot3_png": "outputs/chr16_c1_paired_read_interpretability_observed_small.plot3_dna_vs_6ma_colored_5mc.png",
+    "plot3_svg": "outputs/chr16_c1_paired_read_interpretability_observed_small.plot3_dna_vs_6ma_colored_5mc.svg",
+    "plot4_png": "outputs/chr16_c1_paired_read_interpretability_observed_small.plot4_observed5mc_vs_observed6ma.png",
+    "plot4_svg": "outputs/chr16_c1_paired_read_interpretability_observed_small.plot4_observed5mc_vs_observed6ma.svg"
+  },
+  "methylation_added_value": {
+    "status": "not_enough_data",
+    "n_pairs": 10,
+    "n_loci": 1
+  }
+}

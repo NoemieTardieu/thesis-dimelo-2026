@@ -1,0 +1,49 @@
+{
+  "sample_a": {
+    "name": "merged_e5b",
+    "sample_id": 0,
+    "reads": 799,
+    "npz": "outputs/merged_e5b_chr17_selected_top100_even50_region_split.test.npz",
+    "metadata": "outputs/merged_e5b_chr17_selected_top100_even50_region_split.test.metadata.tsv"
+  },
+  "sample_b": {
+    "name": "merged_c1",
+    "sample_id": 1,
+    "reads": 766,
+    "npz": "outputs/merged_c1_chr17_selected_top100_even50_region_split.test.npz",
+    "metadata": "outputs/merged_c1_chr17_selected_top100_even50_region_split.test.metadata.tsv"
+  },
+  "combined_reads": 1565,
+  "arrays": {
+    "input_ids": [
+      1565,
+      32768
+    ],
+    "target_5mC": [
+      1565,
+      32768
+    ],
+    "mask_5mC": [
+      1565,
+      32768
+    ],
+    "target_6mA": [
+      1565,
+      32768
+    ],
+    "mask_6mA": [
+      1565,
+      32768
+    ],
+    "sample_id": [
+      1565
+    ]
+  },
+  "valid_5mC_targets": 452408,
+  "valid_6mA_targets": 4575428,
+  "outputs": {
+    "npz": "outputs/merged_e5b_c1_chr17_selected_top100_even50_region_split.test.npz",
+    "metadata": "outputs/merged_e5b_c1_chr17_selected_top100_even50_region_split.test.metadata.tsv",
+    "summary": "outputs/merged_e5b_c1_chr17_selected_top100_even50_region_split.test.summary.json"
+  }
+}

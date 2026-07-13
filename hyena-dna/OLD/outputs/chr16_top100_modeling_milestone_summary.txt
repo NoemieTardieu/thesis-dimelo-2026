@@ -1,0 +1,25 @@
+Chr16 top100 HyenaDNA-small-32k modeling milestone
+==================================================
+
+Dataset:
+- chr16 selected top100 regions
+- up to 50 reads per region
+- samples: merged_e5b and merged_c1
+- input: DNA sequence only
+- targets: CpG 5mC probabilities and adenine 6mA probabilities
+- train/val/test split by genomic region
+
+Main result:
+- 5mC is consistently more predictable from sequence than 6mA.
+- 6mA has weak but real sequence-associated signal.
+- Combining C1 and E5B is stable.
+- Adding sample_id gives small improvements in ranking/correlation and improves 6mA calibration, but does not solve the harder 6mA task.
+
+Best current combined sample-conditioned test metrics:
+- 5mC: Pearson 0.454, Spearman 0.351, AUROC 0.707, AUPRC 0.758
+- 6mA: Pearson 0.193, Spearman 0.149, AUROC 0.672, AUPRC 0.112
+
+Interpretation:
+This is now a valid sequence-only + sample-context baseline for the thesis pipeline.
+The next biological/modeling improvement should be scaling to more regions/chromosomes
+or adding richer context, rather than further small architecture tuning on chr16 only.

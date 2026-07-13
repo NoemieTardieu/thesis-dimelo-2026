@@ -1,0 +1,6 @@
+Started: 2026-07-10T11:52:16+02:00
+Command: population_track_benchmark.py --external-bigwig external_tracks/GSE91218/GSM2421502_ENCFF987FCK_signal_of_unique_reads_GRCh38.bigWig --out-dir outputs/population_track_benchmark_GSM2421502_1kb --bin-size 1000 --bootstrap-replicates 100 --external-cell-type unknown_GSE91218_GSM2421502 --external-assay-type ENCODE signal of unique reads bigWig --external-value-type signal of unique reads --external-value-transform raw bigWig signal
+Python: 3.13.1 (main, Apr 16 2025, 16:04:46) [GCC 14.2.0]
+Platform: Linux-5.14.0-687.17.1.20260609.el9.x86_64-x86_64-with-glibc2.34
+Finished: 2026-07-10T11:54:03+02:00
+Output directory: outputs/population_track_benchmark_GSM2421502_1kb

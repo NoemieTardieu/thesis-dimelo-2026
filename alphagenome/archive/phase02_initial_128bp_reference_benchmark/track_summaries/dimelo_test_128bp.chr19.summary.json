@@ -1,0 +1,21 @@
+{
+  "counters": {
+    "mapped_positions_outside_region": 1819814,
+    "positions_in_partial_edge_bin": 10850,
+    "positions_mapped_to_reference": 4228324,
+    "positions_unmapped": 264770,
+    "primary_alignments_found": 692,
+    "raw_overlap_duplicates_removed": 3721140,
+    "selected_reads": 692,
+    "unique_read_positions": 4493094
+  },
+  "grid_source": "explicit",
+  "metadata": "/data/leuven/383/vsc38330/hyena-dna-main/preprocessing_chr16_merged_e5b/outputs/merged_e5b_c1_chr19_selected_top100_overlap16k_full5000_region_split.test.metadata.tsv",
+  "output": "outputs/dimelo_test_128bp.chr19.tsv",
+  "regions": 15,
+  "samples": [
+    "merged_c1",
+    "merged_e5b",
+    "pooled"
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "input_npz": "outputs/merged_c1_chr16_selected_top100_overlap16k_smoke1000.npz",
+  "input_metadata": "outputs/merged_c1_chr16_selected_top100_overlap16k_smoke1000.metadata.tsv",
+  "regions_bed": "regions/merged_e5b_chr16_selected_100kb_top100.bed",
+  "out_prefix": "outputs/merged_c1_chr16_selected_top100_overlap16k_smoke1000_region_split",
+  "seed": 7,
+  "region_counts": {
+    "train": 70,
+    "val": 15,
+    "test": 15
+  },
+  "unassigned_reads": 0,
+  "counters": {
+    "ambiguous_tie_rows": 0
+  },
+  "splits": {
+    "train": {
+      "reads": 672,
+      "npz": "outputs/merged_c1_chr16_selected_top100_overlap16k_smoke1000_region_split.train.npz",
+      "metadata": "outputs/merged_c1_chr16_selected_top100_overlap16k_smoke1000_region_split.train.metadata.tsv",
+      "valid_5mC_targets": 427903,
+      "valid_6mA_targets": 4120176
+    },
+    "val": {
+      "reads": 118,
+      "npz": "outputs/merged_c1_chr16_selected_top100_overlap16k_smoke1000_region_split.val.npz",
+      "metadata": "outputs/merged_c1_chr16_selected_top100_overlap16k_smoke1000_region_split.val.metadata.tsv",
+      "valid_5mC_targets": 81249,
+      "valid_6mA_targets": 721125
+    },
+    "test": {
+      "reads": 210,
+      "npz": "outputs/merged_c1_chr16_selected_top100_overlap16k_smoke1000_region_split.test.npz",
+      "metadata": "outputs/merged_c1_chr16_selected_top100_overlap16k_smoke1000_region_split.test.metadata.tsv",
+      "valid_5mC_targets": 138426,
+      "valid_6mA_targets": 1286383
+    }
+  },
+  "region_splits": "outputs/merged_c1_chr16_selected_top100_overlap16k_smoke1000_region_split.region_splits.tsv",
+  "metadata_with_splits": "outputs/merged_c1_chr16_selected_top100_overlap16k_smoke1000_region_split.metadata_with_splits.tsv"
+}

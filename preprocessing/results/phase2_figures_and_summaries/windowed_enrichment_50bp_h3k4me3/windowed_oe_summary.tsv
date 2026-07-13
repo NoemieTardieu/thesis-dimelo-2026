@@ -1,0 +1,3 @@
+scope	mark	subset	n_bins
+mark	h3k4me3	coverage_ge_10	60082491
+pooled	all	coverage_ge_10	60082491

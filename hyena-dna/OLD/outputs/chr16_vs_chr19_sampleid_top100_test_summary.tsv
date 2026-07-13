@@ -1,0 +1,5 @@
+chromosome	model	task	mae	pearson	spearman	auroc	auprc	mean_pred	mean_target
+chr16	combined_sampleid	5mC	0.3168	0.4536	0.3512	0.7068	0.7582	0.5719	0.6110
+chr16	combined_sampleid	6mA	0.1104	0.1932	0.1486	0.6718	0.1123	0.0743	0.0799
+chr19	combined_sampleid	5mC	0.3160	0.3732	0.2904	0.6720	0.7430	0.6042	0.6174
+chr19	combined_sampleid	6mA	0.1213	0.1716	0.1435	0.6592	0.1044	0.0887	0.0837

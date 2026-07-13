@@ -1,0 +1,56 @@
+{
+  "dataset_a": {
+    "name": "chr16_chr19",
+    "reads": 13943,
+    "npz": "outputs/merged_e5b_c1_chr16_chr19_selected_top100_overlap16k_full5000_region_split.train.npz",
+    "metadata": "outputs/merged_e5b_c1_chr16_chr19_selected_top100_overlap16k_full5000_region_split.train.metadata.tsv"
+  },
+  "dataset_b": {
+    "name": "chr11",
+    "reads": 7303,
+    "npz": "outputs/merged_e5b_c1_chr11_selected_top100_overlap16k_full5000_region_split.train.npz",
+    "metadata": "outputs/merged_e5b_c1_chr11_selected_top100_overlap16k_full5000_region_split.train.metadata.tsv"
+  },
+  "combined_reads": 21246,
+  "arrays": {
+    "input_ids": [
+      21246,
+      32768
+    ],
+    "target_5mC": [
+      21246,
+      32768
+    ],
+    "mask_5mC": [
+      21246,
+      32768
+    ],
+    "target_6mA": [
+      21246,
+      32768
+    ],
+    "mask_6mA": [
+      21246,
+      32768
+    ],
+    "sample_id": [
+      21246
+    ]
+  },
+  "valid_5mC_targets": 11204582,
+  "valid_6mA_targets": 113980476,
+  "chrom_counts": {
+    "chr16": 6865,
+    "chr19": 7078,
+    "chr11": 7303
+  },
+  "sample_counts": {
+    "merged_e5b": 10671,
+    "merged_c1": 10575
+  },
+  "outputs": {
+    "npz": "outputs/merged_e5b_c1_chr16_chr19_chr11_selected_top100_overlap16k_full5000_region_split.train.npz",
+    "metadata": "outputs/merged_e5b_c1_chr16_chr19_chr11_selected_top100_overlap16k_full5000_region_split.train.metadata.tsv",
+    "summary": "outputs/merged_e5b_c1_chr16_chr19_chr11_selected_top100_overlap16k_full5000_region_split.train.summary.json"
+  }
+}

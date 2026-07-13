@@ -1,0 +1,51 @@
+{
+  "npz": "outputs/merged_e5b_c1_chr17_selected_top100_even50_region_split.test.npz",
+  "metadata": "outputs/merged_e5b_c1_chr17_selected_top100_even50_region_split.test.metadata.tsv",
+  "split_name": "test",
+  "checkpoint": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_region_split_sampleid_lastblock_overnight_5epochs_1000batches.pt",
+  "model_name": "hyenadna-small-32k-seqlen",
+  "device": "cuda",
+  "reads": 1565,
+  "reads_evaluated": 1565,
+  "batches_evaluated": 1565,
+  "max_batches": null,
+  "batch_size": 1,
+  "max_length_used": 32768,
+  "num_samples": 2,
+  "sample_embedding_dim": 16,
+  "thresholds": {
+    "5mC": 0.5,
+    "6mA": 0.5
+  },
+  "metrics": {
+    "5mC": {
+      "valid_positions": 452408,
+      "bce": 0.6059034466743469,
+      "mse": 0.12959130108356476,
+      "mae": 0.3125292658805847,
+      "mean_pred": 0.5518190860748291,
+      "mean_target": 0.6085079908370972,
+      "pearson": 0.45595595240592957,
+      "spearman": 0.3783707634453025,
+      "auroc": 0.7192091914139617,
+      "auprc": 0.7716046302890658,
+      "positive_fraction": 0.61502007037895
+    },
+    "6mA": {
+      "valid_positions": 4575428,
+      "bce": 0.27073705196380615,
+      "mse": 0.034138068556785583,
+      "mae": 0.1079501062631607,
+      "mean_pred": 0.07445355504751205,
+      "mean_target": 0.0799202099442482,
+      "pearson": 0.19702808558940887,
+      "spearman": 0.17116541945275812,
+      "auroc": 0.6676578627277652,
+      "auprc": 0.10628175242605054,
+      "positive_fraction": 0.048666703967366554
+    }
+  },
+  "per_region_metrics": "outputs/hyenadna_small32k_chr16_overlap_overnight_on_chr17_on_chr17_test.test.sampleid.per_region_metrics.tsv",
+  "per_sample_metrics": "outputs/hyenadna_small32k_chr16_overlap_overnight_on_chr17_on_chr17_test.test.sampleid.per_sample_metrics.tsv",
+  "per_chrom_metrics": "outputs/hyenadna_small32k_chr16_overlap_overnight_on_chr17_on_chr17_test.test.sampleid.per_chrom_metrics.tsv"
+}

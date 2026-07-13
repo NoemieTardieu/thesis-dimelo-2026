@@ -1,0 +1,140 @@
+{
+  "group": "merged_c1",
+  "chrom": "chr16",
+  "min_reads": 5,
+  "threshold_line": 0.02,
+  "important_note": "The previously reported 49.5% for 5mC and 88.2% for 6mA are within-locus fractions of total variation, not proportions of loci above a variance threshold.",
+  "histogram_consistency": "Threshold percentages and new histograms/ECDFs are computed from the exact same filtered variance arrays loaded from the per-locus TSV.",
+  "old_within_locus_fraction_of_total_variation": {
+    "5mC": 0.495077467624168,
+    "6mA": 0.8824370581398544
+  },
+  "old_between_locus_fraction_of_total_variation": {
+    "5mC": 0.504922532375832,
+    "6mA": 0.1175629418601455
+  },
+  "marks": {
+    "5mC": {
+      "total_genomic_loci_before_filtering": 90338345,
+      "loci_at_least_one_observation": 3721755,
+      "loci_at_least_two_contributing_reads": 1508851,
+      "loci_passing_min_read_coverage_threshold": 1185506,
+      "loci_included_in_variance_histogram": 1185506,
+      "reported_loci_from_summary_json": 1185506,
+      "histogram_array_matches_reported_loci": true,
+      "variance_equal_zero": {
+        "numerator": 13,
+        "denominator": 1185506,
+        "percent": 0.001096578169996609
+      },
+      "variance_greater_than_zero": {
+        "numerator": 1185493,
+        "denominator": 1185506,
+        "percent": 99.99890342183
+      },
+      "variance_ge_0.001": {
+        "numerator": 1120357,
+        "denominator": 1185506,
+        "percent": 94.50454067714546
+      },
+      "variance_ge_0.005": {
+        "numerator": 1056424,
+        "denominator": 1185506,
+        "percent": 89.11165358926905
+      },
+      "variance_ge_0.01": {
+        "numerator": 1031958,
+        "denominator": 1185506,
+        "percent": 87.04789347333544
+      },
+      "variance_ge_0.02": {
+        "numerator": 1000433,
+        "denominator": 1185506,
+        "percent": 84.38869141109366
+      },
+      "variance_ge_0.05": {
+        "numerator": 833341,
+        "denominator": 1185506,
+        "percent": 70.29411913562647
+      },
+      "variance_ge_0.1": {
+        "numerator": 437187,
+        "denominator": 1185506,
+        "percent": 36.8776708004852
+      },
+      "mean_variance": 0.08805636226760351,
+      "median_variance": 0.07954734249370596,
+      "quantiles": {
+        "q25": 0.04165417807442801,
+        "q75": 0.12897507764291072,
+        "q90": 0.18315945898352232,
+        "q95": 0.20064351102639894,
+        "q99": 0.22306922742081173
+      }
+    },
+    "6mA": {
+      "total_genomic_loci_before_filtering": 90338345,
+      "loci_at_least_one_observation": 57465954,
+      "loci_at_least_two_contributing_reads": 49286996,
+      "loci_passing_min_read_coverage_threshold": 45226270,
+      "loci_included_in_variance_histogram": 45226270,
+      "reported_loci_from_summary_json": 45226270,
+      "histogram_array_matches_reported_loci": true,
+      "variance_equal_zero": {
+        "numerator": 1859609,
+        "denominator": 45226270,
+        "percent": 4.111789453342051
+      },
+      "variance_greater_than_zero": {
+        "numerator": 43366661,
+        "denominator": 45226270,
+        "percent": 95.88821054665794
+      },
+      "variance_ge_0.001": {
+        "numerator": 38837289,
+        "denominator": 45226270,
+        "percent": 85.87329664816488
+      },
+      "variance_ge_0.005": {
+        "numerator": 27184875,
+        "denominator": 45226270,
+        "percent": 60.10859396540993
+      },
+      "variance_ge_0.01": {
+        "numerator": 20503463,
+        "denominator": 45226270,
+        "percent": 45.33529517247387
+      },
+      "variance_ge_0.02": {
+        "numerator": 14151115,
+        "denominator": 45226270,
+        "percent": 31.289591204403987
+      },
+      "variance_ge_0.05": {
+        "numerator": 6340309,
+        "denominator": 45226270,
+        "percent": 14.019084483420807
+      },
+      "variance_ge_0.1": {
+        "numerator": 1236438,
+        "denominator": 45226270,
+        "percent": 2.733893376570741
+      },
+      "mean_variance": 0.02078837333720861,
+      "median_variance": 0.008028765909032884,
+      "quantiles": {
+        "q25": 0.002273014613560268,
+        "q75": 0.028133716966727135,
+        "q90": 0.06011154806650829,
+        "q95": 0.08111761114099511,
+        "q99": 0.1310391662234354
+      }
+    }
+  },
+  "outputs": {
+    "threshold_density_ecdf_png": "outputs/full_chr16_c1_locus_variance_threshold_audit.threshold_density_ecdf.png",
+    "threshold_density_ecdf_svg": "outputs/full_chr16_c1_locus_variance_threshold_audit.threshold_density_ecdf.svg",
+    "threshold_count_histograms_png": "outputs/full_chr16_c1_locus_variance_threshold_audit.threshold_count_histograms.png",
+    "threshold_count_histograms_svg": "outputs/full_chr16_c1_locus_variance_threshold_audit.threshold_count_histograms.svg"
+  }
+}

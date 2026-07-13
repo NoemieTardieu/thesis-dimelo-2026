@@ -1,0 +1,43 @@
+{
+  "npz": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.val.npz",
+  "metadata": "outputs/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.val.metadata.tsv",
+  "split_name": "val",
+  "checkpoint": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_reg_given_m_nosample_mlp256_lowlr_lastblock_25epochs_1000batches.best.pt",
+  "model_type": "P(Reg|D,M)",
+  "model_name": "hyenadna-small-32k-seqlen",
+  "device": "cuda",
+  "reads": 1258,
+  "batch_size": 1,
+  "max_length_used": 32768,
+  "sample_conditioned": false,
+  "decoder_hidden_dim": 256,
+  "decoder_dropout": 0.15,
+  "aggregation_unit": "sample/read_id/read_position",
+  "thresholds": {
+    "6mA": 0.5
+  },
+  "aggregation": {
+    "6mA": {
+      "raw_window_valid_positions": 6594628,
+      "aggregated_read_positions": 3887376,
+      "duplicate_overlap_observations_removed": 2707252
+    }
+  },
+  "metrics": {
+    "6mA": {
+      "valid_positions": 3887376,
+      "bce": 0.2586649954319,
+      "mse": 0.03520132228732109,
+      "mae": 0.10816571861505508,
+      "mean_pred": 0.07606802880764008,
+      "mean_target": 0.07635491341352463,
+      "pearson": 0.21310872151883378,
+      "spearman": 0.22079648311271868,
+      "auroc": 0.6797486426468958,
+      "auprc": 0.10951084041141307,
+      "positive_fraction": 0.04995683463601154,
+      "auprc_enrichment": 2.1921092721209328
+    }
+  },
+  "per_region_metrics": "outputs/hyenadna_small32k_chr16_overlap16k_full5000_reg_given_m_nosample_mlp256_lowlr_best_val_overlapagg.per_region_metrics.tsv"
+}

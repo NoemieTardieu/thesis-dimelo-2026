@@ -1,0 +1,5 @@
+case	read_label	sample	read_id	chrom	position_0based	read_pos	target_6ma	target_5mc_context_mean	target_5mc_context_observed	mapq	is_reverse	pair_signal_delta	pair_dna_distance
+same_locus_different_6mA	read_A	merged_c1	84eef2cb-c881-4843-b34e-c524dd76adca	chr16	67190397	21294	0.998046875	0.013671875	1	60	False	0.90625	0.6086956521739131
+same_locus_different_6mA	read_B	merged_c1	61d946d9-1b7b-40b3-9ed9-0757a6ac2f28	chr16	67190397	8031	0.091796875	0.498046875	1	60	False	0.90625	0.6086956521739131
+same_locus_similar_6mA_different_DNA	read_A	merged_c1	84eef2cb-c881-4843-b34e-c524dd76adca	chr16	67190397	21294	0.998046875	0.013671875	1	60	False	0.00390625	0.6086956521739131
+same_locus_similar_6mA_different_DNA	read_B	merged_c1	3de6c837-f883-4ea2-8cda-7a5402047fa4	chr16	67190397	13088	0.994140625	0.072265625	1	60	False	0.00390625	0.6086956521739131

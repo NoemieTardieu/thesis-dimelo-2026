@@ -1,0 +1,16 @@
+experimental_sample	scope	number_of_bins	positive_fraction	alpha_pearson	hyena_pearson	delta_hyena_minus_alpha_pearson	winner_pearson	alpha_spearman	hyena_spearman	delta_hyena_minus_alpha_spearman	winner_spearman	alpha_auroc	hyena_auroc	delta_hyena_minus_alpha_auroc	winner_auroc	alpha_auprc	hyena_auprc	delta_hyena_minus_alpha_auprc	winner_auprc
+merged_c1	pooled	27993	0.125	0.455	0.563	0.108	HyenaDNA	0.300	0.419	0.119	HyenaDNA	0.795	0.803	0.008	similar	0.484	0.473	-0.012	AlphaGenome
+merged_c1	chr11	6634	0.120	0.453	0.575	0.122	HyenaDNA	0.273	0.440	0.167	HyenaDNA	0.758	0.810	0.052	HyenaDNA	0.418	0.468	0.050	HyenaDNA
+merged_c1	chr16	8624	0.118	0.464	0.600	0.136	HyenaDNA	0.297	0.427	0.130	HyenaDNA	0.818	0.808	-0.011	AlphaGenome	0.488	0.491	0.003	similar
+merged_c1	chr17	5837	0.115	0.467	0.571	0.104	HyenaDNA	0.357	0.420	0.064	HyenaDNA	0.822	0.824	0.002	similar	0.518	0.503	-0.015	AlphaGenome
+merged_c1	chr19	6898	0.146	0.444	0.510	0.065	HyenaDNA	0.298	0.388	0.090	HyenaDNA	0.779	0.778	-0.002	similar	0.519	0.443	-0.076	AlphaGenome
+merged_e5b	pooled	25154	0.153	0.454	0.558	0.104	HyenaDNA	0.293	0.468	0.175	HyenaDNA	0.749	0.791	0.042	HyenaDNA	0.491	0.474	-0.017	AlphaGenome
+merged_e5b	chr11	6932	0.142	0.465	0.544	0.079	HyenaDNA	0.289	0.455	0.166	HyenaDNA	0.734	0.778	0.044	HyenaDNA	0.465	0.475	0.011	HyenaDNA
+merged_e5b	chr16	7846	0.152	0.464	0.577	0.113	HyenaDNA	0.303	0.489	0.185	HyenaDNA	0.784	0.813	0.029	HyenaDNA	0.532	0.503	-0.029	AlphaGenome
+merged_e5b	chr17	3250	0.138	0.446	0.618	0.172	HyenaDNA	0.282	0.483	0.201	HyenaDNA	0.761	0.796	0.036	HyenaDNA	0.457	0.478	0.022	HyenaDNA
+merged_e5b	chr19	7126	0.172	0.439	0.521	0.082	HyenaDNA	0.303	0.463	0.159	HyenaDNA	0.723	0.778	0.056	HyenaDNA	0.490	0.448	-0.042	AlphaGenome
+pooled	pooled	31707	0.123	0.477	0.593	0.116	HyenaDNA	0.326	0.491	0.164	HyenaDNA	0.809	0.823	0.014	HyenaDNA	0.517	0.495	-0.023	AlphaGenome
+pooled	chr11	7842	0.108	0.479	0.607	0.128	HyenaDNA	0.321	0.498	0.177	HyenaDNA	0.782	0.834	0.052	HyenaDNA	0.465	0.513	0.048	HyenaDNA
+pooled	chr16	9470	0.123	0.490	0.608	0.118	HyenaDNA	0.329	0.499	0.171	HyenaDNA	0.829	0.825	-0.004	similar	0.542	0.511	-0.031	AlphaGenome
+pooled	chr17	6205	0.111	0.472	0.613	0.141	HyenaDNA	0.330	0.488	0.159	HyenaDNA	0.816	0.836	0.020	HyenaDNA	0.501	0.509	0.008	similar
+pooled	chr19	8190	0.145	0.470	0.552	0.082	HyenaDNA	0.345	0.478	0.132	HyenaDNA	0.803	0.803	0.001	similar	0.549	0.460	-0.089	AlphaGenome

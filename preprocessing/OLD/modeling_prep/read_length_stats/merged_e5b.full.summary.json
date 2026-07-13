@@ -1,0 +1,37 @@
+{
+  "bam": "/staging/leuven/stg_00118/ONT_BAM_Noemie/bam_files/merged_e5b.sorted.bam",
+  "length_cutoff": 32000,
+  "max_reads": null,
+  "filters": {
+    "include_unmapped": false,
+    "include_secondary_supplementary": false
+  },
+  "counters": {
+    "records_seen": 17320900,
+    "skip_secondary_supplementary": 4247968,
+    "primary_reads_counted": 12303347,
+    "skip_unmapped": 769585
+  },
+  "n_reads": 12303347,
+  "total_read_bases": 154503663246,
+  "n_reads_le_cutoff": 11396463,
+  "fraction_reads_le_cutoff": 0.9262896511006314,
+  "bases_in_reads_le_cutoff": 114964944471,
+  "fraction_bases_in_reads_le_cutoff": 0.7440920302837957,
+  "n_reads_gt_cutoff": 906884,
+  "min_length": 43,
+  "mean_length": 12557.856268379654,
+  "median_length": 8864.0,
+  "max_length": 1635764,
+  "quantiles": {
+    "q01": 135,
+    "q05": 526,
+    "q10": 1856,
+    "q25": 5010,
+    "q50": 8864,
+    "q75": 16460,
+    "q90": 28188,
+    "q95": 36689,
+    "q99": 54104
+  }
+}

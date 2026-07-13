@@ -1,0 +1,5 @@
+model	task	mae	pearson	spearman	auroc	auprc	mean_pred	mean_target
+combined_pooled	5mC	0.3106	0.4494	0.3464	0.7049	0.7554	0.5982	0.6110
+combined_sampleid	5mC	0.3168	0.4536	0.3512	0.7068	0.7582	0.5719	0.6110
+combined_pooled	6mA	0.1045	0.1882	0.1370	0.6757	0.1112	0.0621	0.0799
+combined_sampleid	6mA	0.1104	0.1932	0.1486	0.6718	0.1123	0.0743	0.0799

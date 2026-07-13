@@ -1,0 +1,265 @@
+------------------------------------------------------------
+EXTRA VALIDATION FIGURES FOR PHASE 2 METHYLATION VS A-MOD DEPENDENCE
+------------------------------------------------------------
+
+Purpose
+- This workflow collects the best additional validation figures for the Phase 2 claim that CpG methylation fraction (M) and mark-associated A-mod signal (Reg) are dependent but not redundant.
+- It is designed as a follow-up to:
+  - /data/leuven/383/vsc38330/thesis_dimelo/THESIS_WORKFLOW_HISTONE_MARK_INTERPLAY_AND_CPG_CONTEXT.txt
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/plot_phase2_mark_relationships.py
+
+Core inputs already available
+- 1 kb caches:
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_combined/feature_cache_h3k27ac_bin1000_a_mod_per_kb_c_meth_frac_cov30.npz
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_combined/feature_cache_h3k27me3_bin1000_a_mod_per_kb_c_meth_frac_cov30.npz
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_combined/feature_cache_h3k4me3_bin1000_a_mod_per_kb_c_meth_frac_cov30.npz
+- 200 bp caches:
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_200bp_combined/feature_cache_h3k27ac_bin200_a_mod_per_kb_c_meth_frac_cov10.npz
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_200bp_combined/feature_cache_h3k27me3_bin200_a_mod_per_kb_c_meth_frac_cov10.npz
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_200bp_combined/feature_cache_h3k4me3_bin200_a_mod_per_kb_c_meth_frac_cov10.npz
+- 50 bp caches:
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_50bp_combined/feature_cache_h3k27ac_bin50_a_mod_per_kb_c_meth_frac_cov10.npz
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_50bp_combined/feature_cache_h3k27me3_bin50_a_mod_per_kb_c_meth_frac_cov10.npz
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_50bp_combined/feature_cache_h3k4me3_bin50_a_mod_per_kb_c_meth_frac_cov10.npz
+- Promoter and CGI BEDs already used elsewhere:
+  - /lustre1/scratch/383/vsc38330/promoters_2kb_clean.bed
+  - /lustre1/scratch/383/vsc38330/promoters_2kb_CGI_overlap.bed
+  - /lustre1/scratch/383/vsc38330/promoters_2kb_CGI_nonoverlap.bed
+
+Recommended new helper script
+- Create one general helper here:
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/dependence_validation/phase2_dependency_validation.py
+- Reason:
+  - all six requested figures reuse the same cache inputs
+  - all need the same basic operations: load cache, apply optional region mask, bin values, shuffle Reg, compute MI, draw panels, and write TSV summaries
+
+Suggested output directory
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/dependence_validation
+
+Create it first
+- mkdir -p /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/dependence_validation
+
+------------------------------------------------------------
+FIGURE 1) PERMUTATION-BASED NULL COMPARISON
+------------------------------------------------------------
+
+Why
+- This is the cleanest statistical validation.
+- It tests whether the observed M-Reg structure disappears when the pairing between M and Reg is broken.
+
+What to do
+- Keep the observed methylation array fixed.
+- Shuffle Reg across bins.
+- Recompute the same quantile-based observed/expected heatmap.
+- Compare observed, shuffled, and observed-minus-shuffled.
+
+Best output
+- One 3-column panel per mark:
+  - observed O/E heatmap
+  - shuffled O/E heatmap
+  - observed minus shuffled heatmap
+- Also write a TSV with observed and shuffled Spearman and mutual information.
+
+Recommended command pattern
+- 1 kb:
+  /data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/dependence_validation/phase2_dependency_validation.py permutation-oe     --cache h3k27ac=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_combined/feature_cache_h3k27ac_bin1000_a_mod_per_kb_c_meth_frac_cov30.npz     --cache h3k27me3=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_combined/feature_cache_h3k27me3_bin1000_a_mod_per_kb_c_meth_frac_cov30.npz     --cache h3k4me3=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_combined/feature_cache_h3k4me3_bin1000_a_mod_per_kb_c_meth_frac_cov30.npz     --n-quantiles 10     --n-shuffles 100     --out-prefix /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/dependence_validation/permutation_oe_1kb
+- 200 bp:
+  /data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/dependence_validation/phase2_dependency_validation.py permutation-oe     --cache h3k27ac=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_200bp_combined/feature_cache_h3k27ac_bin200_a_mod_per_kb_c_meth_frac_cov10.npz     --cache h3k27me3=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_200bp_combined/feature_cache_h3k27me3_bin200_a_mod_per_kb_c_meth_frac_cov10.npz     --cache h3k4me3=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_200bp_combined/feature_cache_h3k4me3_bin200_a_mod_per_kb_c_meth_frac_cov10.npz     --n-quantiles 10     --n-shuffles 100     --out-prefix /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/dependence_validation/permutation_oe_200bp
+- 50 bp:
+  /data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/dependence_validation/phase2_dependency_validation.py permutation-oe     --cache h3k27ac=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_50bp_combined/feature_cache_h3k27ac_bin50_a_mod_per_kb_c_meth_frac_cov10.npz     --cache h3k27me3=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_50bp_combined/feature_cache_h3k27me3_bin50_a_mod_per_kb_c_meth_frac_cov10.npz     --cache h3k4me3=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_50bp_combined/feature_cache_h3k4me3_bin50_a_mod_per_kb_c_meth_frac_cov10.npz     --n-quantiles 10     --n-shuffles 100     --out-prefix /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/dependence_validation/permutation_oe_50bp
+
+Expected outputs
+- permutation_oe_<resolution>.png
+- permutation_oe_<resolution>.tsv
+
+------------------------------------------------------------
+FIGURE 2) MUTUAL INFORMATION ACROSS RESOLUTIONS AND MARKS
+------------------------------------------------------------
+
+Why
+- Mutual information is a compact non-linear dependence summary.
+- It complements Pearson and Spearman and lets you compare resolutions directly.
+
+What to do
+- For each mark and resolution, bin M and Reg into quantiles.
+- Compute MI on the 2D contingency table.
+- Optionally subtract the mean shuffled-null MI.
+
+Best output
+- Grouped bar plot or heatmap:
+  - x-axis = resolution
+  - groups = marks
+  - y-axis = MI or delta-MI over null
+
+Recommended command
+/data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/dependence_validation/phase2_dependency_validation.py mutual-information-summary   --cache 1kb:h3k27ac=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_combined/feature_cache_h3k27ac_bin1000_a_mod_per_kb_c_meth_frac_cov30.npz   --cache 1kb:h3k27me3=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_combined/feature_cache_h3k27me3_bin1000_a_mod_per_kb_c_meth_frac_cov30.npz   --cache 1kb:h3k4me3=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_1kb_combined/feature_cache_h3k4me3_bin1000_a_mod_per_kb_c_meth_frac_cov30.npz   --cache 200bp:h3k27ac=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_200bp_combined/feature_cache_h3k27ac_bin200_a_mod_per_kb_c_meth_frac_cov10.npz   --cache 200bp:h3k27me3=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_200bp_combined/feature_cache_h3k27me3_bin200_a_mod_per_kb_c_meth_frac_cov10.npz   --cache 200bp:h3k4me3=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_200bp_combined/feature_cache_h3k4me3_bin200_a_mod_per_kb_c_meth_frac_cov10.npz   --cache 50bp:h3k27ac=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_50bp_combined/feature_cache_h3k27ac_bin50_a_mod_per_kb_c_meth_frac_cov10.npz   --cache 50bp:h3k27me3=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_50bp_combined/feature_cache_h3k27me3_bin50_a_mod_per_kb_c_meth_frac_cov10.npz   --cache 50bp:h3k4me3=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_50bp_combined/feature_cache_h3k4me3_bin50_a_mod_per_kb_c_meth_frac_cov10.npz   --n-quantiles 10   --n-shuffles 100   --out-prefix /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/dependence_validation/mi_summary
+
+Expected outputs
+- mi_summary.png
+- mi_summary.tsv
+
+------------------------------------------------------------
+FIGURE 3) CONDITIONAL DISTRIBUTION OF REG GIVEN METHYLATION
+------------------------------------------------------------
+
+Why
+- This shows how the full Reg distribution shifts as methylation increases.
+- It is biologically stronger than only showing a decile mean trend.
+
+What to do
+- Bin methylation into deciles.
+- For each methylation decile, plot the distribution of Reg.
+- Make one panel per mark.
+
+Best output
+- Violin plots or boxplots of Reg across methylation deciles.
+
+Recommended command pattern
+- 200 bp:
+  /data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/dependence_validation/phase2_dependency_validation.py conditional-distribution     --cache h3k27ac=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_200bp_combined/feature_cache_h3k27ac_bin200_a_mod_per_kb_c_meth_frac_cov10.npz     --cache h3k27me3=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_200bp_combined/feature_cache_h3k27me3_bin200_a_mod_per_kb_c_meth_frac_cov10.npz     --cache h3k4me3=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_200bp_combined/feature_cache_h3k4me3_bin200_a_mod_per_kb_c_meth_frac_cov10.npz     --n-quantiles 10     --sample-size 300000     --out-prefix /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/dependence_validation/conditional_reg_200bp
+- Repeat with the 50 bp or 1 kb cache paths if needed.
+
+Expected outputs
+- conditional_reg_<resolution>.png
+- conditional_reg_<resolution>.tsv
+
+------------------------------------------------------------
+FIGURE 4) PROMOTER VS BACKGROUND / CGI STRATIFIED COMPARISON
+------------------------------------------------------------
+
+Why
+- This tests whether the dependence is stronger in biologically relevant regulatory regions than genome-wide.
+
+What to do
+- Repeat the same M-Reg dependence analysis separately for:
+  - genome-wide bins
+  - promoters_2kb_clean
+  - promoters_2kb_CGI_overlap
+  - promoters_2kb_CGI_nonoverlap
+
+Important implementation note
+- This requires mapping each cache bin back to genomic coordinates and masking bins by BED overlap.
+- The new helper script should support:
+  - --regions-bed label=/path/to/file.bed
+  - plus an implicit genome-wide background group
+
+Recommended command
+/data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/dependence_validation/phase2_dependency_validation.py region-stratified   --cache h3k27ac=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_200bp_combined/feature_cache_h3k27ac_bin200_a_mod_per_kb_c_meth_frac_cov10.npz   --cache h3k27me3=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_200bp_combined/feature_cache_h3k27me3_bin200_a_mod_per_kb_c_meth_frac_cov10.npz   --cache h3k4me3=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_200bp_combined/feature_cache_h3k4me3_bin200_a_mod_per_kb_c_meth_frac_cov10.npz   --regions-bed promoters=/lustre1/scratch/383/vsc38330/promoters_2kb_clean.bed   --regions-bed cgi_promoters=/lustre1/scratch/383/vsc38330/promoters_2kb_CGI_overlap.bed   --regions-bed noncgi_promoters=/lustre1/scratch/383/vsc38330/promoters_2kb_CGI_nonoverlap.bed   --plot-type deciles   --out-prefix /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/dependence_validation/promoter_background_200bp
+
+Expected outputs
+- promoter_background_200bp.png
+- promoter_background_200bp.tsv
+
+------------------------------------------------------------
+FIGURE 5) CLUSTER OVERLAP / CONTINGENCY FIGURE
+------------------------------------------------------------
+
+Why
+- This directly tests whether methylation-defined states and Reg-defined states align or diverge.
+- It supports a “related but not redundant” interpretation.
+
+What to do
+- For a chosen region set, cluster regions by methylation profile.
+- Cluster the same regions by A-mod profile or decile vector.
+- Cross-tabulate memberships.
+
+Most defensible region sets
+- promoters_2kb_clean
+- TSS regions
+- HOX gene set if you want a locus-focused figure
+
+Best output
+- Contingency heatmap of cluster labels:
+  - rows = methylation clusters
+  - columns = Reg clusters
+
+Recommended command
+/data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/dependence_validation/phase2_dependency_validation.py cluster-contingency   --cache /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_200bp_combined/feature_cache_h3k27me3_bin200_a_mod_per_kb_c_meth_frac_cov10.npz   --region-bed /lustre1/scratch/383/vsc38330/promoters_2kb_clean.bed   --n-clusters 4   --out-prefix /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/dependence_validation/h3k27me3_cluster_contingency_200bp
+
+Expected outputs
+- h3k27me3_cluster_contingency_200bp.png
+- h3k27me3_cluster_contingency_200bp.tsv
+
+------------------------------------------------------------
+FIGURE 6) 2D MEAN TREND SURFACE / MARK-BY-METHYLATION TREND SUMMARY
+------------------------------------------------------------
+
+Why
+- This is the cleanest mark-comparison summary.
+- It shows how mean Reg changes across methylation deciles for all marks in one panel.
+
+What to do
+- Bin M into deciles.
+- Compute the mean Reg for each decile.
+- Arrange results as:
+  - rows = marks
+  - columns = methylation deciles
+  - value = mean Reg
+
+Best output
+- Heatmap of mark-by-decile mean Reg
+- Optional line plot overlay of all marks on the same axes
+
+Recommended command
+/data/leuven/383/vsc38330/.venv/bin/python /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/dependence_validation/phase2_dependency_validation.py mark-trend-surface   --cache h3k27ac=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_50bp_combined/feature_cache_h3k27ac_bin50_a_mod_per_kb_c_meth_frac_cov10.npz   --cache h3k27me3=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_50bp_combined/feature_cache_h3k27me3_bin50_a_mod_per_kb_c_meth_frac_cov10.npz   --cache h3k4me3=/data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_50bp_combined/feature_cache_h3k4me3_bin50_a_mod_per_kb_c_meth_frac_cov10.npz   --n-quantiles 10   --out-prefix /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/dependence_validation/mark_trend_surface_50bp
+
+for h3k27ac:
+/data/leuven/383/vsc38330/.venv/bin/python \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/dependence_validation/phase2_dependency_validation.py \
+  cluster-contingency \
+  --cache /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_200bp_combined/feature_cache_h3k27ac_bin200_a_mod_per_kb_c_meth_frac_cov10.npz \
+  --region-bed /lustre1/scratch/383/vsc38330/promoters_2kb_clean.bed \
+  --n-clusters 4 \
+  --out-prefix /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/dependence_validation/h3k27ac_cluster_contingency_200bp
+
+for h3k4me3:
+/data/leuven/383/vsc38330/.venv/bin/python \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/dependence_validation/phase2_dependency_validation.py \
+  cluster-contingency \
+  --cache /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/phase2_long_context/windowed_enrichment_200bp_combined/feature_cache_h3k4me3_bin200_a_mod_per_kb_c_meth_frac_cov10.npz \
+  --region-bed /lustre1/scratch/383/vsc38330/promoters_2kb_clean.bed \
+  --n-clusters 4 \
+  --out-prefix /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/dependence_validation/h3k4me3_cluster_contingency_200bp
+
+
+Expected outputs
+- mark_trend_surface_50bp_heatmap.png
+- mark_trend_surface_50bp_lines.png
+- mark_trend_surface_50bp.tsv
+
+------------------------------------------------------------
+PRACTICAL ORDER OF EXECUTION
+------------------------------------------------------------
+
+Recommended order
+1. Permutation null comparison
+2. Mutual information summary
+3. Conditional Reg distributions
+4. Mark-by-methylation trend surface
+5. Promoter-vs-background comparison
+6. Cluster contingency
+
+Why this order
+- 1 to 4 use only the Phase 2 cache files and are the fastest to justify statistically.
+- 5 and 6 need extra region masking or clustering logic and are better done after the core null and summary figures exist.
+
+------------------------------------------------------------
+WHAT ALREADY EXISTS VS WHAT IS NEW
+------------------------------------------------------------
+
+Already existing and reusable
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/plot_phase2_mark_relationships.py
+  - already gives hexbin, decile trend, and joint-density style figures
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/split_bed_by_overlap.py
+  - already gives promoter CGI vs non-CGI BEDs
+
+New work needed
+- /data/leuven/383/vsc38330/thesis_dimelo/src/preprocessing/genomic_context/dependence_validation/phase2_dependency_validation.py
+  - should implement the six figure families above using the existing NPZ cache structure
+
+Interpretation guidance
+- If the shuffled null removes the structure, that is the strongest validation.
+- If MI is largest at broader resolution, that supports a scale-dependent dependence claim.
+- If violin or box plots show that high Reg becomes rare at high M, that is biologically stronger than a mean-only trend.
+- If promoters or CGI promoters show stronger structure than background, that supports biological specificity.
+- If cluster overlap is partial rather than perfect, that supports related-but-not-redundant information content.

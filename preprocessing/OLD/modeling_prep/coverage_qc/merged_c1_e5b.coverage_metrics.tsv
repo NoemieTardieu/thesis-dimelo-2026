@@ -1,0 +1,11 @@
+Sample	Threshold	Percent
+merged_c1	1	93.125
+merged_e5b	1	92.737
+merged_c1	5	92.168
+merged_e5b	5	91.787
+merged_c1	10	91.673
+merged_e5b	10	91.499
+merged_c1	20	84.810
+merged_e5b	20	91.041
+merged_c1	30	57.500
+merged_e5b	30	85.437
