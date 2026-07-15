@@ -1,0 +1,26 @@
+{
+  "n_loci_with_profiles": 1,
+  "n_profiles": 6,
+  "n_eligible_pairs": 15,
+  "n_selected_pairs": 1,
+  "outputs": {
+    "all_pairs": "hyena-dna/results/chr17_c1_paired_read_interpretability_expanded.all_pairs.tsv",
+    "selected_pairs": "hyena-dna/results/chr17_c1_paired_read_interpretability_expanded.selected_pairs.tsv",
+    "within_locus_associations": "hyena-dna/results/chr17_c1_paired_read_interpretability_expanded.within_locus_associations.tsv",
+    "selected_pair_position_audit": "hyena-dna/results/chr17_c1_paired_read_interpretability_expanded.selected_pair_position_audit.tsv",
+    "report": "hyena-dna/results/chr17_c1_paired_read_interpretability_expanded.report.md",
+    "params": "hyena-dna/results/chr17_c1_paired_read_interpretability_expanded.params.json",
+    "plot1_png": "hyena-dna/results/chr17_c1_paired_read_interpretability_expanded.plot1_dna_vs_observed6ma.png",
+    "plot1_svg": "hyena-dna/results/chr17_c1_paired_read_interpretability_expanded.plot1_dna_vs_observed6ma.svg",
+    "plot3_png": "hyena-dna/results/chr17_c1_paired_read_interpretability_expanded.plot3_dna_vs_6ma_colored_5mc.png",
+    "plot3_svg": "hyena-dna/results/chr17_c1_paired_read_interpretability_expanded.plot3_dna_vs_6ma_colored_5mc.svg",
+    "plot4_png": "hyena-dna/results/chr17_c1_paired_read_interpretability_expanded.plot4_observed5mc_vs_observed6ma.png",
+    "plot4_svg": "hyena-dna/results/chr17_c1_paired_read_interpretability_expanded.plot4_observed5mc_vs_observed6ma.svg",
+    "pair_1": "hyena-dna/results/chr17_c1_paired_read_interpretability_expanded.pair_D_lowDNA_low6mA_1.png"
+  },
+  "methylation_added_value": {
+    "status": "not_enough_data",
+    "n_pairs": 15,
+    "n_loci": 1
+  }
+}

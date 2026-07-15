@@ -1,0 +1,2 @@
+locus_id	n_pairs	dna_vs_6ma_pearson	dna_vs_6ma_spearman	dna_vs_6ma_n	5mc_vs_6ma_pearson	5mc_vs_6ma_spearman	5mc_vs_6ma_n	observed_vs_predicted_6ma_pearson	observed_vs_predicted_6ma_spearman	observed_vs_predicted_6ma_n
+chr17:28710746-28711246	15	0.060970952203540874	0.01608579730793425	15	0.6559751814326971	0.5964285714285712	15			0
