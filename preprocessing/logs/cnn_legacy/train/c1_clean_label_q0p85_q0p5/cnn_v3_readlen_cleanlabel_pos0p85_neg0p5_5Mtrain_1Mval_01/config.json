@@ -1,0 +1,20 @@
+{
+  "train_npz": "/data/leuven/383/vsc38330/thesis_dimelo/train/c1_clean_label_q0p85_q0p5/merged_c1_cleanlabel_pos0p85_neg0p5_readlen_train_balanced_5M_per_class.nonoverlap.npz",
+  "val_npz": "/data/leuven/383/vsc38330/thesis_dimelo/train/c1_clean_label_q0p85_q0p5/merged_c1_cleanlabel_pos0p85_neg0p5_readlen_val_balanced_1M_per_class.nonoverlap.npz",
+  "out_dir": "/data/leuven/383/vsc38330/thesis_dimelo/train/c1_clean_label_q0p85_q0p5/cnn_v3_readlen_cleanlabel_pos0p85_neg0p5_5Mtrain_1Mval_01",
+  "epochs": 20,
+  "batch_size": 8192,
+  "lr": 0.0005,
+  "embedding_dim": 12,
+  "conv_channels": 64,
+  "dropout": 0.3,
+  "weight_decay": 0.0001,
+  "seed": 42,
+  "device": "cpu",
+  "train_rows": 10000000,
+  "val_rows": 2000000,
+  "extra_scalar_features": [
+    "read_length_norm",
+    "log_read_length_norm"
+  ]
+}

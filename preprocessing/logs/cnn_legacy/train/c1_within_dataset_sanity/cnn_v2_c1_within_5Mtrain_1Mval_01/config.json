@@ -1,0 +1,16 @@
+{
+  "train_npz": "/data/leuven/383/vsc38330/thesis_dimelo/train/c1_within_dataset_sanity/merged_c1_train_balanced_5M_per_class.nonoverlap.npz",
+  "val_npz": "/data/leuven/383/vsc38330/thesis_dimelo/train/c1_within_dataset_sanity/merged_c1_val_balanced_1M_per_class.nonoverlap.npz",
+  "out_dir": "/data/leuven/383/vsc38330/thesis_dimelo/train/c1_within_dataset_sanity/cnn_v2_c1_within_5Mtrain_1Mval_01",
+  "epochs": 20,
+  "batch_size": 8192,
+  "lr": 0.0005,
+  "embedding_dim": 12,
+  "conv_channels": 64,
+  "dropout": 0.3,
+  "weight_decay": 0.0001,
+  "seed": 42,
+  "device": "cpu",
+  "train_rows": 10000000,
+  "val_rows": 2000000
+}

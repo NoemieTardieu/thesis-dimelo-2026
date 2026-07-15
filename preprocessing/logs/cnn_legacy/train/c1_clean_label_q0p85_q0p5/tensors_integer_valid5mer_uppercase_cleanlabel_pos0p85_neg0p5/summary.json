@@ -1,0 +1,36 @@
+{
+  "input": "/data/leuven/383/vsc38330/thesis_dimelo/train/c1_clean_label_q0p85_q0p5/merged_c1_C_m_cleanlabel_pos0p85_neg0p5.valid5mer.uppercase.cnn_features.tsv.gz",
+  "output_dir": "/data/leuven/383/vsc38330/thesis_dimelo/train/c1_clean_label_q0p85_q0p5/tensors_integer_valid5mer_uppercase_cleanlabel_pos0p85_neg0p5",
+  "chunk_size": 2000000,
+  "chunks_written": 19,
+  "rows_written": 37465350,
+  "label_counts": {
+    "0": 18670034,
+    "1": 18795316
+  },
+  "encoding": {
+    "bases": {
+      "A": 0,
+      "C": 1,
+      "G": 2,
+      "T": 3,
+      "N": 4
+    },
+    "ref_strand": {
+      "+": 1,
+      "-": 0
+    },
+    "ref_mod_strand": {
+      "+": 1,
+      "-": 0
+    }
+  },
+  "arrays": [
+    "ref_kmer",
+    "query_kmer",
+    "pos_norm",
+    "ref_strand",
+    "ref_mod_strand",
+    "label"
+  ]
+}

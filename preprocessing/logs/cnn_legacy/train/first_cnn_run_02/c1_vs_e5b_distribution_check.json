@@ -1,0 +1,1543 @@
+{
+  "parameters": {
+    "max_chunks": 32,
+    "max_rows_per_chunk": 200000,
+    "seed": 42
+  },
+  "train": {
+    "directory": "/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/tensors_integer_valid5mer_uppercase",
+    "chunks_sampled": 22,
+    "rows_sampled": 4224923,
+    "label_counts": {
+      "0": 2250558,
+      "1": 1974365
+    },
+    "label_fractions": {
+      "0": 0.5326861578305687,
+      "1": 0.4673138421694312
+    },
+    "ref_strand_counts": {
+      "0": 2113779,
+      "1": 2111144
+    },
+    "ref_mod_strand_counts": {
+      "0": 2113779,
+      "1": 2111144
+    },
+    "pos_norm": {
+      "min": 0.0,
+      "p01": 0.012621518224477768,
+      "p05": 0.05500823259353638,
+      "p25": 0.25613704323768616,
+      "median": 0.49857279658317566,
+      "p75": 0.7428298592567444,
+      "p95": 0.9455975890159607,
+      "p99": 0.988259494304657,
+      "max": 0.9999557137489319,
+      "mean": 0.4994908273220062
+    },
+    "top_ref_kmers": [
+      {
+        "value": "TCGAA",
+        "count": 344567,
+        "fraction": 0.08155580586912471
+      },
+      {
+        "value": "ATCGA",
+        "count": 273793,
+        "fraction": 0.06480425797109202
+      },
+      {
+        "value": "AACGG",
+        "count": 81793,
+        "fraction": 0.019359642767453986
+      },
+      {
+        "value": "CTCGA",
+        "count": 78091,
+        "fraction": 0.01848341378055884
+      },
+      {
+        "value": "TTCGT",
+        "count": 64061,
+        "fraction": 0.015162643200834667
+      },
+      {
+        "value": "ACGGA",
+        "count": 60625,
+        "fraction": 0.014349373941252894
+      },
+      {
+        "value": "CCCGG",
+        "count": 54851,
+        "fraction": 0.012982721815285155
+      },
+      {
+        "value": "TCGTT",
+        "count": 54108,
+        "fraction": 0.012806860622075242
+      },
+      {
+        "value": "CCGCC",
+        "count": 53660,
+        "fraction": 0.012700823186600088
+      },
+      {
+        "value": "ACGGG",
+        "count": 53620,
+        "fraction": 0.012691355558432663
+      },
+      {
+        "value": "GGCGG",
+        "count": 52141,
+        "fraction": 0.012341290006942139
+      },
+      {
+        "value": "CCGGG",
+        "count": 51965,
+        "fraction": 0.01229963244300547
+      },
+      {
+        "value": "CTCGG",
+        "count": 43517,
+        "fraction": 0.010300069374045397
+      },
+      {
+        "value": "CCGAG",
+        "count": 43308,
+        "fraction": 0.010250601016870604
+      },
+      {
+        "value": "CACGC",
+        "count": 42937,
+        "fraction": 0.01016278876561774
+      },
+      {
+        "value": "GCGTG",
+        "count": 42340,
+        "fraction": 0.010021484415218928
+      },
+      {
+        "value": "GCCGC",
+        "count": 42136,
+        "fraction": 0.009973199511565063
+      },
+      {
+        "value": "CCCGC",
+        "count": 40992,
+        "fraction": 0.00970242534597672
+      },
+      {
+        "value": "TGCGT",
+        "count": 39106,
+        "fraction": 0.00925602667788265
+      },
+      {
+        "value": "AACGA",
+        "count": 38616,
+        "fraction": 0.0091400482328317
+      },
+      {
+        "value": "GCGGG",
+        "count": 37899,
+        "fraction": 0.008970340997930613
+      },
+      {
+        "value": "CCCGA",
+        "count": 37522,
+        "fraction": 0.008881108602452637
+      },
+      {
+        "value": "GCGCC",
+        "count": 37345,
+        "fraction": 0.008839214347811783
+      },
+      {
+        "value": "GGCGC",
+        "count": 37111,
+        "fraction": 0.008783828723032348
+      },
+      {
+        "value": "CCGCT",
+        "count": 36793,
+        "fraction": 0.008708561079101323
+      }
+    ],
+    "top_query_kmers": [
+      {
+        "value": "TTCGA",
+        "count": 405709,
+        "fraction": 0.09602754890444157
+      },
+      {
+        "value": "ATCGA",
+        "count": 318419,
+        "fraction": 0.07536681733607926
+      },
+      {
+        "value": "CCCGG",
+        "count": 115078,
+        "fraction": 0.027237892856272174
+      },
+      {
+        "value": "GGCGG",
+        "count": 114668,
+        "fraction": 0.02714084966755607
+      },
+      {
+        "value": "CTCGA",
+        "count": 114423,
+        "fraction": 0.027082860445030596
+      },
+      {
+        "value": "AACGG",
+        "count": 113869,
+        "fraction": 0.026951733794911767
+      },
+      {
+        "value": "AACGA",
+        "count": 108810,
+        "fraction": 0.02575431552243674
+      },
+      {
+        "value": "TTCGT",
+        "count": 102180,
+        "fraction": 0.024185056153686116
+      },
+      {
+        "value": "TCCGT",
+        "count": 100345,
+        "fraction": 0.023750728711505513
+      },
+      {
+        "value": "CTCGG",
+        "count": 95379,
+        "fraction": 0.022575322674519747
+      },
+      {
+        "value": "CACGC",
+        "count": 93933,
+        "fraction": 0.02223306791626735
+      },
+      {
+        "value": "CCCGT",
+        "count": 86280,
+        "fraction": 0.02042167395713484
+      },
+      {
+        "value": "CCCGC",
+        "count": 86280,
+        "fraction": 0.02042167395713484
+      },
+      {
+        "value": "GGCGC",
+        "count": 79861,
+        "fraction": 0.01890235632696738
+      },
+      {
+        "value": "GCCGG",
+        "count": 79317,
+        "fraction": 0.018773596583890405
+      },
+      {
+        "value": "GGCGT",
+        "count": 76964,
+        "fraction": 0.018216663356941654
+      },
+      {
+        "value": "GCCGC",
+        "count": 76879,
+        "fraction": 0.018196544647085876
+      },
+      {
+        "value": "CACGT",
+        "count": 75139,
+        "fraction": 0.017784702821802906
+      },
+      {
+        "value": "AGCGG",
+        "count": 72162,
+        "fraction": 0.01708007459544233
+      },
+      {
+        "value": "ATCGT",
+        "count": 71943,
+        "fraction": 0.017028239331225683
+      },
+      {
+        "value": "CCCGA",
+        "count": 71059,
+        "fraction": 0.016819004748725597
+      },
+      {
+        "value": "TGCGT",
+        "count": 68212,
+        "fraction": 0.01614514631390915
+      },
+      {
+        "value": "ATCGC",
+        "count": 65965,
+        "fraction": 0.015613302301604076
+      },
+      {
+        "value": "GCCGA",
+        "count": 65751,
+        "fraction": 0.015562650490908355
+      },
+      {
+        "value": "CACGG",
+        "count": 65526,
+        "fraction": 0.015509395082466591
+      }
+    ],
+    "top_ref_query_pairs": [
+      {
+        "value": "TCGAA|TTCGA",
+        "count": 333201,
+        "fraction": 0.07886557932535102
+      },
+      {
+        "value": "ATCGA|ATCGA",
+        "count": 262420,
+        "fraction": 0.06211237459238902
+      },
+      {
+        "value": "AACGG|AACGG",
+        "count": 77213,
+        "fraction": 0.01827559934228387
+      },
+      {
+        "value": "CTCGA|CTCGA",
+        "count": 70977,
+        "fraction": 0.016799596110982376
+      },
+      {
+        "value": "TTCGT|TTCGT",
+        "count": 58785,
+        "fraction": 0.013913863045551363
+      },
+      {
+        "value": "ACGGA|TCCGT",
+        "count": 58024,
+        "fraction": 0.01373374141966611
+      },
+      {
+        "value": "CCCGG|CCCGG",
+        "count": 51469,
+        "fraction": 0.012182233853729406
+      },
+      {
+        "value": "CCGCC|GGCGG",
+        "count": 50957,
+        "fraction": 0.012061048213186371
+      },
+      {
+        "value": "ACGGG|CCCGT",
+        "count": 50457,
+        "fraction": 0.011942702861093562
+      },
+      {
+        "value": "CCGGG|CCCGG",
+        "count": 49771,
+        "fraction": 0.011780333038022232
+      },
+      {
+        "value": "GGCGG|GGCGG",
+        "count": 49453,
+        "fraction": 0.011705065394091206
+      },
+      {
+        "value": "TCGTT|AACGA",
+        "count": 46709,
+        "fraction": 0.011055586101805879
+      },
+      {
+        "value": "CTCGG|CTCGG",
+        "count": 42080,
+        "fraction": 0.009959944832130668
+      },
+      {
+        "value": "CCGAG|CTCGG",
+        "count": 41980,
+        "fraction": 0.009936275761712106
+      },
+      {
+        "value": "CACGC|CACGC",
+        "count": 41123,
+        "fraction": 0.009733431828225034
+      },
+      {
+        "value": "GCGTG|CACGC",
+        "count": 40743,
+        "fraction": 0.009643489360634501
+      },
+      {
+        "value": "CCCGC|CCCGC",
+        "count": 38236,
+        "fraction": 0.009050105765241165
+      },
+      {
+        "value": "GCCGC|GCCGC",
+        "count": 36832,
+        "fraction": 0.008717792016564562
+      },
+      {
+        "value": "TGCGT|TGCGT",
+        "count": 36351,
+        "fraction": 0.008603943787851282
+      },
+      {
+        "value": "GCGCC|GGCGC",
+        "count": 35739,
+        "fraction": 0.008459089076889685
+      },
+      {
+        "value": "GCGGG|CCCGC",
+        "count": 35517,
+        "fraction": 0.008406543740560478
+      },
+      {
+        "value": "GGCGC|GGCGC",
+        "count": 35323,
+        "fraction": 0.008360625743948469
+      },
+      {
+        "value": "ACGCC|GGCGT",
+        "count": 34682,
+        "fraction": 0.008208907002565491
+      },
+      {
+        "value": "AACGA|AACGA",
+        "count": 34617,
+        "fraction": 0.008193522106793425
+      },
+      {
+        "value": "GGCGT|GGCGT",
+        "count": 34521,
+        "fraction": 0.008170799799191606
+      }
+    ],
+    "top_ref_kmers_label_rates": [
+      {
+        "value": "TCGAA",
+        "count": 344567,
+        "label1_fraction": 0.36561539555442046,
+        "label0": 218588,
+        "label1": 125979
+      },
+      {
+        "value": "ATCGA",
+        "count": 273793,
+        "label1_fraction": 0.3946192926773146,
+        "label0": 165749,
+        "label1": 108044
+      },
+      {
+        "value": "AACGG",
+        "count": 81793,
+        "label1_fraction": 0.5235166823566809,
+        "label0": 38973,
+        "label1": 42820
+      },
+      {
+        "value": "CTCGA",
+        "count": 78091,
+        "label1_fraction": 0.2942336504846909,
+        "label0": 55114,
+        "label1": 22977
+      },
+      {
+        "value": "TTCGT",
+        "count": 64061,
+        "label1_fraction": 0.5556422784533491,
+        "label0": 28466,
+        "label1": 35595
+      },
+      {
+        "value": "ACGGA",
+        "count": 60625,
+        "label1_fraction": 0.4310432989690722,
+        "label0": 34493,
+        "label1": 26132
+      },
+      {
+        "value": "CCCGG",
+        "count": 54851,
+        "label1_fraction": 0.4620699713770032,
+        "label0": 29506,
+        "label1": 25345
+      },
+      {
+        "value": "TCGTT",
+        "count": 54108,
+        "label1_fraction": 0.5834627042211873,
+        "label0": 22538,
+        "label1": 31570
+      },
+      {
+        "value": "CCGCC",
+        "count": 53660,
+        "label1_fraction": 0.563399180022363,
+        "label0": 23428,
+        "label1": 30232
+      },
+      {
+        "value": "ACGGG",
+        "count": 53620,
+        "label1_fraction": 0.5269302499067512,
+        "label0": 25366,
+        "label1": 28254
+      },
+      {
+        "value": "GGCGG",
+        "count": 52141,
+        "label1_fraction": 0.5664256535164266,
+        "label0": 22607,
+        "label1": 29534
+      },
+      {
+        "value": "CCGGG",
+        "count": 51965,
+        "label1_fraction": 0.47999615125565287,
+        "label0": 27022,
+        "label1": 24943
+      },
+      {
+        "value": "CTCGG",
+        "count": 43517,
+        "label1_fraction": 0.5335156375669279,
+        "label0": 20300,
+        "label1": 23217
+      },
+      {
+        "value": "CCGAG",
+        "count": 43308,
+        "label1_fraction": 0.5358594255102983,
+        "label0": 20101,
+        "label1": 23207
+      },
+      {
+        "value": "CACGC",
+        "count": 42937,
+        "label1_fraction": 0.6453874280923213,
+        "label0": 15226,
+        "label1": 27711
+      },
+      {
+        "value": "GCGTG",
+        "count": 42340,
+        "label1_fraction": 0.6594000944733113,
+        "label0": 14421,
+        "label1": 27919
+      },
+      {
+        "value": "GCCGC",
+        "count": 42136,
+        "label1_fraction": 0.5995111068919688,
+        "label0": 16875,
+        "label1": 25261
+      },
+      {
+        "value": "CCCGC",
+        "count": 40992,
+        "label1_fraction": 0.5415446916471507,
+        "label0": 18793,
+        "label1": 22199
+      },
+      {
+        "value": "TGCGT",
+        "count": 39106,
+        "label1_fraction": 0.37183552396051756,
+        "label0": 24565,
+        "label1": 14541
+      },
+      {
+        "value": "AACGA",
+        "count": 38616,
+        "label1_fraction": 0.3260306608659623,
+        "label0": 26026,
+        "label1": 12590
+      },
+      {
+        "value": "GCGGG",
+        "count": 37899,
+        "label1_fraction": 0.5749755930235626,
+        "label0": 16108,
+        "label1": 21791
+      },
+      {
+        "value": "CCCGA",
+        "count": 37522,
+        "label1_fraction": 0.3493683705559405,
+        "label0": 24413,
+        "label1": 13109
+      },
+      {
+        "value": "GCGCC",
+        "count": 37345,
+        "label1_fraction": 0.6067478912839738,
+        "label0": 14686,
+        "label1": 22659
+      },
+      {
+        "value": "GGCGC",
+        "count": 37111,
+        "label1_fraction": 0.6114090161946593,
+        "label0": 14421,
+        "label1": 22690
+      },
+      {
+        "value": "CCGCT",
+        "count": 36793,
+        "label1_fraction": 0.6866523523496317,
+        "label0": 11529,
+        "label1": 25264
+      }
+    ],
+    "top_query_kmers_label_rates": [
+      {
+        "value": "TTCGA",
+        "count": 405709,
+        "label1_fraction": 0.3596247556746338,
+        "label0": 259806,
+        "label1": 145903
+      },
+      {
+        "value": "ATCGA",
+        "count": 318419,
+        "label1_fraction": 0.3922190572798734,
+        "label0": 193529,
+        "label1": 124890
+      },
+      {
+        "value": "CCCGG",
+        "count": 115078,
+        "label1_fraction": 0.4464797789325501,
+        "label0": 63698,
+        "label1": 51380
+      },
+      {
+        "value": "GGCGG",
+        "count": 114668,
+        "label1_fraction": 0.5304792967523634,
+        "label0": 53839,
+        "label1": 60829
+      },
+      {
+        "value": "CTCGA",
+        "count": 114423,
+        "label1_fraction": 0.32040761035805737,
+        "label0": 77761,
+        "label1": 36662
+      },
+      {
+        "value": "AACGG",
+        "count": 113869,
+        "label1_fraction": 0.48966795176913824,
+        "label0": 58111,
+        "label1": 55758
+      },
+      {
+        "value": "AACGA",
+        "count": 108810,
+        "label1_fraction": 0.44359893392151456,
+        "label0": 60542,
+        "label1": 48268
+      },
+      {
+        "value": "TTCGT",
+        "count": 102180,
+        "label1_fraction": 0.5116461146995498,
+        "label0": 49900,
+        "label1": 52280
+      },
+      {
+        "value": "TCCGT",
+        "count": 100345,
+        "label1_fraction": 0.4234491006029199,
+        "label0": 57854,
+        "label1": 42491
+      },
+      {
+        "value": "CTCGG",
+        "count": 95379,
+        "label1_fraction": 0.5021440778368403,
+        "label0": 47485,
+        "label1": 47894
+      },
+      {
+        "value": "CACGC",
+        "count": 93933,
+        "label1_fraction": 0.615970958023272,
+        "label0": 36073,
+        "label1": 57860
+      },
+      {
+        "value": "CCCGT",
+        "count": 86280,
+        "label1_fraction": 0.5029786740843765,
+        "label0": 42883,
+        "label1": 43397
+      },
+      {
+        "value": "CCCGC",
+        "count": 86280,
+        "label1_fraction": 0.534144645340751,
+        "label0": 40194,
+        "label1": 46086
+      },
+      {
+        "value": "GGCGC",
+        "count": 79861,
+        "label1_fraction": 0.5782171523021249,
+        "label0": 33684,
+        "label1": 46177
+      },
+      {
+        "value": "GCCGG",
+        "count": 79317,
+        "label1_fraction": 0.49554320007060276,
+        "label0": 40012,
+        "label1": 39305
+      },
+      {
+        "value": "GGCGT",
+        "count": 76964,
+        "label1_fraction": 0.6264617223637025,
+        "label0": 28749,
+        "label1": 48215
+      },
+      {
+        "value": "GCCGC",
+        "count": 76879,
+        "label1_fraction": 0.5621821303606966,
+        "label0": 33659,
+        "label1": 43220
+      },
+      {
+        "value": "CACGT",
+        "count": 75139,
+        "label1_fraction": 0.43989140126964693,
+        "label0": 42086,
+        "label1": 33053
+      },
+      {
+        "value": "AGCGG",
+        "count": 72162,
+        "label1_fraction": 0.6533078351486932,
+        "label0": 25018,
+        "label1": 47144
+      },
+      {
+        "value": "ATCGT",
+        "count": 71943,
+        "label1_fraction": 0.37714579597737097,
+        "label0": 44810,
+        "label1": 27133
+      },
+      {
+        "value": "CCCGA",
+        "count": 71059,
+        "label1_fraction": 0.3530024345966028,
+        "label0": 45975,
+        "label1": 25084
+      },
+      {
+        "value": "TGCGT",
+        "count": 68212,
+        "label1_fraction": 0.36127074415058935,
+        "label0": 43569,
+        "label1": 24643
+      },
+      {
+        "value": "ATCGC",
+        "count": 65965,
+        "label1_fraction": 0.6540286515576442,
+        "label0": 22822,
+        "label1": 43143
+      },
+      {
+        "value": "GCCGA",
+        "count": 65751,
+        "label1_fraction": 0.510227981323478,
+        "label0": 32203,
+        "label1": 33548
+      },
+      {
+        "value": "CACGG",
+        "count": 65526,
+        "label1_fraction": 0.4460824710801819,
+        "label0": 36296,
+        "label1": 29230
+      }
+    ]
+  },
+  "validation": {
+    "directory": "/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/tensors_integer_valid5mer_uppercase",
+    "chunks_sampled": 32,
+    "rows_sampled": 6400000,
+    "label_counts": {
+      "0": 3400000,
+      "1": 3000000
+    },
+    "label_fractions": {
+      "0": 0.53125,
+      "1": 0.46875
+    },
+    "ref_strand_counts": {
+      "0": 3202231,
+      "1": 3197769
+    },
+    "ref_mod_strand_counts": {
+      "0": 3202231,
+      "1": 3197769
+    },
+    "pos_norm": {
+      "min": 0.0,
+      "p01": 0.01200885884463787,
+      "p05": 0.05373150482773781,
+      "p25": 0.252990186214447,
+      "median": 0.4975757896900177,
+      "p75": 0.7443825006484985,
+      "p95": 0.946600079536438,
+      "p99": 0.9886023998260498,
+      "max": 0.9999635815620422,
+      "mean": 0.4988519549369812
+    },
+    "top_ref_kmers": [
+      {
+        "value": "TCGAA",
+        "count": 103615,
+        "fraction": 0.01618984375
+      },
+      {
+        "value": "CCCGG",
+        "count": 101884,
+        "fraction": 0.015919375
+      },
+      {
+        "value": "CCGCC",
+        "count": 99242,
+        "fraction": 0.0155065625
+      },
+      {
+        "value": "GGCGG",
+        "count": 98193,
+        "fraction": 0.01534265625
+      },
+      {
+        "value": "CCGGG",
+        "count": 95940,
+        "fraction": 0.014990625
+      },
+      {
+        "value": "CACGC",
+        "count": 87389,
+        "fraction": 0.01365453125
+      },
+      {
+        "value": "GCGTG",
+        "count": 86342,
+        "fraction": 0.0134909375
+      },
+      {
+        "value": "CTCGG",
+        "count": 84717,
+        "fraction": 0.01323703125
+      },
+      {
+        "value": "CCGAG",
+        "count": 83633,
+        "fraction": 0.01306765625
+      },
+      {
+        "value": "ATCGA",
+        "count": 78250,
+        "fraction": 0.0122265625
+      },
+      {
+        "value": "CCCGC",
+        "count": 74879,
+        "fraction": 0.01169984375
+      },
+      {
+        "value": "CACGT",
+        "count": 72384,
+        "fraction": 0.01131
+      },
+      {
+        "value": "GGCGT",
+        "count": 72317,
+        "fraction": 0.01129953125
+      },
+      {
+        "value": "GCGCC",
+        "count": 72220,
+        "fraction": 0.011284375
+      },
+      {
+        "value": "ACGCC",
+        "count": 72143,
+        "fraction": 0.01127234375
+      },
+      {
+        "value": "ACGTG",
+        "count": 71091,
+        "fraction": 0.01110796875
+      },
+      {
+        "value": "GGCGC",
+        "count": 70893,
+        "fraction": 0.01107703125
+      },
+      {
+        "value": "GCGGG",
+        "count": 68904,
+        "fraction": 0.01076625
+      },
+      {
+        "value": "GCCGG",
+        "count": 68570,
+        "fraction": 0.0107140625
+      },
+      {
+        "value": "CCGGC",
+        "count": 67837,
+        "fraction": 0.01059953125
+      },
+      {
+        "value": "CACGG",
+        "count": 62065,
+        "fraction": 0.00969765625
+      },
+      {
+        "value": "ACGGG",
+        "count": 62007,
+        "fraction": 0.00968859375
+      },
+      {
+        "value": "TCGCT",
+        "count": 60696,
+        "fraction": 0.00948375
+      },
+      {
+        "value": "CCGTG",
+        "count": 60675,
+        "fraction": 0.00948046875
+      },
+      {
+        "value": "TCGGC",
+        "count": 60186,
+        "fraction": 0.0094040625
+      }
+    ],
+    "top_query_kmers": [
+      {
+        "value": "GGCGG",
+        "count": 213958,
+        "fraction": 0.0334309375
+      },
+      {
+        "value": "CCCGG",
+        "count": 213824,
+        "fraction": 0.03341
+      },
+      {
+        "value": "CACGC",
+        "count": 188576,
+        "fraction": 0.029465
+      },
+      {
+        "value": "CTCGG",
+        "count": 185343,
+        "fraction": 0.02895984375
+      },
+      {
+        "value": "TTCGA",
+        "count": 160733,
+        "fraction": 0.02511453125
+      },
+      {
+        "value": "CACGT",
+        "count": 159860,
+        "fraction": 0.024978125
+      },
+      {
+        "value": "CCCGC",
+        "count": 156484,
+        "fraction": 0.024450625
+      },
+      {
+        "value": "GGCGT",
+        "count": 153923,
+        "fraction": 0.02405046875
+      },
+      {
+        "value": "GGCGC",
+        "count": 153693,
+        "fraction": 0.02401453125
+      },
+      {
+        "value": "GCCGG",
+        "count": 148555,
+        "fraction": 0.02321171875
+      },
+      {
+        "value": "CACGG",
+        "count": 136203,
+        "fraction": 0.02128171875
+      },
+      {
+        "value": "GCCGA",
+        "count": 133093,
+        "fraction": 0.02079578125
+      },
+      {
+        "value": "AGCGA",
+        "count": 130185,
+        "fraction": 0.02034140625
+      },
+      {
+        "value": "CCCGT",
+        "count": 127295,
+        "fraction": 0.01988984375
+      },
+      {
+        "value": "ATCGA",
+        "count": 123055,
+        "fraction": 0.01922734375
+      },
+      {
+        "value": "TCCGT",
+        "count": 122003,
+        "fraction": 0.01906296875
+      },
+      {
+        "value": "GACGG",
+        "count": 121721,
+        "fraction": 0.01901890625
+      },
+      {
+        "value": "CTCGA",
+        "count": 121597,
+        "fraction": 0.01899953125
+      },
+      {
+        "value": "TCCGC",
+        "count": 119066,
+        "fraction": 0.0186040625
+      },
+      {
+        "value": "CACGA",
+        "count": 116565,
+        "fraction": 0.01821328125
+      },
+      {
+        "value": "CCCGA",
+        "count": 116540,
+        "fraction": 0.018209375
+      },
+      {
+        "value": "AACGT",
+        "count": 116213,
+        "fraction": 0.01815828125
+      },
+      {
+        "value": "TTCGT",
+        "count": 107594,
+        "fraction": 0.0168115625
+      },
+      {
+        "value": "ATCGC",
+        "count": 106948,
+        "fraction": 0.016710625
+      },
+      {
+        "value": "CTCGC",
+        "count": 103816,
+        "fraction": 0.01622125
+      }
+    ],
+    "top_ref_query_pairs": [
+      {
+        "value": "TCGAA|TTCGA",
+        "count": 99697,
+        "fraction": 0.01557765625
+      },
+      {
+        "value": "CCCGG|CCCGG",
+        "count": 95793,
+        "fraction": 0.01496765625
+      },
+      {
+        "value": "CCGCC|GGCGG",
+        "count": 94648,
+        "fraction": 0.01478875
+      },
+      {
+        "value": "GGCGG|GGCGG",
+        "count": 93542,
+        "fraction": 0.0146159375
+      },
+      {
+        "value": "CCGGG|CCCGG",
+        "count": 92129,
+        "fraction": 0.01439515625
+      },
+      {
+        "value": "CACGC|CACGC",
+        "count": 84003,
+        "fraction": 0.01312546875
+      },
+      {
+        "value": "GCGTG|CACGC",
+        "count": 83380,
+        "fraction": 0.013028125
+      },
+      {
+        "value": "CTCGG|CTCGG",
+        "count": 82006,
+        "fraction": 0.0128134375
+      },
+      {
+        "value": "CCGAG|CTCGG",
+        "count": 81201,
+        "fraction": 0.01268765625
+      },
+      {
+        "value": "ATCGA|ATCGA",
+        "count": 75131,
+        "fraction": 0.01173921875
+      },
+      {
+        "value": "GGCGT|GGCGT",
+        "count": 70025,
+        "fraction": 0.01094140625
+      },
+      {
+        "value": "CCCGC|CCCGC",
+        "count": 69989,
+        "fraction": 0.01093578125
+      },
+      {
+        "value": "ACGCC|GGCGT",
+        "count": 69857,
+        "fraction": 0.01091515625
+      },
+      {
+        "value": "CACGT|CACGT",
+        "count": 69370,
+        "fraction": 0.0108390625
+      },
+      {
+        "value": "GCGCC|GGCGC",
+        "count": 69247,
+        "fraction": 0.01081984375
+      },
+      {
+        "value": "ACGTG|CACGT",
+        "count": 68396,
+        "fraction": 0.010686875
+      },
+      {
+        "value": "GGCGC|GGCGC",
+        "count": 68105,
+        "fraction": 0.01064140625
+      },
+      {
+        "value": "GCGGG|CCCGC",
+        "count": 66034,
+        "fraction": 0.0103178125
+      },
+      {
+        "value": "CCGGC|GCCGG",
+        "count": 63824,
+        "fraction": 0.0099725
+      },
+      {
+        "value": "GCCGG|GCCGG",
+        "count": 63675,
+        "fraction": 0.00994921875
+      },
+      {
+        "value": "ACGGG|CCCGT",
+        "count": 59950,
+        "fraction": 0.0093671875
+      },
+      {
+        "value": "TCGGC|GCCGA",
+        "count": 58070,
+        "fraction": 0.0090734375
+      },
+      {
+        "value": "CACGG|CACGG",
+        "count": 57966,
+        "fraction": 0.0090571875
+      },
+      {
+        "value": "TCGCT|AGCGA",
+        "count": 57093,
+        "fraction": 0.00892078125
+      },
+      {
+        "value": "CCGTG|CACGG",
+        "count": 56984,
+        "fraction": 0.00890375
+      }
+    ],
+    "top_ref_kmers_label_rates": [
+      {
+        "value": "TCGAA",
+        "count": 103615,
+        "label1_fraction": 0.17723302610625874,
+        "label0": 85251,
+        "label1": 18364
+      },
+      {
+        "value": "CCCGG",
+        "count": 101884,
+        "label1_fraction": 0.4252090612853834,
+        "label0": 58562,
+        "label1": 43322
+      },
+      {
+        "value": "CCGCC",
+        "count": 99242,
+        "label1_fraction": 0.5392676487777353,
+        "label0": 45724,
+        "label1": 53518
+      },
+      {
+        "value": "GGCGG",
+        "count": 98193,
+        "label1_fraction": 0.5333883270701577,
+        "label0": 45818,
+        "label1": 52375
+      },
+      {
+        "value": "CCGGG",
+        "count": 95940,
+        "label1_fraction": 0.4394100479466333,
+        "label0": 53783,
+        "label1": 42157
+      },
+      {
+        "value": "CACGC",
+        "count": 87389,
+        "label1_fraction": 0.6289578779937979,
+        "label0": 32425,
+        "label1": 54964
+      },
+      {
+        "value": "GCGTG",
+        "count": 86342,
+        "label1_fraction": 0.6295313983924393,
+        "label0": 31987,
+        "label1": 54355
+      },
+      {
+        "value": "CTCGG",
+        "count": 84717,
+        "label1_fraction": 0.49699588040180837,
+        "label0": 42613,
+        "label1": 42104
+      },
+      {
+        "value": "CCGAG",
+        "count": 83633,
+        "label1_fraction": 0.49625147967907407,
+        "label0": 42130,
+        "label1": 41503
+      },
+      {
+        "value": "ATCGA",
+        "count": 78250,
+        "label1_fraction": 0.20279872204472843,
+        "label0": 62381,
+        "label1": 15869
+      },
+      {
+        "value": "CCCGC",
+        "count": 74879,
+        "label1_fraction": 0.5179422802120754,
+        "label0": 36096,
+        "label1": 38783
+      },
+      {
+        "value": "CACGT",
+        "count": 72384,
+        "label1_fraction": 0.4739997789566755,
+        "label0": 38074,
+        "label1": 34310
+      },
+      {
+        "value": "GGCGT",
+        "count": 72317,
+        "label1_fraction": 0.6280266050859411,
+        "label0": 26900,
+        "label1": 45417
+      },
+      {
+        "value": "GCGCC",
+        "count": 72220,
+        "label1_fraction": 0.5743561340348934,
+        "label0": 30740,
+        "label1": 41480
+      },
+      {
+        "value": "ACGCC",
+        "count": 72143,
+        "label1_fraction": 0.6231651026433611,
+        "label0": 27186,
+        "label1": 44957
+      },
+      {
+        "value": "ACGTG",
+        "count": 71091,
+        "label1_fraction": 0.48008890014207145,
+        "label0": 36961,
+        "label1": 34130
+      },
+      {
+        "value": "GGCGC",
+        "count": 70893,
+        "label1_fraction": 0.5953761302244227,
+        "label0": 28685,
+        "label1": 42208
+      },
+      {
+        "value": "GCGGG",
+        "count": 68904,
+        "label1_fraction": 0.5280825496342738,
+        "label0": 32517,
+        "label1": 36387
+      },
+      {
+        "value": "GCCGG",
+        "count": 68570,
+        "label1_fraction": 0.48470176462009623,
+        "label0": 35334,
+        "label1": 33236
+      },
+      {
+        "value": "CCGGC",
+        "count": 67837,
+        "label1_fraction": 0.4931527042764273,
+        "label0": 34383,
+        "label1": 33454
+      },
+      {
+        "value": "CACGG",
+        "count": 62065,
+        "label1_fraction": 0.4631273664706356,
+        "label0": 33321,
+        "label1": 28744
+      },
+      {
+        "value": "ACGGG",
+        "count": 62007,
+        "label1_fraction": 0.42004934926701826,
+        "label0": 35961,
+        "label1": 26046
+      },
+      {
+        "value": "TCGCT",
+        "count": 60696,
+        "label1_fraction": 0.613236457097667,
+        "label0": 23475,
+        "label1": 37221
+      },
+      {
+        "value": "CCGTG",
+        "count": 60675,
+        "label1_fraction": 0.47236918005768436,
+        "label0": 32014,
+        "label1": 28661
+      },
+      {
+        "value": "TCGGC",
+        "count": 60186,
+        "label1_fraction": 0.5381650217658591,
+        "label0": 27796,
+        "label1": 32390
+      }
+    ],
+    "top_query_kmers_label_rates": [
+      {
+        "value": "GGCGG",
+        "count": 213958,
+        "label1_fraction": 0.504814028921564,
+        "label0": 105949,
+        "label1": 108009
+      },
+      {
+        "value": "CCCGG",
+        "count": 213824,
+        "label1_fraction": 0.40957516462137084,
+        "label0": 126247,
+        "label1": 87577
+      },
+      {
+        "value": "CACGC",
+        "count": 188576,
+        "label1_fraction": 0.595372687934838,
+        "label0": 76303,
+        "label1": 112273
+      },
+      {
+        "value": "CTCGG",
+        "count": 185343,
+        "label1_fraction": 0.4679378233869097,
+        "label0": 98614,
+        "label1": 86729
+      },
+      {
+        "value": "TTCGA",
+        "count": 160733,
+        "label1_fraction": 0.23936590494795718,
+        "label0": 122259,
+        "label1": 38474
+      },
+      {
+        "value": "CACGT",
+        "count": 159860,
+        "label1_fraction": 0.443706993619417,
+        "label0": 88929,
+        "label1": 70931
+      },
+      {
+        "value": "CCCGC",
+        "count": 156484,
+        "label1_fraction": 0.4960826665985021,
+        "label0": 78855,
+        "label1": 77629
+      },
+      {
+        "value": "GGCGT",
+        "count": 153923,
+        "label1_fraction": 0.5996439778330723,
+        "label0": 61624,
+        "label1": 92299
+      },
+      {
+        "value": "GGCGC",
+        "count": 153693,
+        "label1_fraction": 0.5562972939561334,
+        "label0": 68194,
+        "label1": 85499
+      },
+      {
+        "value": "GCCGG",
+        "count": 148555,
+        "label1_fraction": 0.46049611255090706,
+        "label0": 80146,
+        "label1": 68409
+      },
+      {
+        "value": "CACGG",
+        "count": 136203,
+        "label1_fraction": 0.43057788741804515,
+        "label0": 77557,
+        "label1": 58646
+      },
+      {
+        "value": "GCCGA",
+        "count": 133093,
+        "label1_fraction": 0.49748671981246195,
+        "label0": 66881,
+        "label1": 66212
+      },
+      {
+        "value": "AGCGA",
+        "count": 130185,
+        "label1_fraction": 0.5866036793793448,
+        "label0": 53818,
+        "label1": 76367
+      },
+      {
+        "value": "CCCGT",
+        "count": 127295,
+        "label1_fraction": 0.4267488903727562,
+        "label0": 72972,
+        "label1": 54323
+      },
+      {
+        "value": "ATCGA",
+        "count": 123055,
+        "label1_fraction": 0.28221526959489657,
+        "label0": 88327,
+        "label1": 34728
+      },
+      {
+        "value": "TCCGT",
+        "count": 122003,
+        "label1_fraction": 0.46314434890945305,
+        "label0": 65498,
+        "label1": 56505
+      },
+      {
+        "value": "GACGG",
+        "count": 121721,
+        "label1_fraction": 0.47902169715989845,
+        "label0": 63414,
+        "label1": 58307
+      },
+      {
+        "value": "CTCGA",
+        "count": 121597,
+        "label1_fraction": 0.3720239808547908,
+        "label0": 76360,
+        "label1": 45237
+      },
+      {
+        "value": "TCCGC",
+        "count": 119066,
+        "label1_fraction": 0.5704063292627618,
+        "label0": 51150,
+        "label1": 67916
+      },
+      {
+        "value": "CACGA",
+        "count": 116565,
+        "label1_fraction": 0.4105520525028954,
+        "label0": 68709,
+        "label1": 47856
+      },
+      {
+        "value": "CCCGA",
+        "count": 116540,
+        "label1_fraction": 0.3726360048052171,
+        "label0": 73113,
+        "label1": 43427
+      },
+      {
+        "value": "AACGT",
+        "count": 116213,
+        "label1_fraction": 0.43385851841016065,
+        "label0": 65793,
+        "label1": 50420
+      },
+      {
+        "value": "TTCGT",
+        "count": 107594,
+        "label1_fraction": 0.4038422216852241,
+        "label0": 64143,
+        "label1": 43451
+      },
+      {
+        "value": "ATCGC",
+        "count": 106948,
+        "label1_fraction": 0.6045554849085537,
+        "label0": 42292,
+        "label1": 64656
+      },
+      {
+        "value": "CTCGC",
+        "count": 103816,
+        "label1_fraction": 0.5144197426215612,
+        "label0": 50411,
+        "label1": 53405
+      }
+    ]
+  }
+}

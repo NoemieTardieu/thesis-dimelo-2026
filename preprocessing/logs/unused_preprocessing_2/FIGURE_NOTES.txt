@@ -1,0 +1,108 @@
+preprocessing_2 figure notes
+
+Purpose
+This folder holds a new figure suite built from the newer staging-based preprocessing outputs:
+- h3k27ac
+- h3k27me3
+- h3k4me3
+- merged_c1
+
+Input convention
+- A signal uses the staging A bigWig tracks:
+  - h3k4me3 uses h3k4me3_noref_allchr_A_Y_percent.bw
+  - merged_c1 uses merged_c1_A_a_all_percent.bw
+  - h3k27ac and h3k27me3 currently use the valid staging A_mod bigWigs as a fallback because their direct noref_allchr_A_Y bigWigs were corrupted when this figure suite was assembled
+  - merged_c1_A_a_all_percent.bw for merged_c1
+- C / CpG signal uses:
+  - *_CpG_methylation_percent.bw for the three original marks
+  - merged_c1_C_combined_cpg_percent.bw for merged_c1
+
+Color convention
+- Heatmaps use RdYlBu_r so lower signal is blue and higher signal is red.
+
+How the figures were created
+- plot_preprocessing2_bigwig_panels.py
+  - samples the bigWig tracks on fixed genomic bins
+  - produces staging-based analogues of the dependence and summary figures
+  - uses 200 bp bins for most summary and dependence panels
+  - uses 50 bp bins for the finer-grained trend surface and enrichment panel
+- run_preprocessing2_heatmaps.sh
+  - uses deepTools computeMatrix / plotHeatmap
+  - produces HOX, promoter, and TSS heatmaps directly from the staging bigWigs
+  - currently uses TSS.bed as the promoter-proxy region set in the absence of a stable standalone promoter-CGI BED on disk
+
+Figure usage
+- cpg_methylation_by_mark.png
+  - Compare overall CpG methylation distributions across the four samples.
+  - Useful for a high-level “global methylation landscape” panel.
+
+- oe_heatmap_by_mark.svg
+  - Observed/expected enrichment of A and CpG signal quantiles by sample.
+  - Useful for showing dependence or independence structure.
+
+- permutation_oe_200bp.png
+  - Observed versus shuffled mutual-information-style dependence summary.
+  - Useful as a robustness check that the enrichment is not a marginal-distribution artifact.
+
+- conditional_a_meth_frac_200bp.png
+  - Distribution of A signal conditional on CpG methylation quantiles.
+  - Useful for testing whether A changes across methylation strata.
+
+- conditional_reg_200bp.png
+  - Convenience duplicate of the conditional A panel under the older naming convention.
+  - Useful when comparing the new folder with the older dependence-validation outputs.
+
+- h3k4me3_cluster_contingency_200bp.png
+  - Quantile-contingency heatmap for h3k4me3 A versus CpG signal.
+  - Useful as a compact sample-specific dependence panel.
+
+- mark_trend_surface_50bp.png
+  - Mean A signal across CpG quantiles at finer 50 bp resolution.
+  - Useful for comparing trend direction and dynamic range across samples.
+
+- mi_summary.png
+  - Mutual information summary across 200 bp and 50 bp resolutions.
+  - Useful for a one-panel dependence ranking across samples.
+
+- promoter_background_200bp.png
+  - Mean A and CpG signal inside promoter CGI-overlap regions versus genomic background.
+  - Useful for region-specific enrichment statements.
+
+- hox_genebody_a_fraction_scaled_200bp_blue_red_existing.png
+  - HOX gene-body A-signal heatmap across the four samples.
+  - Useful for qualitative locus-level comparison.
+
+- hox_genebody_meth_heatmap_sorted_200bp_z0to0.4_kmeans3_blue_red.png
+  - HOX gene-body CpG methylation heatmap with k-means clustering.
+  - Useful for revealing shared and sample-specific methylation patterns.
+
+- tss_c_meth_fraction_heatmap_kmeans4_blue_red.png
+  - TSS-centered CpG methylation heatmap.
+  - Useful for promoter/TSS methylation stratification.
+
+- gene_level_promoter_a_meth_frac_5k_clustered_summary_kmeans4.png
+  - Promoter-centered A-signal heatmap around promoter CGI-overlap intervals.
+  - Useful for summarizing promoter-scale A patterns.
+
+- h3k4me3_vs_h3k27me3_a_meth_fraction_joint_density.png
+  - Joint density of h3k4me3 versus h3k27me3 A signal.
+  - Useful for pairwise antagonism or co-occurrence interpretation.
+
+- hox_genebody_a_meth_fraction_heatmap_sorted_200bp.png
+  - Additional HOX gene-body A heatmap using the new four-sample staging inputs.
+  - Useful when a non-clustered or directly sortable view is preferred.
+
+- marks_vs_cpg_methylation_hexbin_a_meth_fraction_200bp.png
+  - Sample-wise hexbin panels of A versus CpG signal.
+  - Useful for showing the overall shape of A/C association.
+
+Practical note
+- These are intentionally “similar” rather than byte-for-byte reproductions of the older figures.
+- The older plots were built from a mix of caches and earlier track families.
+- This new folder standardizes the workflow around the newer staging bigWig outputs and explicitly includes merged_c1.
+
+Assembly split
+- The three original marks use hs1-based bigWigs.
+- merged_c1 uses hg38/GRCh38-style bigWigs.
+- Because of that, deepTools-style combined heatmaps should not mix merged_c1 with the three original marks.
+- Run them as separate figure suites.

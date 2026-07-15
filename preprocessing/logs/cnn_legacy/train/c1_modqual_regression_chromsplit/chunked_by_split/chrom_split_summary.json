@@ -1,0 +1,67 @@
+{
+  "input": "/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/merged_c1_C_m_q0p8_training.valid5mer.uppercase.cnn_features.tsv.gz",
+  "output_base": "/data/leuven/383/vsc38330/thesis_dimelo/train/c1_modqual_regression_chromsplit/chunked_by_split",
+  "chunk_size": 2000000,
+  "chrom_split": {
+    "train": [
+      "chr1",
+      "chr10",
+      "chr11",
+      "chr12",
+      "chr13",
+      "chr14",
+      "chr15",
+      "chr16",
+      "chr2",
+      "chr3",
+      "chr4",
+      "chr5",
+      "chr6",
+      "chr7",
+      "chr8",
+      "chr9"
+    ],
+    "val": [
+      "chr17",
+      "chr18"
+    ],
+    "test": [
+      "chr19",
+      "chr20",
+      "chr21",
+      "chr22"
+    ]
+  },
+  "rows_written": {
+    "train": 42024923,
+    "val": 0,
+    "test": 0
+  },
+  "chunks_written": {
+    "train": 22,
+    "val": 0,
+    "test": 0
+  },
+  "chrom_counts": {
+    "chr1": 42024923
+  },
+  "target": "mod_qual",
+  "arrays": [
+    "ref_kmer",
+    "query_kmer",
+    "pos_norm",
+    "read_length_norm",
+    "log_read_length_norm",
+    "ref_strand",
+    "ref_mod_strand",
+    "mod_qual"
+  ],
+  "train_mod_qual_summary": {
+    "min": 0.001953125,
+    "p25": 0.041015625,
+    "median": 0.712890625,
+    "p75": 0.982421875,
+    "max": 0.998046875,
+    "mean": 0.550595223903656
+  }
+}

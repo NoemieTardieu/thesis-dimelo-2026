@@ -1,0 +1,6 @@
+{
+  "positive_mod_qual_ge_0p85": 18795316,
+  "negative_mod_qual_le_0p5": 18670034,
+  "discarded_middle_0p5_to_0p85": 4559573,
+  "malformed_kmer_rows": 0
+}

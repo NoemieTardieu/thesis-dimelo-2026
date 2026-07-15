@@ -1,0 +1,4 @@
+- wandb.mode=disabled
+- experiment=hg38/genomic_benchmark_scratch
+- trainer.devices=1
+- trainer.max_epochs=1

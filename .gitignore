@@ -9,27 +9,71 @@ env
 *.bai
 *.cram
 *.crai
+*.sam
+*.fastq
+*.fq
+*.fastq.gz
+*.fq.gz
+*.fasta
+*.fa
+*.fna
+*.fasta.fai
+*.fa.fai
+*.fai
+*.2bit
 *.bigWig
 *.bw
+*.bedGraph
+*.bedGraph.gz
 *.npz
 *.npy
+*.h5
+*.hdf5
+*.zarr/
+*.loom
 
 # model checkpoints
 *.pt
 *.pth
+*.ckpt
+*.safetensors
+*.onnx
 checkpoints/
+**/checkpoints/
+wandb/
+**/wandb/
+lightning_logs/
+**/lightning_logs/
 
 # generated heavy tables
 canonical_raw_bins.tsv.gz
 canonical_normalized_bins.tsv.gz
 all_read_bin_values.tsv
 alphagenome_readseq_*.tsv
+*.coverage_raw_counts.tsv
 *.per_locus_variance.tsv.gz
 *.per_locus_variance.tsv
 *.all_pairs.tsv
 *.tsv.gz
+*.csv.gz
+*.parquet
+*.feather
+*.arrow
+*.pkl
+*.pickle
+*.joblib
 *_matrix.gz
 *.matrix.gz
+
+# logs and scheduler/runtime output
+*.out
+*.err
+*.log
+slurm-*.out
+slurm-*.err
+*.pid
+index.html?acc=*
+*?acc=*&format=file
 
 # AlphaGenome and runtime caches
 cache*/
@@ -40,20 +84,10 @@ __pycache__/
 .mypy_cache/
 .ipynb_checkpoints/
 
-# SLURM / cluster logs
-*.sbatch
-slurm-*.out
-slurm-*.err
-*.out
-*.err
-
 # server-resident large artifacts
 server_artifacts/
 **/server_artifacts/
 
-# cleanup/debris snapshots
-preprocessing/to_delete/
-hyena-dna/to_delete/
 # root cleanup / local runtime state
 root_environment/
 **/root_environment/
@@ -68,13 +102,18 @@ CachedProfilesData/
 CachedExtensionVSIXs/
 User/
 Machine/
-logs/
 venvs/
 bin/
 modkit/
+residual_preprocessing_chr16_merged_e5b/
 
 # AlphaGenome archived large generated tables
 alphagenome_test_128bp.tsv
 dimelo_*_128bp*.tsv
 hyenadna_*_128bp*.tsv
 *.per_read.tsv
+
+# known oversized generated thesis figures / archive tables
+preprocessing/results/phase2_figures_and_summaries/windowed_joint_plots_1kb/phase2_option*_overlay_*.svg
+**/archive/**/*.tsv
+**/archive/**/*.tsv.gz

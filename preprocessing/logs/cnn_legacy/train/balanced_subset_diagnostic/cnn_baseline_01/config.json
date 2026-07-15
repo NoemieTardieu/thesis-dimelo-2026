@@ -1,0 +1,14 @@
+{
+  "train_npz": "/data/leuven/383/vsc38330/thesis_dimelo/train/balanced_subset_diagnostic/merged_c1_train_balanced_1M_per_class.npz",
+  "val_npz": "/data/leuven/383/vsc38330/thesis_dimelo/train/balanced_subset_diagnostic/merged_e5b_val_balanced_1M_per_class.npz",
+  "out_dir": "/data/leuven/383/vsc38330/thesis_dimelo/train/balanced_subset_diagnostic/cnn_baseline_01",
+  "epochs": 10,
+  "batch_size": 8192,
+  "lr": 0.001,
+  "embedding_dim": 8,
+  "conv_channels": 32,
+  "seed": 42,
+  "device": "cpu",
+  "train_rows": 2000000,
+  "val_rows": 2000000
+}

@@ -1,0 +1,824 @@
+First practical start for CNN modeling of P(M | D, C) using merged_c1 only
+
+Why start with merged_c1 first
+- In your current project, merged_c1 gave the cleanest IGV impression and the strongest figure-level behavior.
+- That makes it a good first debugging dataset before mixing in the three separate marks.
+- Using one sample first reduces moving parts while you confirm:
+  - CpG event filtering
+  - sequence-window extraction
+  - label definition
+  - chromosome-based split
+
+Important interpretation
+- If you use only merged_c1, then C is constant.
+- So this first dataset is best thought of as a debug version of:
+  - P(M | D)
+- The table still keeps the `cell_type` column so it remains compatible with the later full:
+  - P(M | D, C)
+- Once this works, you can add more cell types and the same schema still holds.
+
+What this starter workflow does
+- Starts from the existing modkit extract-calls file:
+  - `/data/leuven/383/vsc38330/thesis_dimelo/modkit_preproc/merged_c1/extract_calls.tsv.gz`
+- Keeps only cytosine events:
+  - `canonical_base = C`
+- Keeps only passing calls:
+  - `fail = false`
+- Keeps only calls with a valid reference coordinate:
+  - `ref_position >= 0`
+- Restricts to true CpG cytosines using the hg38 reference:
+  - reference dinucleotide at `pos0` must be `CG`
+- Extracts a fixed centered DNA sequence window:
+  - default = 101 bp
+- Defines the label:
+  - `m_label = 0` for canonical / unmodified CpG rows
+  - `m_label = 1` for `5mC` rows only
+  - `5hmC` rows are excluded from the first CNN dataset
+- Assigns a chromosome-based split:
+  - but should be balanced by per-chromosome event counts rather than by a simple sequential chromosome rule
+
+Why the label is defined this way
+- For the first CNN, the target has now been narrowed to:
+  - `5mC` only
+- This means:
+  - canonical / unmodified CpG rows are the negative class
+  - `5mC` rows are the positive class
+  - `5hmC` rows are not used in the first model
+- This decision does not require rerunning `modkit extract full`, because the read-level table still keeps:
+  - modification identity via `mod_code`
+- So the `m` vs `h` distinction can be enforced later at dataset-building time.
+
+Current validation step
+- A counting job is being run on the merged `extract_full` file to summarize which cytosine `mod_code` values are present and in what quantity:
+  - `/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/merged_c1_count_c_mod_codes_wice.sbatch`
+- That job does not modify the merged extract file.
+- It only reads:
+  - `/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/extract_full_merged_c1_complete.tsv.gz`
+  and writes a summary count table:
+  - `/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/c_mod_code_counts.txt`
+- So it is only a diagnostic / confirmation step before finalizing the dataset-building logic.
+
+Important split recommendation
+- Do not randomize rows across all chromosomes.
+- That would risk train / validation / test leakage because nearby loci and highly similar local sequence contexts could land in more than one split.
+- A chromosome-based split is still the safer design.
+- However, the initial example:
+  - train = chr1-16
+  - valid = chr17-18
+  - test = chr19-22 and chrX
+  is probably not the most representative split because the largest chromosomes are concentrated in train.
+- A better approach is:
+  - estimate the number of final CpG events per chromosome first
+  - then assign whole chromosomes to train / valid / test so the total number of events is more balanced
+  - keep the assignment fixed in a manifest so the split remains reproducible
+
+Why this is better
+- It preserves chromosome-level separation, which reduces leakage.
+- It avoids having train dominated by the largest chromosomes while validation and test are built mostly from smaller chromosomes.
+- It makes train / valid / test more comparable in total event count and often more stable for model evaluation.
+
+Practical rule
+- Keep whole chromosomes intact within one split.
+- Randomize or rebalance only at the chromosome level, not at the row level.
+
+Files created for this first step
+- Dataset-building script:
+  - `/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/scripts/build_merged_c1_cpg_event_dataset.py`
+- Sample manifest:
+  - `/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/manifests/sample_manifest.tsv`
+- Cell-type mapping:
+  - `/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/manifests/cell_type_to_id.tsv`
+- Split manifest:
+  - `/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/manifests/modeling_split_manifest.tsv`
+
+Main command to run
+```bash
+/data/leuven/383/vsc38330/.venv/bin/python \
+  /data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/scripts/build_merged_c1_cpg_event_dataset.py
+```
+
+Recommended step before fixing the final split
+- First estimate how many final CpG events each chromosome contributes.
+- Then use those counts to design a more even chromosome-level split.
+
+Command to estimate final CpG event counts per chromosome from the finished dataset
+```bash
+python3 -c "import gzip,csv,collections; c=collections.Counter(); f=gzip.open('/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/datasets/merged_c1_cpg_event_dataset.tsv.gz','rt'); r=csv.DictReader(f, delimiter='\t'); [c.update([row['chrom']]) for row in r]; [print(k, c[k], sep='\t') for k in sorted(c)]"
+``
+Save the chromosome event counts to a file
+```bash
+python3 -c "import gzip,csv,collections; c=collections.Counter(); f=gzip.open('/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/datasets/merged_c1_cpg_event_dataset.tsv.gz','rt'); r=csv.DictReader(f, delimiter='\t'); [c.update([row['chrom']]) for row in r]; [print(k, c[k], sep='\t') for k in sorted(c)]" \
+> /data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/datasets/merged_c1_cpg_event_counts_by_chrom.tsv
+```
+
+Command to calculate per-chromosome CpG event fractions
+```bash
+python3 -c "import gzip,csv,collections; c=collections.Counter(); f=gzip.open('/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/datasets/merged_c1_cpg_event_dataset.tsv.gz','rt'); r=csv.DictReader(f, delimiter='\t'); [c.update([row['chrom']]) for row in r]; total=sum(c.values()); [print(k, c[k], c[k]/total, sep='\t') for k in sorted(c)]"
+```
+
+Save the per-chromosome CpG event fractions to a file
+```bash
+python3 -c "import gzip,csv,collections; c=collections.Counter(); f=gzip.open('/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/datasets/merged_c1_cpg_event_dataset.tsv.gz','rt'); r=csv.DictReader(f, delimiter='\t'); [c.update([row['chrom']]) for row in r]; total=sum(c.values()); [print(k, c[k], c[k]/total, sep='\t') for k in sorted(c)]" \
+> /data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/datasets/merged_c1_cpg_event_fraction_by_chrom.tsv
+```
+
+What to do with these counts
+- Use the per-chromosome event counts, not just chromosome sizes, to define train / valid / test.
+- Aim for something close to:
+  - train about 80 percent of events
+  - valid about 10 percent of events
+  - test about 10 percent of events
+- Again, keep each chromosome entirely inside one split.
+- Save the chosen assignment in:
+  - `/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/manifests/modeling_split_manifest.tsv`
+
+Optional stronger evaluation design
+- Instead of one fixed split, create several balanced chromosome-level splits.
+- Train and evaluate on each split separately.
+- Report mean and spread of the model metrics.
+- This is usually more robust than relying on one arbitrary holdout set.
+
+What this command writes
+- Main event table:
+  - `/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/datasets/merged_c1_cpg_event_dataset.tsv.gz`
+- Summary counts:
+  - `/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/datasets/merged_c1_cpg_event_dataset.summary.tsv`
+
+Important output columns
+- `sample_id`
+- `cell_type`
+- `read_id`
+- `chrom`
+- `pos0`
+- `strand`
+- `seq_window`
+- `m_label`
+- `m_prob`
+- `split`
+- `call_code`
+- `canonical_base`
+- `modified_primary_base`
+- `ref_kmer`
+- `query_kmer`
+- `source_file`
+- `reference_name`
+
+How to check that it worked
+
+1. Preview the first few rows
+```bash
+python3 -c "import gzip,itertools; f=gzip.open('/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/datasets/merged_c1_cpg_event_dataset.tsv.gz','rt'); print(''.join(itertools.islice(f,5)))"
+```
+
+2. Count total rows
+```bash
+python3 -c "import gzip; n=sum(1 for _ in gzip.open('/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/datasets/merged_c1_cpg_event_dataset.tsv.gz','rt'))-1; print(n)"
+```
+
+3. Inspect summary counters
+```bash
+sed -n '1,80p' /data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/datasets/merged_c1_cpg_event_dataset.summary.tsv
+```
+
+4. Check split counts directly from the dataset
+```bash
+python3 -c "import gzip,csv,collections; c=collections.Counter(); f=gzip.open('/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/datasets/merged_c1_cpg_event_dataset.tsv.gz','rt'); r=csv.DictReader(f, delimiter='\t'); [c.update([row['split']]) for row in r]; print(dict(c))"
+```
+
+4b. Check chromosome event counts directly from the dataset
+```bash
+python3 -c "import gzip,csv,collections; c=collections.Counter(); f=gzip.open('/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/datasets/merged_c1_cpg_event_dataset.tsv.gz','rt'); r=csv.DictReader(f, delimiter='\t'); [c.update([row['chrom']]) for row in r]; print(dict(sorted(c.items())))"
+```
+
+5. Check label balance
+```bash
+python3 -c "import gzip,csv,collections; c=collections.Counter(); f=gzip.open('/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/datasets/merged_c1_cpg_event_dataset.tsv.gz','rt'); r=csv.DictReader(f, delimiter='\t'); [c.update([row['m_label']]) for row in r]; print(dict(c))"
+```
+
+What you have done after this step
+- You have converted merged_c1 from a raw modkit extract table into a model-ready CpG event dataset.
+- Each row now represents:
+  - one CpG cytosine event on one read
+- The dataset keeps:
+  - the methylation label M
+  - the local DNA sequence context D
+  - the placeholder cell-type label C
+  - the train/valid/test split
+
+Why this is the correct first step before a CNN
+- A CNN needs fixed-length input.
+- The `seq_window` column gives that fixed-length input directly.
+- A supervised model also needs a clean target.
+- The `m_label` column gives that target directly.
+- The split column lets you train and evaluate without leakage.
+- This is the smallest clean unit that still matches your intended biology:
+  - CpG `5mC` state conditioned on local DNA context
+
+Recommended next step after this one
+- If this dataset looks good, the next step is to make a small PyTorch training script that:
+  - one-hot encodes `seq_window`
+  - reads `m_label`
+  - trains a first binary CNN
+  - reports train / valid / test accuracy or AUROC
+
+Session update - 2026-04-26
+
+Current split decision
+- Do not do chromosome-based train / validation / test splits inside merged_c1 for the main experiment.
+- Instead, use separate BAM-derived datasets as fixed splits:
+  - train = merged_c1
+  - validation = merged_e5b
+  - test = third dataset when available
+- This is a stronger anti-leakage design because rows from the same BAM source are not mixed across splits.
+
+Important modeling note about labels
+- Current binary labels are defined directly from `mod_qual`:
+  - label 1 = m rows with mod_qual >= 0.8
+  - label 0 = m rows with mod_qual < 0.8
+- Because the label is built from `mod_qual`, `mod_qual` itself should probably not be used as an input feature.
+- Otherwise the model could learn the threshold almost directly instead of learning sequence/context patterns.
+
+What ref_kmer means
+- `ref_kmer` is the local sequence from the reference genome around the site.
+- So this is the expected genomic context according to hg38.
+- Example idea:
+  if the locus in the reference is ACGTG, then ref_kmer is that reference-centered local sequence.
+
+What query_kmer means
+- `query_kmer` is the local sequence as represented in the read / query.
+- So this reflects what is actually present in the aligned ONT read around that same position.
+- It may match the reference exactly, or it may differ because of sequencing errors, mismatches, indels, or alignment effects.
+
+Why both ref_kmer and query_kmer are useful
+- `ref_kmer` tells the model the genomic motif / local DNA context.
+- `query_kmer` tells the model what the read looked like at that same local region.
+- Together they may help the model learn whether some local sequence contexts or read-level patterns are associated with high-confidence vs low-confidence m calls.
+
+CNN input recommendation for this project
+- Good candidate inputs:
+  - ref_kmer
+  - query_kmer
+  - possibly normalized read position = forward_read_position / read_length
+  - possibly strand indicators
+- Probably do not include mod_qual as an input feature if it defines the label.
+
+Interpretation note about cell types
+- There may not be large biological differences in C across datasets because they are all A549-derived clones rather than very different cell types.
+- So variation may be subtler than in a cross-cell-line comparison.
+- Still, clone-specific or sample-specific differences may exist, and the split-by-BAM setup is still the safer evaluation design.
+
+Practical next steps
+- Finish merged_e5b in exactly the same final schema as merged_c1.
+- Keep the same columns and the same label definition.
+- Then start the CNN pipeline with:
+  - training file = merged_c1 final labeled table
+  - validation file = merged_e5b final labeled table
+- The test dataset can be added later once available.
+
+CNN-specific QC to run before training
+
+Important note
+- Before starting the CNN, do a final quality-control pass.
+- This is not exactly the same as a classic tabular-ML QC pass.
+- For this project, sequence integrity, label logic, and split validity matter more than things like classical multicollinearity.
+
+What to check before CNN training
+- Dataset completeness
+  - confirm files exist
+  - confirm headers are correct
+  - confirm rows are present
+- Schema consistency across train / validation / test
+  - same column names
+  - same column meanings
+  - same label definition
+  - same threshold rule
+- Kmer integrity
+  - all ref_kmer values should have the same length
+  - all query_kmer values should have the same length
+  - no empty kmers
+  - no malformed kmers
+  - no unexpected bases unless explicitly allowed
+- Label integrity
+  - labels should only be 0 and 1
+  - count positives and negatives in each split
+  - check whether imbalance is extreme
+- Missing data
+  - check for missing values in:
+    ref_kmer
+    query_kmer
+    forward_read_position
+    read_length
+    ref_strand
+    ref_mod_strand
+    label
+- Leakage prevention
+  - keep train / validation / test as separate BAM-derived datasets
+  - do not mix rows across those datasets
+- Feature logic
+  - do not include mod_qual as an input feature if it defines the label
+  - if using forward_read_position, probably normalize it by read_length
+- Duplication / redundancy
+  - check whether exact duplicate rows are very common
+  - check whether one split contains suspiciously repeated events
+
+What is less central here than in a tabular ML project
+- Classical multicollinearity is not the main issue for this CNN setup.
+- The main inputs are sequence-like tensors, not a wide table of correlated numeric predictors.
+- So the most important QC is:
+  - sequence integrity
+  - label construction
+  - split correctness
+  - feature leakage prevention
+
+Reminder for future step
+- When asking for the CNN pre-training QC later, use this section as the checklist.
+- The QC should be run on merged_c1 first and then on merged_e5b once the validation file is finalized.
+Session update - 2026-04-24
+
+Goal of this session
+- Continue preparing merged_c1 modkit extract-full output for CNN modeling.
+- Focus only on C methylation calls with mod_code = m.
+- Do not use h-labeled C calls for the current positive class.
+
+What was checked first
+- Counted C-base mod_code values from:
+  /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/extract_full_merged_c1_complete.tsv.gz
+- Result:
+  h 988320011
+  m 988320011
+- Interpretation:
+  merged_c1 contains two C-related labels in the full file, h and m.
+  For the CNN positive class, only m should be kept.
+
+Positive set creation
+- Created a C/m-only file from the full extract-full output:
+  /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/extract_full_merged_c1_C_m_only.tsv.gz
+- Then created a cleaned version:
+  /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/extract_full_merged_c1_C_m_only.clean.tsv.gz
+
+Important cleaning note
+- An early cleaning attempt used:
+  NF==20 && $14=="m" && $18=="C"
+- That was too strict and produced a file with only the header.
+- The corrected cleaning logic was to keep the header and filter only on the relevant fields:
+  $14=="m" && $18=="C"
+- This worked.
+
+Validation of cleaned positive set
+- Head of the cleaned file showed expected rows with:
+  mod_code = m
+  canonical_base = C
+- Row count of cleaned file:
+  47634443 total lines
+- Interpretation:   47634442 positive data rows + 1 header row.
+
+CNN feature table created
+- Created:
+  /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/merged_c1_C_m_only.cnn_features.tsv
+- Columns kept:
+  chrom
+  ref_position
+  mod_qual
+  ref_kmer
+  query_kmer
+  forward_read_position
+  read_length
+  ref_strand
+  ref_mod_strand
+  label
+- All rows in this file have:
+  label = 1
+- Row count:
+  47634443 total lines
+- Interpretation:
+  47634442 positive examples + 1 header row.
+
+Why this was done
+- The full merged_c1 extract-full file contains multiple C labels.
+- For the current CNN task, the intended positive class is methylated CpG C with mod_code = m only.
+- The feature table was reduced to a compact set of columns that are easier to use for downstream model preparation.
+
+Current status
+- Positive class file is ready:
+  /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/merged_c1_C_m_only.cnn_features.tsv
+- This is not yet a full training table.
+- It contains only label = 1 examples.
+
+What still needs to be done later
+- Build a negative set with the same columns and label = 0.
+- Most likely source:
+  non-m C examples or another explicitly defined unmethylated/background C set from the full merged_c1 extract-full file.
+- After that:
+  combine positive and negative tables
+  optionally balance or subsample classes
+  split into train/validation/test sets
+
+Next session - what still needs to be done before CNN training
+
+Current state
+- Positive set is ready:
+  /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/merged_c1_C_m_only.cnn_features.tsv
+- This file contains only label = 1 examples.
+- CNN training cannot start yet because label = 0 examples are still missing.
+
+Important blocker / interpretation
+- From the earlier full-file C mod_code count, canonical_base = C rows in:
+  /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/extract_full_merged_c1_complete.tsv.gz
+  appeared to contain only:
+  h
+  m
+- This means the current extract-full file does not obviously provide a straightforward "unmodified C" class.
+- Therefore, do NOT automatically use h as label = 0 unless that is a deliberate biological/modeling choice.
+- Current interpretation:
+  m = positive class of interest
+  h = not being modeled for now, and should be excluded unless explicitly repurposed
+
+What needs to be decided
+- Decide what label = 0 should mean.
+- Reasonable options:
+  1. true unmodified CpG C examples, if they can be obtained from another source/workflow
+  2. h-labeled C as "not-m" negatives, but only if that is scientifically acceptable for this model
+  3. a background/control set defined from another methylation track or preprocessing output
+
+Recommended next step
+- First confirm whether a usable negative class exists in the current merged_c1 extract-full output or whether another source is needed.
+- If the full file still only contains h and m for C rows, then a true negative set must come from somewhere else.
+
+Useful check command
+- This re-checks which mod_code values exist for canonical_base = C:
+  gzip -cd /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/extract_full_merged_c1_complete.tsv.gz | awk -F'\t' 'NR==1 {for (i=1; i<=NF; i++) {if ($i=="canonical_base") cb=i; if ($i=="mod_code") mc=i} next} $cb=="C" {count[$mc]++} END {for (k in count) print "[" k "]", count[k]}'
+
+If a real negative source is found
+- The negative table must use the same columns as the positive table:
+  chrom
+  ref_position
+  mod_qual
+  ref_kmer
+  query_kmer
+  forward_read_position
+  read_length
+  ref_strand
+  ref_mod_strand
+  label
+- and every negative row must have:
+  label = 0
+
+Template for building a negative feature table
+- Replace NEGATIVE_INPUT.tsv.gz with the real negative-source file once that source is decided:
+  gzip -cd NEGATIVE_INPUT.tsv.gz | awk -F'\t' 'BEGIN{OFS="\t"} NR==1 {for (i=1; i<=NF; i++) {if ($i=="chrom") chrom=i; if ($i=="ref_position") refpos=i; if ($i=="mod_qual") modqual=i; if ($i=="ref_kmer") refk=i; if ($i=="query_kmer") qk=i; if ($i=="forward_read_position") frp=i; if ($i=="read_length") rl=i; if ($i=="ref_strand") rs=i; if ($i=="ref_mod_strand") rms=i} print "chrom","ref_position","mod_qual","ref_kmer","query_kmer","forward_read_position","read_length","ref_strand","ref_mod_strand","label"; next} {print $chrom,$refpos,$modqual,$refk,$qk,$frp,$rl,$rs,$rms,0}' > NEGATIVE_OUTPUT.tsv
+
+After the negative table exists
+- Combine positive and negative tables into one training table.
+- Keep the header only once.
+- Example pattern:
+  { head -n 1 POSITIVE.tsv; tail -n +2 POSITIVE.tsv; tail -n +2 NEGATIVE.tsv; } > TRAINING.tsv
+
+Practical note
+- Because the full merged_c1 extract is large, avoid repeatedly scanning it on the login node unless necessary.
+- Heavy validation/counting commands should preferably run in batch if they need to read the full gzipped file.
+
+How Pierre's workflow translates to this merged_c1 CNN task
+
+Big picture
+- Pierre's notebook is a standard supervised classification workflow:
+  define the prediction target
+  inspect the labels
+  clean and simplify features
+  make train/validation splits
+  encode features
+  train baseline and stronger models
+  evaluate
+- The same logic applies here, but the data structure is very different:
+  his rows = water pumps
+  our rows = individual methylation-call events from modkit extract full
+- Therefore, the important takeaway is the workflow structure, not the exact models or feature engineering choices.
+
+What is already analogous in our data
+- Problem definition has started:
+  current positive class = C rows with mod_code = m
+- Positive feature table has already been created:
+  /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/merged_c1_C_m_only.cnn_features.tsv
+- This corresponds to Pierre's early "clean training table" stage, but only for one class.
+
+Main difference from Pierre's project
+- Pierre already had labels for every row.
+- We do not yet have a complete labeled dataset.
+- Our main unresolved preprocessing problem is label construction:
+  label = 1 positives exist
+  label = 0 negatives are still undefined
+
+What should happen next, following the same logic as Pierre's notebook
+
+1. Define the target clearly
+- Before any CNN training, decide exactly what label = 0 means.
+- Options:
+  a. h as negative ("not m")
+  b. a true unmethylated/background C class from another source
+- This is the most important unresolved step.
+
+2. Build one full labeled table
+- Once the negative source is chosen, create a negative feature table with the same columns as:
+  merged_c1_C_m_only.cnn_features.tsv
+- Set:
+  label = 0 for all negatives
+- Then combine positive and negative tables into one training table.
+
+3. Check class balance
+- Just like Pierre inspected class counts first, do the same here.
+- After combining positive and negative rows, count:
+  number of label = 1 rows
+  number of label = 0 rows
+- If very imbalanced:
+  either downsample the larger class
+  or use class weighting later during model training
+
+4. Split train / validation / test
+- Pierre used a stratified train/validation split.
+- We should do the same once the full labeled table exists.
+- Important:
+  split after the table is built, not before.
+- Prefer stratified splitting by label.
+
+5. Decide what the model input should be
+- Pierre used a mix of numeric and categorical tabular features.
+- Our current table is also tabular, not image-like.
+- So the first sensible model is not necessarily a deep CNN.
+- A simpler baseline should come first.
+
+Recommended modeling order for our data
+- Start with a simple baseline on the tabular feature table:
+  logistic regression
+  random forest
+  xgboost or catboost
+- Only move to a CNN if we explicitly transform sequence/context into a representation where convolution makes sense.
+
+Why this matters
+- Current columns such as:
+  ref_kmer
+  query_kmer
+  mod_qual
+  forward_read_position
+  read_length
+  strand fields
+  are naturally usable in a tabular classifier
+- A CNN becomes more justified if the main signal is local sequence pattern and we encode k-mers or windows around the site into numeric arrays.
+
+Possible input strategies for our data
+
+Option A - tabular baseline first
+- Use the current feature table and treat:
+  mod_qual
+  forward_read_position
+  read_length
+  strand information
+  encoded sequence features from ref_kmer and query_kmer
+  as inputs to a standard classifier
+- This is the closest analog to Pierre's workflow and is the safest next modeling step.
+
+Option B - CNN after sequence encoding
+- Build fixed-length numeric encodings of:
+  ref_kmer
+  query_kmer
+- For example:
+  one-hot encode each base position in the k-mer
+  optionally concatenate sequence channels with scalar features like mod_qual
+- Then train a 1D CNN on the sequence-centered representation.
+- This should be considered only after the labeled dataset is complete.
+
+Concrete preprocessing plan for our project
+
+Step 1 - finalize label definition
+- Decide whether h is acceptable as label = 0.
+- If not, identify another source for negatives.
+
+Step 2 - build negative feature table
+- Must use the same columns as the positive table:
+  chrom
+  ref_position
+  mod_qual
+  ref_kmer
+  query_kmer
+  forward_read_position
+  read_length
+  ref_strand
+  ref_mod_strand
+  label
+
+Step 3 - combine positive and negative tables
+- Keep header once.
+- Produce one final training TSV.
+
+Step 4 - inspect the resulting dataset
+- Count class sizes.
+- Check for missing values.
+- Check if kmers contain mixed case or ambiguous bases that need normalization.
+- Check whether sequence columns should be uppercased before encoding.
+
+Step 5 - define the first baseline model
+- Recommended first baseline:
+  tabular model, not CNN
+- Reason:
+  faster
+  easier to debug
+  immediately tells whether the current features carry predictive signal
+
+Step 6 - only then decide whether a CNN adds value
+- If the baseline works reasonably:
+  keep it as benchmark
+- Then create a sequence-encoded dataset for CNN experiments.
+
+Practical recommendation for next session
+- Do not start with CNN code immediately.
+- First finish:
+  negative-set definition
+  full labeled table construction
+  class-balance inspection
+- After that, train one simple baseline model as a sanity check.
+- Then compare a sequence-aware CNN against that baseline.
+
+Summary of what Pierre's notebook teaches us for this project
+- The most important lesson is not "use CatBoost/XGBoost/CNN".
+- The most important lesson is:
+  define labels clearly
+  clean data consistently
+  build one complete feature table
+  inspect class balance
+  make a baseline first
+  only then move to more complex modeling
+
+Decision taken on 2026-04-26
+- h-labeled C rows should be excluded entirely.
+- label = 1:
+  C rows with mod_code = m and mod_qual >= 0.8
+- label = 0:
+  C rows with mod_code = m and mod_qual < 0.8
+- This means the first model will distinguish high-confidence methylated C from low-confidence / below-threshold C within the m class.
+
+Best current next action for merged_c1
+- Build a thresholded positive feature table with label = 1.
+- Build a thresholded negative feature table with label = 0.
+- Exclude h rows completely.
+- Combine both tables into one training table.
+- Then create the first train/validation split and start with a non-CNN baseline.
+
+Commands that worked
+- Clean positive file:
+  gzip -cd /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/extract_full_merged_c1_C_m_only.tsv.gz | awk -F'\t' 'BEGIN{OFS="\t"} NR==1 {print; next} $14=="m" && $18=="C" {print}' | gzip > /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/extract_full_merged_c1_C_m_only.clean.tsv.gz
+
+- Count lines in cleaned file:
+  gzip -cd /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/extract_full_merged_c1_C_m_only.clean.tsv.gz | awk 'END{print NR}'
+
+- Build compact CNN feature table:
+  gzip -cd /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/extract_full_merged_c1_C_m_only.clean.tsv.gz | awk -F'\t' 'BEGIN{OFS="\t"} NR==1 {for (i=1; i<=NF; i++) {if ($i=="chrom") chrom=i; if ($i=="ref_position") refpos=i; if ($i=="mod_qual") modqual=i; if ($i=="ref_kmer") refk=i; if ($i=="query_kmer") qk=i; if ($i=="forward_read_position") frp=i; if ($i=="read_length") rl=i; if ($i=="ref_strand") rs=i; if ($i=="ref_mod_strand") rms=i} print "chrom","ref_position","mod_qual","ref_kmer","query_kmer","forward_read_position","read_length","ref_strand","ref_mod_strand","label"; next} {print $chrom,$refpos,$modqual,$refk,$qk,$frp,$rl,$rs,$rms,1}' > /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/merged_c1_C_m_only.cnn_features.tsv
+Status update after final train/validation preparation and integer encoding
+
+The final CNN-ready text datasets are now:
+
+- Training:
+  - /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/merged_c1_C_m_q0p8_training.valid5mer.uppercase.cnn_features.tsv.gz
+- Validation:
+  - /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/merged_e5b_C_m_q0p8_validation.valid5mer.uppercase.cnn_features.tsv.gz
+
+Why these are the correct final text tables:
+
+- they contain only canonical base C rows with mod_code = m
+- labels are defined consistently from mod_qual with threshold 0.8
+- rows with ref_position = -1 or ref_kmer = "." were removed
+- only rows with length(ref_kmer) = 5 and length(query_kmer) = 5 were kept
+- kmers were normalized to uppercase so train and validation use the same alphabet
+
+This means the train and validation tables are now aligned for CNN input preparation.
+
+
+Integer encoding step completed
+
+To reduce storage and avoid saving gigantic one-hot tensors on disk, the final uppercase files were converted into compact integer-encoded chunked NPZ datasets.
+
+Encoding used:
+
+- A -> 0
+- C -> 1
+- G -> 2
+- T -> 3
+- N/other -> 4
+- ref_strand: + -> 1, - -> 0
+- ref_mod_strand: + -> 1, - -> 0
+- pos_norm = forward_read_position / read_length
+
+Encoded outputs now exist here:
+
+- Training NPZ chunks:
+  - /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/tensors_integer_valid5mer_uppercase
+- Validation NPZ chunks:
+  - /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/tensors_integer_valid5mer_uppercase
+
+Why integer encoding was the right choice:
+
+- much smaller on disk than one-hot tensors
+- easier to load in chunks
+- allows later conversion to embeddings or one-hot in memory during training
+- scales better to hundreds of millions of rows
+
+
+Important observation before CNN training
+
+The encoded chunk manifests show that data are still ordered by class inside the combined files:
+
+- the first chunks are dominated by label 1
+- later chunks will contain label 0
+
+This is not an error, but it means the CNN training pipeline must shuffle examples during loading.
+
+So the next step is not another large preprocessing pass. The next step is to build the CNN loader / training pipeline on top of the integer-encoded NPZ chunks.
+
+
+Immediate next step for the CNN
+
+The next stage should do the following:
+
+1. load NPZ chunks lazily rather than loading the full dataset into memory
+2. shuffle rows during training so batches are not label-blocked
+3. use:
+   - ref_kmer integer array
+   - query_kmer integer array
+   - pos_norm
+   - ref_strand
+   - ref_mod_strand
+4. train a first binary CNN using:
+   - merged_c1 as training
+   - merged_e5b as validation
+
+Why this is the right next step:
+
+- all major cleaning and representation preparation is already done
+- the data are now compact and model-readable
+- the remaining work is model-side, not preprocessing-side
+
+
+Commands to inspect the encoded inputs before CNN training
+
+Check train summary:
+
+```bash
+cat /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/tensors_integer_valid5mer_uppercase/summary.json
+```
+
+Check validation summary:
+
+```bash
+cat /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/tensors_integer_valid5mer_uppercase/summary.json
+```
+
+Check how many chunks exist:
+
+```bash
+find /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/tensors_integer_valid5mer_uppercase -maxdepth 1 -name 'chunk_*.npz' | wc -l
+find /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/tensors_integer_valid5mer_uppercase -maxdepth 1 -name 'chunk_*.npz' | wc -l
+```
+
+This confirms the encoded data are present and ready to be used by the CNN loader.
+
+
+First training run plan
+
+The next practical step is now to train a first binary CNN directly from the integer-encoded NPZ chunks.
+
+Why we should train from NPZ chunks instead of the TSV files:
+
+- the integer encoding step is already complete
+- loading NPZ chunks is much faster than reparsing huge gzipped TSV files every epoch
+- the chunked layout avoids loading the entire dataset into memory
+- it is the right level of compactness before model training
+
+What the first training pipeline should do:
+
+1. lazily load NPZ chunks
+2. shuffle rows during training
+3. concatenate ref_kmer and query_kmer into one 10-base sequence
+4. use base embeddings instead of disk-stored one-hot tensors
+5. run a simple 1D CNN for binary classification
+6. use merged_c1 for training and merged_e5b for validation
+
+Important note:
+
+- because the encoded chunks are written in class blocks, the training loader must shuffle rows
+- otherwise early batches will be label-biased
+
+Files created for this next step:
+
+- training script:
+  - /data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/scripts/train_first_cnn_npz.py
+- saved run instructions:
+  - /data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/CNN_FIRST_TRAINING_RUN.txt
+
+The recommended first run uses only a limited number of validation chunks:
+
+- validation is much larger than training
+- for a first run, it is better to confirm that the training loop works cleanly before scaling validation further
+
+After the first run works, the next decision will be whether to:
+
+- increase validation coverage
+- tune learning rate / batch size
+- deepen the CNN
+- or add richer feature handling

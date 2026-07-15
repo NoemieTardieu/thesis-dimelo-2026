@@ -1,0 +1,21 @@
+{
+  "input_dir": "/data/leuven/383/vsc38330/thesis_dimelo/train/c1_clean_label_q0p85_q0p5/tensors_integer_valid5mer_uppercase_cleanlabel_pos0p85_neg0p5",
+  "train_output": "/data/leuven/383/vsc38330/thesis_dimelo/train/c1_clean_label_q0p85_q0p5/merged_c1_cleanlabel_pos0p85_neg0p5_train_balanced_5M_per_class.nonoverlap.npz",
+  "val_output": "/data/leuven/383/vsc38330/thesis_dimelo/train/c1_clean_label_q0p85_q0p5/merged_c1_cleanlabel_pos0p85_neg0p5_val_balanced_1M_per_class.nonoverlap.npz",
+  "train_rows_per_class_requested": 5000000,
+  "val_rows_per_class_requested": 1000000,
+  "train_counts": {
+    "0": 5000000,
+    "1": 5000000
+  },
+  "val_counts": {
+    "0": 1000000,
+    "1": 1000000
+  },
+  "train_rows_written": 10000000,
+  "val_rows_written": 2000000,
+  "chunks_used": 13,
+  "max_chunks": null,
+  "seed": 82,
+  "split_method": "Within each chunk and class, shuffled indices are assigned to train first, then validation; rows are not reused."
+}

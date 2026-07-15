@@ -1,0 +1,23 @@
+> checking tags on first 1000 reads
+> no errors
+> num PASS records: 1000 (100.00%)
+> num records: 1000
+> valid record tag headers:
++------------+-------+
+| tag_header | count |
++------------+-------+
+| A+a.       | 1000  |
+| C+h?       | 985   |
+| C+m?       | 985   |
++------------+-------+
+
+
+> modified bases:
++--------+--------------+----------+------+
+| strand | primary_base | mod_code | mode |
++--------+--------------+----------+------+
+| +      | C            | h        | ?    |
+| +      | C            | m        | ?    |
+| +      | A            | a        | .    |
++--------+--------------+----------+------+
+

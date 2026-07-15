@@ -1,0 +1,28 @@
+{
+  "input_dir": "/data/leuven/383/vsc38330/thesis_dimelo/train/c1_clean_label_q0p85_q0p5/tensors_integer_valid5mer_uppercase_cleanlabel_pos0p85_neg0p5_readlen",
+  "train_output": "/data/leuven/383/vsc38330/thesis_dimelo/train/c1_clean_label_q0p85_q0p5/merged_c1_cleanlabel_pos0p85_neg0p5_readlen_train_balanced_5M_per_class.nonoverlap.npz",
+  "val_output": "/data/leuven/383/vsc38330/thesis_dimelo/train/c1_clean_label_q0p85_q0p5/merged_c1_cleanlabel_pos0p85_neg0p5_readlen_val_balanced_1M_per_class.nonoverlap.npz",
+  "train_counts": {
+    "0": 5000000,
+    "1": 5000000
+  },
+  "val_counts": {
+    "0": 1000000,
+    "1": 1000000
+  },
+  "train_rows_written": 10000000,
+  "val_rows_written": 2000000,
+  "chunks_used": 13,
+  "seed": 92,
+  "arrays": [
+    "ref_kmer",
+    "query_kmer",
+    "pos_norm",
+    "read_length_norm",
+    "log_read_length_norm",
+    "ref_strand",
+    "ref_mod_strand",
+    "label"
+  ],
+  "split_method": "Non-overlapping within chunk/class shuffled split."
+}

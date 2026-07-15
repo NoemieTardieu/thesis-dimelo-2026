@@ -1,0 +1,21 @@
+{
+  "input_dir": "/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/tensors_integer_valid5mer_uppercase",
+  "train_output": "/data/leuven/383/vsc38330/thesis_dimelo/train/c1_within_dataset_sanity/merged_c1_train_balanced_5M_per_class.nonoverlap.npz",
+  "val_output": "/data/leuven/383/vsc38330/thesis_dimelo/train/c1_within_dataset_sanity/merged_c1_val_balanced_1M_per_class.nonoverlap.npz",
+  "train_rows_per_class_requested": 5000000,
+  "val_rows_per_class_requested": 1000000,
+  "train_counts": {
+    "0": 5000000,
+    "1": 5000000
+  },
+  "val_counts": {
+    "0": 1000000,
+    "1": 1000000
+  },
+  "train_rows_written": 10000000,
+  "val_rows_written": 2000000,
+  "chunks_used": 13,
+  "max_chunks": null,
+  "seed": 62,
+  "split_method": "Within each chunk and class, shuffled indices are assigned to train first, then validation; rows are not reused."
+}

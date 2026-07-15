@@ -1,0 +1,4 @@
+sample	observed_mi_bits	shuffled_mi_bits
+h3k27ac	0.009525	0.000249
+h3k27me3	0.072918	0.000284
+h3k4me3	0.021395	0.000290

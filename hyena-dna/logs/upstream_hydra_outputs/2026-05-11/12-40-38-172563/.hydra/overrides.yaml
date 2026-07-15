@@ -1,0 +1,14 @@
+- wandb=null
+- experiment=hg38/genomic_benchmark_scratch
+- dataset.dataset_name=dummy_mouse_enhancers_ensembl
+- dataset.max_length=256
+- dataset.batch_size=8
+- train.global_batch_size=8
+- trainer.accelerator=cpu
+- trainer.devices=1
+- trainer.max_epochs=1
+- trainer.limit_train_batches=1
+- trainer.limit_val_batches=1
+- trainer.precision=32
+- model.fused_dropout_add_ln=False
+- loader.num_workers=0

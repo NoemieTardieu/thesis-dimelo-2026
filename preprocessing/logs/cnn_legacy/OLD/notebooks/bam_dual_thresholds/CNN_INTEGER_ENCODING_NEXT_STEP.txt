@@ -1,0 +1,79 @@
+Next step after valid5mer + uppercase normalization
+
+Goal
+- Convert the final CNN-ready TSV files into compact integer-encoded chunked NPZ files.
+- This is more storage-efficient than saving one-hot tensors on disk.
+
+Input files
+- Train:
+  /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/merged_c1_C_m_q0p8_training.valid5mer.uppercase.cnn_features.tsv.gz
+- Validation:
+  /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/merged_e5b_C_m_q0p8_validation.valid5mer.uppercase.cnn_features.tsv.gz
+
+Encoding used
+- A -> 0
+- C -> 1
+- G -> 2
+- T -> 3
+- N/other -> 4
+- ref_strand: + -> 1, - -> 0
+- ref_mod_strand: + -> 1, - -> 0
+- forward_read_position is normalized by read_length and saved as pos_norm
+
+What the script writes
+- chunk_00000.npz, chunk_00001.npz, ...
+- manifest.tsv
+- summary.json
+
+Python script
+- /data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/scripts/encode_cnn_kmers_to_npz.py
+
+Recommended Slurm job
+
+BASE_NOTE=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds
+
+cat > $BASE_NOTE/run_integer_encode_c1_e5b.sbatch <<'EOF'
+#!/bin/bash
+#SBATCH --job-name=cnn_int_encode
+#SBATCH --clusters=genius
+#SBATCH --account=lccbe
+#SBATCH --partition=batch
+#SBATCH --time=24:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=32G
+#SBATCH --output=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-cnn-int-encode-%j.out
+#SBATCH --error=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-cnn-int-encode-%j.err
+
+set -euo pipefail
+
+PY=/data/leuven/383/vsc38330/.venv/bin/python
+SCRIPT=/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/scripts/encode_cnn_kmers_to_npz.py
+
+TRAIN_IN=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/merged_c1_C_m_q0p8_training.valid5mer.uppercase.cnn_features.tsv.gz
+VAL_IN=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/merged_e5b_C_m_q0p8_validation.valid5mer.uppercase.cnn_features.tsv.gz
+
+TRAIN_OUT=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/tensors_integer_valid5mer_uppercase
+VAL_OUT=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/tensors_integer_valid5mer_uppercase
+
+$PY $SCRIPT --input "$TRAIN_IN" --output-dir "$TRAIN_OUT" --chunk-size 2000000
+$PY $SCRIPT --input "$VAL_IN" --output-dir "$VAL_OUT" --chunk-size 2000000
+EOF
+
+sbatch --account=lccbe $BASE_NOTE/run_integer_encode_c1_e5b.sbatch
+
+How to check the job
+- sacct -j <JOBID> --format=JobID,State,ExitCode,Elapsed,MaxRSS
+- tail -n 40 /data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-cnn-int-encode-<JOBID>.out
+
+How to inspect the outputs
+- ls -lh /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/tensors_integer_valid5mer_uppercase | head
+- ls -lh /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/tensors_integer_valid5mer_uppercase | head
+- cat /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/tensors_integer_valid5mer_uppercase/summary.json
+- cat /staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/tensors_integer_valid5mer_uppercase/summary.json
+
+Notes
+- This does NOT save one-hot tensors on disk.
+- It saves compact integer arrays in chunks, which is much lighter.
+- One-hot conversion can be done later on the fly during model loading/training.

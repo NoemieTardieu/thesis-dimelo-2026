@@ -1,0 +1,13 @@
+{
+  "input_dir": "/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/tensors_integer_valid5mer_uppercase",
+  "output": "/data/leuven/383/vsc38330/thesis_dimelo/train/balanced_subset_diagnostic/merged_c1_train_balanced_5M_per_class.npz",
+  "rows_per_class_requested": 5000000,
+  "counts": {
+    "0": 5000000,
+    "1": 5000000
+  },
+  "rows_written": 10000000,
+  "chunks_used": 13,
+  "max_chunks": null,
+  "seed": 52
+}

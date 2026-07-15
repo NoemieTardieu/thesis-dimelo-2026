@@ -1,0 +1,88 @@
+{
+  "train_dir": "/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/tensors_integer_valid5mer_uppercase",
+  "val_dir": "/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/tensors_integer_valid5mer_uppercase",
+  "out_dir": "/data/leuven/383/vsc38330/thesis_dimelo/train/first_cnn_run_01",
+  "epochs": 3,
+  "batch_size": 8192,
+  "lr": 0.001,
+  "embedding_dim": 8,
+  "conv_channels": 32,
+  "seed": 42,
+  "train_max_chunks": null,
+  "val_max_chunks": 16,
+  "num_workers": 0,
+  "device": "cpu",
+  "train_summary": {
+    "input": "/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/merged_c1_C_m_q0p8_training.valid5mer.uppercase.cnn_features.tsv.gz",
+    "output_dir": "/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/tensors_integer_valid5mer_uppercase",
+    "chunk_size": 2000000,
+    "chunks_written": 22,
+    "rows_written": 42024923,
+    "label_counts": {
+      "0": 22281830,
+      "1": 19743093
+    },
+    "encoding": {
+      "bases": {
+        "A": 0,
+        "C": 1,
+        "G": 2,
+        "T": 3,
+        "N": 4
+      },
+      "ref_strand": {
+        "+": 1,
+        "-": 0
+      },
+      "ref_mod_strand": {
+        "+": 1,
+        "-": 0
+      }
+    },
+    "arrays": [
+      "ref_kmer",
+      "query_kmer",
+      "pos_norm",
+      "ref_strand",
+      "ref_mod_strand",
+      "label"
+    ]
+  },
+  "val_summary": {
+    "input": "/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/merged_e5b_C_m_q0p8_validation.valid5mer.uppercase.cnn_features.tsv.gz",
+    "output_dir": "/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/tensors_integer_valid5mer_uppercase",
+    "chunk_size": 2000000,
+    "chunks_written": 344,
+    "rows_written": 687312723,
+    "label_counts": {
+      "0": 362971987,
+      "1": 324340736
+    },
+    "encoding": {
+      "bases": {
+        "A": 0,
+        "C": 1,
+        "G": 2,
+        "T": 3,
+        "N": 4
+      },
+      "ref_strand": {
+        "+": 1,
+        "-": 0
+      },
+      "ref_mod_strand": {
+        "+": 1,
+        "-": 0
+      }
+    },
+    "arrays": [
+      "ref_kmer",
+      "query_kmer",
+      "pos_norm",
+      "ref_strand",
+      "ref_mod_strand",
+      "label"
+    ]
+  },
+  "train_pos_weight": 1.1285885572433472
+}

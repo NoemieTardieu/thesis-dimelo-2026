@@ -1,0 +1,1244 @@
+First CNN training run from integer-encoded NPZ chunks
+
+What is already done
+- train and validation text tables were cleaned to:
+  - C only
+  - mod_code = m only
+  - valid 5-mer ref/query kmers only
+  - uppercase-normalized kmers
+- both datasets were integer-encoded into chunked NPZ files
+
+Why we train from NPZ chunks instead of TSV
+- much faster to load than parsing giant text files every epoch
+- much smaller than saving one-hot tensors on disk
+- allows lazy loading so we do not need to keep the full dataset in memory
+
+Important note
+- the encoded chunks are ordered by class because positives were written before negatives
+- therefore the training loader must shuffle rows during loading
+
+Training script
+- /data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/scripts/train_first_cnn_npz.py
+
+What the first model uses
+- ref_kmer integer array
+- query_kmer integer array
+- pos_norm
+- ref_strand
+- ref_mod_strand
+
+Model idea
+- concatenate the 5-base ref_kmer and 5-base query_kmer into one 10-base sequence
+- use an embedding layer for bases
+- apply 1D convolutions with kernel sizes 3 and 5
+- max-pool over sequence length
+- concatenate scalar features
+- output one binary logit
+
+Why this is a good first model
+- simple enough to debug
+- sequence-aware
+- lightweight enough for a first realistic run
+- easy to extend later with deeper CNNs or more features
+
+Recommended first Slurm run
+
+BASE_NOTE=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds
+
+cat > $BASE_NOTE/run_first_cnn_training.sbatch <<'EOF'
+#!/bin/bash
+#SBATCH --job-name=cnn_first_train
+#SBATCH --clusters=genius
+#SBATCH --account=lccbe
+#SBATCH --partition=batch
+#SBATCH --time=24:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=32G
+#SBATCH --output=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-cnn-first-train-%j.out
+#SBATCH --error=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-cnn-first-train-%j.err
+
+set -euo pipefail
+
+PY=/data/leuven/383/vsc38330/.venv/bin/python
+SCRIPT=/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/scripts/train_first_cnn_npz.py
+
+TRAIN_DIR=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/tensors_integer_valid5mer_uppercase
+VAL_DIR=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/tensors_integer_valid5mer_uppercase
+OUT_DIR=/data/leuven/383/vsc38330/thesis_dimelo/train/first_cnn_run_01
+
+mkdir -p "$OUT_DIR"
+
+$PY $SCRIPT \
+  --train-dir "$TRAIN_DIR" \
+  --val-dir "$VAL_DIR" \
+  --out-dir "$OUT_DIR" \
+  --epochs 3 \
+  --batch-size 8192 \
+  --lr 1e-3 \
+  --embedding-dim 8 \
+  --conv-channels 32 \
+  --val-max-chunks 16
+EOF
+
+sbatch --account=lccbe $BASE_NOTE/run_first_cnn_training.sbatch
+
+Why val-max-chunks is limited in the first run
+- validation is much larger than training
+- a first run should check whether the pipeline trains cleanly before evaluating on a huge validation subset
+- once the training loop works, val-max-chunks can be increased
+- when validation is limited, chunks must be sampled across the whole validation directory rather than taking the first N chunks, because the chunk order is class-blocked
+
+Important interpretation note from the first run
+- a validation result with:
+  - tp = 32000000
+  - tn = 0
+  - fp = 0
+  - fn = 0
+  - accuracy = 1.0
+  is not a real perfect model result
+- it means the limited validation subset contained only positive chunks
+- the training script was therefore updated so limited validation uses uniformly spaced chunks across the full validation set
+
+If rerunning after this fix, use a new output directory, for example:
+- /data/leuven/383/vsc38330/thesis_dimelo/train/first_cnn_run_02
+
+How to monitor the run
+- squeue -u vsc38330
+- sacct -j <JOBID> --format=JobID,State,ExitCode,Elapsed,MaxRSS
+- tail -f /data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-cnn-first-train-<JOBID>.out
+
+What to inspect after the run
+- /data/leuven/383/vsc38330/thesis_dimelo/train/first_cnn_run_01/config.json
+- /data/leuven/383/vsc38330/thesis_dimelo/train/first_cnn_run_01/metrics.jsonl
+- /data/leuven/383/vsc38330/thesis_dimelo/train/first_cnn_run_01/best_model.pt
+- /data/leuven/383/vsc38330/thesis_dimelo/train/first_cnn_run_01/last_model.pt
+
+Expected next step after the first run
+- confirm the training loop works
+- inspect train/validation loss and F1
+- then decide whether to:
+  - increase validation coverage
+  - tune batch size / learning rate
+  - deepen the CNN
+  - add richer feature handling
+
+Interpretation of corrected run 02
+- run 02 fixed the validation subset selection, so validation now contains both labels
+- however, the model predicted all validation examples as positive at threshold 0.5
+- this is visible from:
+  - tn = 0
+  - fn = 0
+  - fp = all validation negatives
+  - tp = all validation positives
+- therefore the training loop works, but the first model is not yet a good validation model
+
+Useful diagnostic next step
+- evaluate the saved model across multiple decision thresholds
+- inspect the predicted probability distribution on validation
+- this tells whether the model is truly unable to separate validation examples or whether the threshold/calibration is the main issue
+
+Diagnostic script
+- /data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/scripts/evaluate_first_cnn_npz.py
+
+Recommended diagnostic command
+
+BASE_NOTE=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds
+
+cat > $BASE_NOTE/run_eval_first_cnn_run02.sbatch <<'EOF'
+#!/bin/bash
+#SBATCH --job-name=cnn_eval_run02
+#SBATCH --clusters=genius
+#SBATCH --account=lccbe
+#SBATCH --partition=batch
+#SBATCH --time=04:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=16G
+#SBATCH --output=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-cnn-eval-run02-%j.out
+#SBATCH --error=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-cnn-eval-run02-%j.err
+
+set -euo pipefail
+
+PY=/data/leuven/383/vsc38330/.venv/bin/python
+SCRIPT=/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/scripts/evaluate_first_cnn_npz.py
+
+CHECKPOINT=/data/leuven/383/vsc38330/thesis_dimelo/train/first_cnn_run_02/best_model.pt
+VAL_DIR=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/tensors_integer_valid5mer_uppercase
+OUT=/data/leuven/383/vsc38330/thesis_dimelo/train/first_cnn_run_02/val_threshold_diagnostics.json
+
+$PY $SCRIPT \
+  --checkpoint "$CHECKPOINT" \
+  --data-dir "$VAL_DIR" \
+  --out "$OUT" \
+  --batch-size 8192 \
+  --max-chunks 16 \
+  --selection-mode uniform
+EOF
+
+sbatch --account=lccbe $BASE_NOTE/run_eval_first_cnn_run02.sbatch
+
+
+Distribution shift diagnostic after run 02
+
+The run 02 model predicts almost all validation examples as positive. Since threshold tuning did not fix this, the next diagnostic is to compare train and validation feature distributions.
+
+Script:
+- /data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/scripts/compare_cnn_npz_distributions.py
+
+What it compares:
+- label balance
+- pos_norm distribution
+- ref_strand distribution
+- ref_mod_strand distribution
+- most common ref_kmers
+- most common query_kmers
+- most common ref/query kmer pairs
+- label-1 fraction for common ref_kmers/query_kmers
+
+Recommended Slurm command:
+
+BASE_NOTE=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds
+
+cat > $BASE_NOTE/run_compare_c1_e5b_distributions.sbatch <<'EOF'
+#!/bin/bash
+#SBATCH --job-name=cnn_dist_check
+#SBATCH --clusters=genius
+#SBATCH --account=lccbe
+#SBATCH --partition=batch
+#SBATCH --time=04:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=16G
+#SBATCH --output=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-cnn-dist-check-%j.out
+#SBATCH --error=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-cnn-dist-check-%j.err
+
+set -euo pipefail
+
+PY=/data/leuven/383/vsc38330/.venv/bin/python
+SCRIPT=/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/scripts/compare_cnn_npz_distributions.py
+
+TRAIN_DIR=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/tensors_integer_valid5mer_uppercase
+VAL_DIR=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/tensors_integer_valid5mer_uppercase
+OUT=/data/leuven/383/vsc38330/thesis_dimelo/train/first_cnn_run_02/c1_vs_e5b_distribution_check.json
+
+$PY $SCRIPT \
+  --train-dir "$TRAIN_DIR" \
+  --val-dir "$VAL_DIR" \
+  --out "$OUT" \
+  --max-chunks 32 \
+  --max-rows-per-chunk 200000
+EOF
+
+sbatch --account=lccbe $BASE_NOTE/run_compare_c1_e5b_distributions.sbatch
+
+How to inspect:
+- cat /data/leuven/383/vsc38330/thesis_dimelo/train/first_cnn_run_02/c1_vs_e5b_distribution_check.json
+
+
+Balanced subset baseline diagnostic
+
+Reason:
+- run 02 showed that the first CNN predicts nearly everything in validation as positive
+- the distribution check showed kmer composition shift, but label balance and position/strand distributions look similar
+- the next clean test is to train on smaller balanced subsets and compare a simple baseline before making the CNN more complex
+
+Step 1: build balanced train/validation NPZ subsets
+
+BASE_NOTE=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds
+
+cat > $BASE_NOTE/run_build_balanced_cnn_subsets.sbatch <<'EOF'
+#!/bin/bash
+#SBATCH --job-name=cnn_bal_subsets
+#SBATCH --clusters=genius
+#SBATCH --account=lccbe
+#SBATCH --partition=batch
+#SBATCH --time=04:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=16G
+#SBATCH --output=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-cnn-bal-subsets-%j.out
+#SBATCH --error=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-cnn-bal-subsets-%j.err
+
+set -euo pipefail
+
+PY=/data/leuven/383/vsc38330/.venv/bin/python
+SCRIPT=/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/scripts/build_balanced_npz_subset.py
+
+TRAIN_DIR=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/tensors_integer_valid5mer_uppercase
+VAL_DIR=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/tensors_integer_valid5mer_uppercase
+OUT_DIR=/data/leuven/383/vsc38330/thesis_dimelo/train/balanced_subset_diagnostic
+
+mkdir -p "$OUT_DIR"
+
+$PY $SCRIPT \
+  --input-dir "$TRAIN_DIR" \
+  --output "$OUT_DIR/merged_c1_train_balanced_1M_per_class.npz" \
+  --rows-per-class 1000000 \
+  --seed 42
+
+$PY $SCRIPT \
+  --input-dir "$VAL_DIR" \
+  --output "$OUT_DIR/merged_e5b_val_balanced_1M_per_class.npz" \
+  --rows-per-class 1000000 \
+  --max-chunks 96 \
+  --seed 43
+EOF
+
+sbatch --account=lccbe $BASE_NOTE/run_build_balanced_cnn_subsets.sbatch
+
+Step 2: train simple MLP baseline on those balanced subsets
+
+cat > $BASE_NOTE/run_balanced_mlp_baseline.sbatch <<'EOF'
+#!/bin/bash
+#SBATCH --job-name=cnn_bal_mlp
+#SBATCH --clusters=genius
+#SBATCH --account=lccbe
+#SBATCH --partition=batch
+#SBATCH --time=04:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=16G
+#SBATCH --output=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-cnn-bal-mlp-%j.out
+#SBATCH --error=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-cnn-bal-mlp-%j.err
+
+set -euo pipefail
+
+PY=/data/leuven/383/vsc38330/.venv/bin/python
+SCRIPT=/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/scripts/train_balanced_mlp_baseline.py
+BASE=/data/leuven/383/vsc38330/thesis_dimelo/train/balanced_subset_diagnostic
+
+$PY $SCRIPT \
+  --train-npz "$BASE/merged_c1_train_balanced_1M_per_class.npz" \
+  --val-npz "$BASE/merged_e5b_val_balanced_1M_per_class.npz" \
+  --out-dir "$BASE/mlp_baseline_01" \
+  --epochs 10 \
+  --batch-size 8192 \
+  --lr 1e-3
+EOF
+
+sbatch --account=lccbe $BASE_NOTE/run_balanced_mlp_baseline.sbatch
+
+How to check:
+- sacct -j <JOBID> --format=JobID,State,ExitCode,Elapsed,MaxRSS
+- cat /data/leuven/383/vsc38330/thesis_dimelo/train/balanced_subset_diagnostic/merged_c1_train_balanced_1M_per_class.summary.json
+- cat /data/leuven/383/vsc38330/thesis_dimelo/train/balanced_subset_diagnostic/merged_e5b_val_balanced_1M_per_class.summary.json
+- cat /data/leuven/383/vsc38330/thesis_dimelo/train/balanced_subset_diagnostic/mlp_baseline_01/metrics.jsonl
+
+Step 3: train the same first CNN on the same balanced subsets
+
+Reason:
+- the MLP baseline gives a fair reference
+- now the CNN should be tested on the exact same balanced train/validation subset
+- this tells whether the convolutional model helps beyond a simple MLP
+
+cat > $BASE_NOTE/run_balanced_cnn_baseline.sbatch <<'EOF'
+#!/bin/bash
+#SBATCH --job-name=cnn_bal_cnn
+#SBATCH --clusters=genius
+#SBATCH --account=lccbe
+#SBATCH --partition=batch
+#SBATCH --time=04:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=16G
+#SBATCH --output=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-cnn-bal-cnn-%j.out
+#SBATCH --error=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-cnn-bal-cnn-%j.err
+
+set -euo pipefail
+
+PY=/data/leuven/383/vsc38330/.venv/bin/python
+SCRIPT=/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/scripts/train_balanced_cnn_baseline.py
+BASE=/data/leuven/383/vsc38330/thesis_dimelo/train/balanced_subset_diagnostic
+
+$PY $SCRIPT \
+  --train-npz "$BASE/merged_c1_train_balanced_1M_per_class.npz" \
+  --val-npz "$BASE/merged_e5b_val_balanced_1M_per_class.npz" \
+  --out-dir "$BASE/cnn_baseline_01" \
+  --epochs 10 \
+  --batch-size 8192 \
+  --lr 1e-3 \
+  --embedding-dim 8 \
+  --conv-channels 32
+EOF
+
+sbatch --account=lccbe $BASE_NOTE/run_balanced_cnn_baseline.sbatch
+
+How to inspect:
+- cat /data/leuven/383/vsc38330/thesis_dimelo/train/balanced_subset_diagnostic/cnn_baseline_01/metrics.jsonl
+
+
+Feature ablation diagnostic
+
+Reason:
+- balanced MLP slightly outperformed the balanced CNN
+- before changing the CNN architecture, test which input group carries transferable signal
+- this helps identify whether query_kmer or scalar read features are helping or hurting validation transfer
+
+Ablations:
+- ref: ref_kmer only
+- query: query_kmer only
+- ref_query: ref_kmer + query_kmer
+- ref_query_scalar: ref_kmer + query_kmer + pos_norm + strands
+- scalar: pos_norm + strands only
+
+Script:
+- /data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/scripts/train_balanced_mlp_ablation.py
+
+Command:
+
+BASE_NOTE=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds
+
+cat > $BASE_NOTE/run_balanced_mlp_ablation.sbatch <<'EOF'
+#!/bin/bash
+#SBATCH --job-name=cnn_mlp_ablate
+#SBATCH --clusters=genius
+#SBATCH --account=lccbe
+#SBATCH --partition=batch
+#SBATCH --time=08:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=16G
+#SBATCH --output=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-cnn-mlp-ablate-%j.out
+#SBATCH --error=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-cnn-mlp-ablate-%j.err
+
+set -euo pipefail
+
+PY=/data/leuven/383/vsc38330/.venv/bin/python
+SCRIPT=/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/scripts/train_balanced_mlp_ablation.py
+BASE=/data/leuven/383/vsc38330/thesis_dimelo/train/balanced_subset_diagnostic
+OUT=$BASE/mlp_ablation_01
+
+for FEATURE_SET in ref query ref_query ref_query_scalar scalar
+do
+  $PY $SCRIPT \
+    --train-npz "$BASE/merged_c1_train_balanced_1M_per_class.npz" \
+    --val-npz "$BASE/merged_e5b_val_balanced_1M_per_class.npz" \
+    --out-dir "$OUT" \
+    --feature-set "$FEATURE_SET" \
+    --epochs 10 \
+    --batch-size 8192 \
+    --lr 1e-3
+done
+EOF
+
+sbatch --account=lccbe $BASE_NOTE/run_balanced_mlp_ablation.sbatch
+
+How to inspect:
+- for d in /data/leuven/383/vsc38330/thesis_dimelo/train/balanced_subset_diagnostic/mlp_ablation_01/*; do echo "$d"; tail -n 1 "$d/metrics.jsonl"; done
+
+
+Improved balanced CNN using the best ablation feature set
+
+Reason:
+- the best ablation was ref_query_scalar
+- the first balanced CNN did not beat the MLP baseline
+- the next test keeps the same input set but improves the CNN architecture/training
+
+Changes compared with the first CNN:
+- larger embedding dimension
+- more convolution channels
+- residual convolution blocks
+- batch normalization
+- max + mean pooling
+- scalar branch for pos_norm and strands
+- AdamW with weight decay
+- gradient clipping
+- learning-rate reduction on validation F1 plateau
+
+Script:
+- /data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/scripts/train_balanced_cnn_v2.py
+
+Command:
+
+BASE_NOTE=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds
+
+cat > $BASE_NOTE/run_balanced_cnn_v2.sbatch <<'EOF'
+#!/bin/bash
+#SBATCH --job-name=cnn_bal_v2
+#SBATCH --clusters=genius
+#SBATCH --account=lccbe
+#SBATCH --partition=batch
+#SBATCH --time=08:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=16G
+#SBATCH --output=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-cnn-bal-v2-%j.out
+#SBATCH --error=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-cnn-bal-v2-%j.err
+
+set -euo pipefail
+
+PY=/data/leuven/383/vsc38330/.venv/bin/python
+SCRIPT=/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/scripts/train_balanced_cnn_v2.py
+BASE=/data/leuven/383/vsc38330/thesis_dimelo/train/balanced_subset_diagnostic
+
+$PY $SCRIPT \
+  --train-npz "$BASE/merged_c1_train_balanced_1M_per_class.npz" \
+  --val-npz "$BASE/merged_e5b_val_balanced_1M_per_class.npz" \
+  --out-dir "$BASE/cnn_v2_01" \
+  --epochs 20 \
+  --batch-size 8192 \
+  --lr 5e-4 \
+  --embedding-dim 12 \
+  --conv-channels 64 \
+  --dropout 0.3 \
+  --weight-decay 1e-4
+EOF
+
+sbatch --account=lccbe $BASE_NOTE/run_balanced_cnn_v2.sbatch
+
+How to inspect:
+- cat /data/leuven/383/vsc38330/thesis_dimelo/train/balanced_subset_diagnostic/cnn_v2_01/metrics.jsonl
+
+
+Balanced 5M/class scaling experiment
+
+Reason:
+- the 1M/class balanced subset showed that CNN v2 is stable and slightly better than the MLP baseline
+- the next question is whether more balanced data improves generalization or whether performance plateaus
+- this keeps the model and feature set fixed, changing only the amount of balanced training/validation data
+
+Step 1: build 5M/class balanced train and validation subsets
+
+BASE_NOTE=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds
+
+cat > $BASE_NOTE/run_build_balanced_5M_cnn_subsets.sbatch <<'EOF'
+#!/bin/bash
+#SBATCH --job-name=cnn_bal_5m
+#SBATCH --clusters=genius
+#SBATCH --account=lccbe
+#SBATCH --partition=batch
+#SBATCH --time=08:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=32G
+#SBATCH --output=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-cnn-bal-5m-%j.out
+#SBATCH --error=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-cnn-bal-5m-%j.err
+
+set -euo pipefail
+
+PY=/data/leuven/383/vsc38330/.venv/bin/python
+SCRIPT=/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/scripts/build_balanced_npz_subset.py
+
+TRAIN_DIR=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/tensors_integer_valid5mer_uppercase
+VAL_DIR=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_e5b/tensors_integer_valid5mer_uppercase
+OUT_DIR=/data/leuven/383/vsc38330/thesis_dimelo/train/balanced_subset_diagnostic
+
+mkdir -p "$OUT_DIR"
+
+$PY $SCRIPT \
+  --input-dir "$TRAIN_DIR" \
+  --output "$OUT_DIR/merged_c1_train_balanced_5M_per_class.npz" \
+  --rows-per-class 5000000 \
+  --seed 52
+
+$PY $SCRIPT \
+  --input-dir "$VAL_DIR" \
+  --output "$OUT_DIR/merged_e5b_val_balanced_5M_per_class.npz" \
+  --rows-per-class 5000000 \
+  --max-chunks 192 \
+  --seed 53
+EOF
+
+sbatch --account=lccbe $BASE_NOTE/run_build_balanced_5M_cnn_subsets.sbatch
+
+Step 2: train CNN v2 on the 5M/class balanced subsets
+
+cat > $BASE_NOTE/run_balanced_cnn_v2_5M.sbatch <<'EOF'
+#!/bin/bash
+#SBATCH --job-name=cnn_bal_v2_5m
+#SBATCH --clusters=genius
+#SBATCH --account=lccbe
+#SBATCH --partition=batch
+#SBATCH --time=12:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=32G
+#SBATCH --output=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-cnn-bal-v2-5m-%j.out
+#SBATCH --error=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-cnn-bal-v2-5m-%j.err
+
+set -euo pipefail
+
+PY=/data/leuven/383/vsc38330/.venv/bin/python
+SCRIPT=/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/scripts/train_balanced_cnn_v2.py
+BASE=/data/leuven/383/vsc38330/thesis_dimelo/train/balanced_subset_diagnostic
+
+$PY $SCRIPT \
+  --train-npz "$BASE/merged_c1_train_balanced_5M_per_class.npz" \
+  --val-npz "$BASE/merged_e5b_val_balanced_5M_per_class.npz" \
+  --out-dir "$BASE/cnn_v2_5M_01" \
+  --epochs 20 \
+  --batch-size 8192 \
+  --lr 5e-4 \
+  --embedding-dim 12 \
+  --conv-channels 64 \
+  --dropout 0.3 \
+  --weight-decay 1e-4
+EOF
+
+sbatch --account=lccbe $BASE_NOTE/run_balanced_cnn_v2_5M.sbatch
+
+How to compare with 1M/class run:
+- tail -n 1 /data/leuven/383/vsc38330/thesis_dimelo/train/balanced_subset_diagnostic/cnn_v2_01/metrics.jsonl
+- cat /data/leuven/383/vsc38330/thesis_dimelo/train/balanced_subset_diagnostic/cnn_v2_5M_01/metrics.jsonl
+
+Results obtained so far
+
+1. Full chunked CNN, C1 training -> E5B validation
+
+Run:
+- /data/leuven/383/vsc38330/thesis_dimelo/train/first_cnn_run_02
+
+Observation:
+- training looked strong on merged_c1, with train F1 around 0.93-0.94
+- validation on merged_e5b failed because the model predicted almost everything as positive
+- validation accuracy was around 0.511 and validation F1 around 0.676, but this was misleading because TN=0 and FP was very high
+- threshold diagnostics showed predicted probabilities were almost all very high, so changing the classification threshold did not solve it
+
+Interpretation:
+- the first full CNN learned a C1-specific decision rule that did not transfer well to E5B
+- this motivated the distribution-shift and balanced-subset checks
+
+2. C1 vs E5B distribution check
+
+Run:
+- /data/leuven/383/vsc38330/thesis_dimelo/train/first_cnn_run_02/c1_vs_e5b_distribution_check.json
+
+Observation:
+- label balance was similar between C1 and E5B
+- position-normalized read position and strand distributions were also similar
+- the biggest difference was the kmer/motif composition
+- example: C1 was enriched for ref kmers like TCGAA and ATCGA, whereas E5B had a more distributed set of CpG-rich kmers such as CCCGG, CCGCC, GGCGG, CACGC, etc.
+
+Interpretation:
+- the main issue is probably not class imbalance, read position, or strand
+- the main transfer challenge seems to be sequence-context / kmer distribution shift between BAM files
+
+3. Balanced 1M/class MLP baseline
+
+Run:
+- /data/leuven/383/vsc38330/thesis_dimelo/train/balanced_subset_diagnostic/mlp_baseline_01
+
+Best/final behavior:
+- validation accuracy around 0.58-0.59
+- validation F1 around 0.66
+- example final epoch: val accuracy 0.5885, val F1 0.6639
+
+Interpretation:
+- after balancing the classes, the model performs above random but not extremely well
+- this suggests there is transferable signal, but it is modest
+
+4. Balanced 1M/class CNN baseline
+
+Run:
+- /data/leuven/383/vsc38330/thesis_dimelo/train/balanced_subset_diagnostic/cnn_baseline_01
+
+Best/final behavior:
+- validation accuracy around 0.59
+- validation F1 around 0.63-0.65
+- example final epoch: val accuracy 0.5905, val F1 0.6349
+
+Interpretation:
+- the first balanced CNN was stable but did not beat the simpler MLP baseline
+- this suggested the architecture needed improvement before changing feature sets
+
+5. Feature ablation with balanced MLP
+
+Run:
+- /data/leuven/383/vsc38330/thesis_dimelo/train/balanced_subset_diagnostic/mlp_ablation_01
+
+Final validation F1 values:
+- scalar only: about 0.456, close to non-informative
+- query_kmer only: about 0.545
+- ref_kmer only: about 0.637
+- ref_kmer + query_kmer: about 0.655
+- ref_kmer + query_kmer + scalar features: about 0.664
+
+Interpretation:
+- ref_kmer carries the strongest transferable signal
+- query_kmer adds useful information
+- scalar features alone are weak, but they slightly help when combined with ref/query kmers
+- therefore we kept ref_query_scalar as the main feature set
+
+6. Improved CNN v2, balanced 1M/class
+
+Run:
+- /data/leuven/383/vsc38330/thesis_dimelo/train/balanced_subset_diagnostic/cnn_v2_01
+
+Best behavior:
+- best validation F1 around 0.670
+- validation accuracy around 0.59-0.60
+- probabilities were no longer collapsed to all-positive, unlike the first full chunked CNN
+
+Interpretation:
+- CNN v2 was more stable and slightly better than the MLP baseline
+- however, performance remained modest, supporting the idea that C1-to-E5B transfer is difficult
+
+7. Improved CNN v2, balanced 5M/class
+
+Run:
+- /data/leuven/383/vsc38330/thesis_dimelo/train/balanced_subset_diagnostic/cnn_v2_5M_01
+
+Best/final behavior:
+- best validation F1 was about 0.628, around epoch 2
+- validation accuracy stayed around 0.59
+- final epoch had val accuracy 0.5915 and val F1 0.6073
+- training F1 reached about 0.65, so the model learned something on C1 but did not transfer better to E5B
+
+Interpretation:
+- adding more balanced data did not improve generalization to E5B
+- the limitation is probably not only training set size
+- this strengthens the hypothesis that cross-BAM/domain shift is the bottleneck
+
+Overall modeling conclusion so far:
+- the meaningful metric range we obtained on balanced C1-to-E5B experiments is roughly 0.59-0.60 validation accuracy and 0.60-0.67 validation F1
+- this is above random but still modest
+- the best current transfer result is the balanced 1M/class CNN v2 with validation F1 around 0.670
+- the next sanity check is C1 train -> held-out C1 validation to see whether performance improves when the validation data comes from the same BAM/domain
+
+
+Within-dataset C1 sanity check
+
+Reason:
+- the C1-to-E5B experiments plateau around modest validation performance
+- the 5M/class experiment did not improve transfer to E5B, so the issue is probably not simply too little data
+- this sanity check asks a cleaner question: can the same CNN v2 architecture learn and generalize within merged_c1 itself?
+- if C1 train -> held-out C1 validation is clearly better than C1 -> E5B, then the architecture is working and the main limitation is cross-BAM/domain shift
+- if C1 -> held-out C1 is also weak, then the current feature representation/model is the bottleneck
+
+Important detail:
+- do not build train and validation by running the old balanced sampler twice, because independent random samples can overlap
+- this uses a paired split script that creates both files in one pass
+- within each chunk and class, row indices are shuffled; rows are assigned to train first, then validation, so validation rows are held out and not reused
+
+Step 1: build non-overlapping balanced C1 train and held-out C1 validation subsets
+
+BASE_NOTE=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds
+
+cat > $BASE_NOTE/run_build_c1_within_sanity_split.sbatch <<'EOF'
+#!/bin/bash
+#SBATCH --job-name=c1_sanity_split
+#SBATCH --clusters=genius
+#SBATCH --account=lccbe
+#SBATCH --partition=batch
+#SBATCH --time=04:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=32G
+#SBATCH --output=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-c1-sanity-split-%j.out
+#SBATCH --error=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-c1-sanity-split-%j.err
+
+set -euo pipefail
+
+PY=/data/leuven/383/vsc38330/.venv/bin/python
+SCRIPT=/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/scripts/build_balanced_train_val_npz_split.py
+INPUT_DIR=/staging/leuven/stg_00118/BAM_Noemie/modkit_preproc/merged_c1/tensors_integer_valid5mer_uppercase
+OUT_DIR=/data/leuven/383/vsc38330/thesis_dimelo/train/c1_within_dataset_sanity
+
+mkdir -p "$OUT_DIR"
+
+$PY "$SCRIPT" \
+  --input-dir "$INPUT_DIR" \
+  --train-output "$OUT_DIR/merged_c1_train_balanced_5M_per_class.nonoverlap.npz" \
+  --val-output "$OUT_DIR/merged_c1_val_balanced_1M_per_class.nonoverlap.npz" \
+  --train-rows-per-class 5000000 \
+  --val-rows-per-class 1000000 \
+  --seed 62
+EOF
+
+sbatch --account=lccbe $BASE_NOTE/run_build_c1_within_sanity_split.sbatch
+
+How to check Step 1:
+
+sacct -j <JOBID> --format=JobID,State,ExitCode,Elapsed,MaxRSS
+
+cat /data/leuven/383/vsc38330/thesis_dimelo/train/c1_within_dataset_sanity/merged_c1_train_balanced_5M_per_class.nonoverlap.split_summary.json
+
+Expected:
+- train_counts should be 5,000,000 for label 0 and 5,000,000 for label 1
+- val_counts should be 1,000,000 for label 0 and 1,000,000 for label 1
+- train_rows_written should be 10,000,000
+- val_rows_written should be 2,000,000
+
+Step 2: train CNN v2 on C1 train and validate on held-out C1
+
+cat > $BASE_NOTE/run_cnn_v2_c1_within_sanity.sbatch <<'EOF'
+#!/bin/bash
+#SBATCH --job-name=cnn_c1_sanity
+#SBATCH --clusters=genius
+#SBATCH --account=lccbe
+#SBATCH --partition=batch
+#SBATCH --time=08:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=32G
+#SBATCH --output=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-cnn-c1-sanity-%j.out
+#SBATCH --error=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-cnn-c1-sanity-%j.err
+
+set -euo pipefail
+
+PY=/data/leuven/383/vsc38330/.venv/bin/python
+SCRIPT=/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/scripts/train_balanced_cnn_v2.py
+BASE=/data/leuven/383/vsc38330/thesis_dimelo/train/c1_within_dataset_sanity
+
+$PY "$SCRIPT" \
+  --train-npz "$BASE/merged_c1_train_balanced_5M_per_class.nonoverlap.npz" \
+  --val-npz "$BASE/merged_c1_val_balanced_1M_per_class.nonoverlap.npz" \
+  --out-dir "$BASE/cnn_v2_c1_within_5Mtrain_1Mval_01" \
+  --epochs 20 \
+  --batch-size 8192 \
+  --lr 5e-4 \
+  --embedding-dim 12 \
+  --conv-channels 64 \
+  --dropout 0.3 \
+  --weight-decay 1e-4
+EOF
+
+sbatch --account=lccbe $BASE_NOTE/run_cnn_v2_c1_within_sanity.sbatch
+
+How to check Step 2:
+
+sacct -j <JOBID> --format=JobID,State,ExitCode,Elapsed,MaxRSS
+
+cat /data/leuven/383/vsc38330/thesis_dimelo/train/c1_within_dataset_sanity/cnn_v2_c1_within_5Mtrain_1Mval_01/metrics.jsonl
+
+How to interpret:
+- compare this held-out C1 validation F1 against the C1-to-E5B 5M/class run
+- C1-to-E5B 5M/class best validation F1 was about 0.628
+- C1-to-E5B 1M/class CNN v2 best validation F1 was about 0.670
+- if held-out C1 validation is much higher, for example >0.75, then the CNN can learn within the same BAM and the main issue is cross-BAM/domain shift
+- if held-out C1 validation is also around 0.60-0.67, then the current CNN features carry only modest signal even without cross-BAM shift
+
+Observed C1-within-C1 sanity result:
+- best held-out C1 validation F1 was about 0.6585
+- best held-out C1 validation accuracy was about 0.558
+- the model had high recall, often around 0.83-0.85, but low precision around 0.53-0.54
+- this means it detects many positives but also creates many false positives
+- because C1-within-C1 was not dramatically better than C1-to-E5B, the limitation is not only cross-BAM/domain shift
+- current 5-mer ref/query context plus simple scalar features seem to provide only a modest classification signal for the q0.8 label
+
+Next diagnostic: threshold, ROC-AUC, and PR-AUC for the C1-within-C1 model
+
+Reason:
+- F1 and accuracy at threshold 0.5 may not tell the full story
+- the model may rank positives above negatives reasonably well but use a poorly calibrated probability threshold
+- ROC-AUC and PR-AUC test ranking quality across thresholds
+- best-F1 threshold shows whether threshold tuning alone can improve the result
+
+Run:
+
+BASE_NOTE=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds
+
+sbatch --account=lccbe $BASE_NOTE/run_evaluate_c1_within_cnn_v2.sbatch
+
+How to check:
+
+sacct -j <JOBID> --format=JobID,State,ExitCode,Elapsed,MaxRSS
+
+cat /data/leuven/383/vsc38330/thesis_dimelo/train/c1_within_dataset_sanity/cnn_v2_c1_within_5Mtrain_1Mval_01/heldout_c1_threshold_auc_diagnostics.json
+
+How to interpret:
+- ROC-AUC near 0.5 means weak ranking, close to random
+- ROC-AUC clearly above 0.7 means the model ranks positives and negatives reasonably well, but the threshold/calibration may be the issue
+- PR-AUC should be compared to the positive fraction; here the held-out validation is balanced, so random PR-AUC is about 0.5
+- if best-F1 threshold is far from 0.5 and improves a lot, then threshold calibration matters
+- if best-F1 remains around 0.65, then the model signal itself is modest
+
+
+Clean-label experiment, recommended first version: positive >=0.85 and negative <=0.5
+
+Reason:
+- the previous q0.8 split labels every row below 0.8 as negative
+- this makes near-boundary cases ambiguous, for example 0.78 negative vs 0.82 positive, although they are technically very similar
+- to reduce label noise, we define a cleaner positive class as mod_qual >= 0.85
+- we define a cleaner negative class as mod_qual <= 0.5
+- rows between 0.5 and 0.85 are discarded for this experiment
+- this creates a margin between classes while keeping more positives than the stricter 0.9 threshold
+
+Threshold options:
+- recommended first choice: positive >=0.85, negative <=0.5
+- second option: positive >=0.8, negative <=0.5
+- stricter follow-up: positive >=0.9, negative <=0.5
+
+About broader kmer context:
+- the current prepared files contain 5-base ref_kmer and 5-base query_kmer
+- increasing to 7-mer, 9-mer, or 11-mer cannot be done honestly from the current integer tensors, because the extra bases are not present there
+- for ref_kmer only, wider context could potentially be reconstructed from reference genome coordinates
+- for query_kmer, true wider read context would require going back to the BAM/read sequence or rerunning the extraction with a wider kmer setting if available
+- therefore the clean-label experiment below keeps the current valid 5-mer representation first
+- if clean labels improve performance a lot, then the label boundary was a major issue
+- if clean labels do not improve performance much, then broader context or richer read-level features become the next priority
+
+Step 1: count how many clean positive/negative C1 rows exist
+
+BASE_NOTE=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds
+
+sbatch --account=lccbe $BASE_NOTE/run_count_c1_clean_label_q0p85_q0p5.sbatch
+
+Check:
+
+sacct -j <JOBID> --format=JobID,State,ExitCode,Elapsed,MaxRSS
+
+cat /data/leuven/383/vsc38330/thesis_dimelo/train/c1_clean_label_q0p85_q0p5/c1_clean_label_counts_q0p85_q0p5.json
+
+Important:
+- to build the planned 5M/class train plus 1M/class validation split, we need at least 6M positive rows and 6M negative rows
+- if one class has fewer than 6M rows, reduce the requested rows per class in the split Slurm file before running Step 3
+
+Step 2: build the clean-label feature file and encode it to integer tensors
+
+sbatch --account=lccbe $BASE_NOTE/run_build_c1_clean_label_q0p85_q0p5_encode.sbatch
+
+Check:
+
+sacct -j <JOBID> --format=JobID,State,ExitCode,Elapsed,MaxRSS
+
+cat /data/leuven/383/vsc38330/thesis_dimelo/train/c1_clean_label_q0p85_q0p5/tensors_integer_valid5mer_uppercase_cleanlabel_pos0p85_neg0p5/summary.json
+
+Step 3: create non-overlapping balanced train/held-out validation subsets
+
+sbatch --account=lccbe $BASE_NOTE/run_split_c1_clean_label_q0p85_q0p5.sbatch
+
+Check:
+
+sacct -j <JOBID> --format=JobID,State,ExitCode,Elapsed,MaxRSS
+
+cat /data/leuven/383/vsc38330/thesis_dimelo/train/c1_clean_label_q0p85_q0p5/merged_c1_cleanlabel_pos0p85_neg0p5_train_balanced_5M_per_class.nonoverlap.split_summary.json
+
+Expected:
+- train_counts should be 5,000,000 for label 0 and 5,000,000 for label 1
+- val_counts should be 1,000,000 for label 0 and 1,000,000 for label 1
+
+Step 4: train CNN v2 on the clean-label C1 split
+
+sbatch --account=lccbe $BASE_NOTE/run_cnn_v2_c1_clean_label_q0p85_q0p5.sbatch
+
+Check:
+
+sacct -j <JOBID> --format=JobID,State,ExitCode,Elapsed,MaxRSS
+
+cat /data/leuven/383/vsc38330/thesis_dimelo/train/c1_clean_label_q0p85_q0p5/cnn_v2_cleanlabel_pos0p85_neg0p5_5Mtrain_1Mval_01/metrics.jsonl
+
+Step 5: evaluate threshold, ROC-AUC, and PR-AUC
+
+sbatch --account=lccbe $BASE_NOTE/run_evaluate_c1_clean_label_q0p85_q0p5.sbatch
+
+Check:
+
+sacct -j <JOBID> --format=JobID,State,ExitCode,Elapsed,MaxRSS
+
+cat /data/leuven/383/vsc38330/thesis_dimelo/train/c1_clean_label_q0p85_q0p5/cnn_v2_cleanlabel_pos0p85_neg0p5_5Mtrain_1Mval_01/heldout_c1_cleanlabel_threshold_auc_diagnostics.json
+
+How to interpret:
+- compare clean-label ROC-AUC and PR-AUC to the previous C1-within-C1 values: ROC-AUC 0.594 and PR-AUC 0.593
+- if the clean-label ROC-AUC rises clearly, for example >0.70, then ambiguity around the q0.8 threshold was a major reason the earlier task was hard
+- if the clean-label result remains around 0.60, then the current 5-mer features are probably not enough and we should prioritize wider context or richer read-level features
+
+
+Next improvement plan
+
+The clean-label q0.85/q0.5 experiment did not improve ROC-AUC/PR-AUC:
+- ROC-AUC about 0.595
+- PR-AUC about 0.595
+- best F1 about 0.672 at threshold 0.35
+
+Interpretation:
+- removing ambiguous labels improved the label definition but did not improve ranking power
+- the current 5-mer ref/query + pos_norm + strand inputs are probably too limited
+- next experiments should improve the input representation rather than only changing thresholds or epochs
+
+Experiment A:
+Add read_length/log_read_length as an additional scalar feature.
+Reason:
+- read length may capture sequencing/read-quality context that affects modkit confidence
+- current tensors only keep normalized read position, not the read length itself
+- this is easier than rebuilding wider kmer context because read_length is already in the CNN TSV files
+
+Experiment B:
+Predict mod_qual as a continuous regression target.
+Reason:
+- mod_qual is continuous, but the current binary task forces hard thresholds
+- regression can test whether sequence/read-context features explain confidence at all
+
+Experiment C:
+Use wider sequence context, e.g. 7-mer, 9-mer, or 11-mer.
+Reason:
+- current 5-mer may be too local
+- wider context may capture neighboring CpG/motif structure
+- this likely requires going back to BAM/reference extraction because current tensors only store 5 bases per kmer
+
+
+cat >> /data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/CNN_FIRST_TRAINING_RUN.txt <<'EOF'
+
+Experiment A: add read-length scalar features
+
+Reason:
+- previous clean-label q0.85/q0.5 result had ROC-AUC about 0.595 and PR-AUC about 0.595
+- threshold tuning recovered F1 around 0.672, but ranking power stayed modest
+- current tensors keep pos_norm but do not keep read length itself
+- read length may capture read quality / sequencing context that affects modkit confidence
+- this experiment keeps the same valid 5-mer ref/query context and clean-label split, but adds:
+  read_length_norm = clipped read_length / 100000
+  log_read_length_norm = log1p(read_length) / log1p(100000)
+
+Goal:
+- test whether adding read-length information improves C1-within-C1 clean-label classification beyond ROC-AUC ~0.595
+EOF
+
+
+encode clean-label TSV -> enhanced NPZ tensors with read_length_norm and log_read_length_norm
+split into non-overlapping 5M/class train + 1M/class validation
+train CNN v3 using the extra scalar features
+evaluate ROC-AUC / PR-AUC
+
+For experiment A, add read-lenght scalar features, and so create an enhanced encoder to encode the clean-label TSV into new tensors containing: 
+ref_kmer
+query_kmer
+pos_norm
+read_length_norm
+log_read_length_norm
+ref_strand
+ref_mod_strand
+label
+
+BASE_NOTE=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds
+SCRIPT_DIR=/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/scripts
+
+cat >> $BASE_NOTE/CNN_FIRST_TRAINING_RUN.txt <<'EOF'
+
+Experiment A: add read-length scalar features
+
+Reason:
+- clean-label q0.85/q0.5 gave ROC-AUC about 0.595 and PR-AUC about 0.595
+- threshold tuning recovered F1 around 0.672, but ranking power stayed modest
+- current tensors include normalized read position but not read length itself
+- read length may capture read-level quality/context that affects modkit confidence
+- this experiment keeps the same valid 5-mer ref/query context and clean-label labels, but adds read_length_norm and log_read_length_norm
+
+Goal:
+- test whether adding read-length information improves C1-within-C1 clean-label classification beyond ROC-AUC ~0.595
+EOF
+
+cat > $SCRIPT_DIR/encode_cnn_kmers_readlen_to_npz.py <<'EOF'
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+import csv
+import gzip
+import json
+import math
+from pathlib import Path
+
+import numpy as np
+
+BASE_TO_INT = {"A": 0, "C": 1, "G": 2, "T": 3, "N": 4}
+STRAND_TO_INT = {"+": 1, "-": 0}
+READ_LENGTH_CLIP = 100000.0
+
+def parse_args():
+    p = argparse.ArgumentParser()
+    p.add_argument("--input", required=True)
+    p.add_argument("--output-dir", required=True)
+    p.add_argument("--chunk-size", type=int, default=2000000)
+    return p.parse_args()
+
+def encode_kmer(kmer):
+    return [BASE_TO_INT.get(base, 4) for base in kmer.upper()]
+
+def encode_strand(value):
+    return STRAND_TO_INT.get(value, 255)
+
+def flush(out_dir, chunk_idx, arrays):
+    n = len(arrays["label"])
+    if n == 0:
+        return 0
+    np.savez_compressed(
+        out_dir / f"chunk_{chunk_idx:05d}.npz",
+        ref_kmer=np.asarray(arrays["ref_kmer"], dtype=np.uint8),
+        query_kmer=np.asarray(arrays["query_kmer"], dtype=np.uint8),
+        pos_norm=np.asarray(arrays["pos_norm"], dtype=np.float32),
+        read_length_norm=np.asarray(arrays["read_length_norm"], dtype=np.float32),
+        log_read_length_norm=np.asarray(arrays["log_read_length_norm"], dtype=np.float32),
+        ref_strand=np.asarray(arrays["ref_strand"], dtype=np.uint8),
+        ref_mod_strand=np.asarray(arrays["ref_mod_strand"], dtype=np.uint8),
+        label=np.asarray(arrays["label"], dtype=np.uint8),
+    )
+    return n
+
+def empty_arrays():
+    return {
+        "ref_kmer": [],
+        "query_kmer": [],
+        "pos_norm": [],
+        "read_length_norm": [],
+        "log_read_length_norm": [],
+        "ref_strand": [],
+        "ref_mod_strand": [],
+        "label": [],
+    }
+
+def main():
+    args = parse_args()
+    inp = Path(args.input)
+    out_dir = Path(args.output_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    arrays = empty_arrays()
+    total = 0
+    chunk_idx = 0
+    label_counts = {0: 0, 1: 0}
+
+    manifest = out_dir / "manifest.tsv"
+    with gzip.open(inp, "rt", encoding="utf-8", newline="") as handle, open(manifest, "w", encoding="utf-8", newline="") as mf:
+        reader = csv.DictReader(handle, delimiter="\t")
+        writer = csv.writer(mf, delimiter="\t")
+        writer.writerow(["chunk_file", "rows", "label0_rows", "label1_rows"])
+
+        for row in reader:
+            ref = row["ref_kmer"].upper()
+            query = row["query_kmer"].upper()
+            if len(ref) != 5 or len(query) != 5:
+                continue
+
+            read_length = int(row["read_length"])
+            forward_pos = int(row["forward_read_position"])
+            label = int(row["label"])
+
+            clipped_rl = min(float(read_length), READ_LENGTH_CLIP)
+            arrays["ref_kmer"].append(encode_kmer(ref))
+            arrays["query_kmer"].append(encode_kmer(query))
+            arrays["pos_norm"].append(forward_pos / read_length if read_length else 0.0)
+            arrays["read_length_norm"].append(clipped_rl / READ_LENGTH_CLIP)
+            arrays["log_read_length_norm"].append(math.log1p(clipped_rl) / math.log1p(READ_LENGTH_CLIP))
+            arrays["ref_strand"].append(encode_strand(row["ref_strand"]))
+            arrays["ref_mod_strand"].append(encode_strand(row["ref_mod_strand"]))
+            arrays["label"].append(label)
+            label_counts[label] = label_counts.get(label, 0) + 1
+
+            if len(arrays["label"]) >= args.chunk_size:
+                n = flush(out_dir, chunk_idx, arrays)
+                writer.writerow([f"chunk_{chunk_idx:05d}.npz", n, sum(x == 0 for x in arrays["label"]), sum(x == 1 for x in arrays["label"])])
+                total += n
+                chunk_idx += 1
+                arrays = empty_arrays()
+
+        if arrays["label"]:
+            n = flush(out_dir, chunk_idx, arrays)
+            writer.writerow([f"chunk_{chunk_idx:05d}.npz", n, sum(x == 0 for x in arrays["label"]), sum(x == 1 for x in arrays["label"])])
+            total += n
+            chunk_idx += 1
+
+    summary = {
+        "input": str(inp),
+        "output_dir": str(out_dir),
+        "chunk_size": args.chunk_size,
+        "chunks_written": chunk_idx,
+        "rows_written": total,
+        "label_counts": label_counts,
+        "extra_features": ["read_length_norm", "log_read_length_norm"],
+        "read_length_clip": READ_LENGTH_CLIP,
+        "arrays": ["ref_kmer", "query_kmer", "pos_norm", "read_length_norm", "log_read_length_norm", "ref_strand", "ref_mod_strand", "label"],
+    }
+    (out_dir / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    print(json.dumps(summary, indent=2))
+
+if __name__ == "__main__":
+    main()
+EOF
+
+cat > $BASE_NOTE/run_encode_c1_clean_label_q0p85_q0p5_readlen.sbatch <<'EOF'
+#!/bin/bash
+#SBATCH --job-name=enc_c1_rl
+#SBATCH --clusters=genius
+#SBATCH --account=lccbe
+#SBATCH --partition=batch
+#SBATCH --time=04:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=32G
+#SBATCH --output=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-enc-c1-readlen-%j.out
+#SBATCH --error=/data/leuven/383/vsc38330/thesis_dimelo/notebooks/bam_dual_thresholds/slurm-enc-c1-readlen-%j.err
+
+set -euo pipefail
+
+PY=/data/leuven/383/vsc38330/.venv/bin/python
+SCRIPT=/data/leuven/383/vsc38330/thesis_dimelo/src/modeling_prep/scripts/encode_cnn_kmers_readlen_to_npz.py
+
+BASE=/data/leuven/383/vsc38330/thesis_dimelo/train/c1_clean_label_q0p85_q0p5
+IN=$BASE/merged_c1_C_m_cleanlabel_pos0p85_neg0p5.valid5mer.uppercase.cnn_features.tsv.gz
+OUT=$BASE/tensors_integer_valid5mer_uppercase_cleanlabel_pos0p85_neg0p5_readlen
+
+rm -rf "$OUT"
+
+$PY "$SCRIPT" \
+  --input "$IN" \
+  --output-dir "$OUT" \
+  --chunk-size 2000000
+
+cat "$OUT/summary.json"
+EOF
+
+sbatch --account=lccbe $BASE_NOTE/run_encode_c1_clean_label_q0p85_q0p5_readlen.sbatch
+
+Experiment A: add read-length scalar features
+
+Reason:
+- clean-label q0.85/q0.5 gave ROC-AUC about 0.595 and PR-AUC about 0.595
+- threshold tuning recovered F1 around 0.672, but ranking power stayed modest
+- current tensors include normalized read position but not read length itself
+- read length may capture read-level quality/context that affects modkit confidence
+- this experiment keeps the same valid 5-mer ref/query context and clean-label labels, but adds read_length_norm and log_read_length_norm
+
+Goal:
+- test whether adding read-length information improves C1-within-C1 clean-label classification beyond ROC-AUC ~0.595
+CNN regression experiment: predict continuous mod_qual
+
+Reason:
+- previous binary CNN experiments plateaued around ROC-AUC/PR-AUC about 0.59-0.60
+- binary labels force hard boundaries, for example 0.84 negative versus 0.86 positive
+- mod_qual is naturally continuous, so regression may be a more appropriate diagnostic target
+- this experiment keeps the CNN idea but changes the target and loss:
+  target = mod_qual
+  loss = SmoothL1Loss
+- after regression, predicted mod_qual can still be thresholded at 0.8 or 0.85 if a binary methylated/not-high-confidence decision is needed
+
+Question:
+- can ref/query 5-mer context plus read-level scalar features explain continuous modkit confidence?
+
+Inputs:
+- ref_kmer
+- query_kmer
+- pos_norm
+- read_length_norm
+- log_read_length_norm
+- ref_strand
+- ref_mod_strand
+
+Target:
+- mod_qual as a continuous value between 0 and 1
+
+Evaluation:
+- Pearson correlation
+- Spearman correlation
+- RMSE
+- MAE
+- R2
+- thresholded metrics at predicted mod_qual >=0.8 and >=0.85
+
+Interpretation:
+- if regression correlation is clearly better than classification AUC, then hard threshold labels were part of the problem
+- if regression correlation is also weak, then the current input features are missing important information

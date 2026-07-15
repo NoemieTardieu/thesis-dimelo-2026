@@ -1,0 +1,19 @@
+{
+  "input_dir": "/data/leuven/383/vsc38330/thesis_dimelo/train/c1_modqual_regression_chromsplit/chunked_by_split/train",
+  "output": "/data/leuven/383/vsc38330/thesis_dimelo/train/c1_modqual_regression_chromsplit/merged_c1_modqual_regression_chromsplit_train_chr1_16_10M.npz",
+  "rows_requested": 10000000,
+  "rows_written": 10000000,
+  "source_rows_available": 42024923,
+  "chunks_used": 22,
+  "seed": 112,
+  "arrays": [
+    "ref_kmer",
+    "query_kmer",
+    "pos_norm",
+    "read_length_norm",
+    "log_read_length_norm",
+    "ref_strand",
+    "ref_mod_strand",
+    "mod_qual"
+  ]
+}

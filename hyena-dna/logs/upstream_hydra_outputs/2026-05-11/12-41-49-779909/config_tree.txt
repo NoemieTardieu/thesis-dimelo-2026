@@ -1,0 +1,172 @@
+CONFIG
+├── train
+│   └── seed: 2222                                                              
+│       interval: step                                                          
+│       monitor: val/accuracy                                                   
+│       mode: max                                                               
+│       ema: 0.0                                                                
+│       test: false                                                             
+│       debug: false                                                            
+│       ignore_warnings: false                                                  
+│       state:                                                                  
+│         mode: null                                                            
+│         n_context: 0                                                          
+│         n_context_eval: 0                                                     
+│       ckpt: null                                                              
+│       disable_dataset: false                                                  
+│       validate_at_start: false                                                
+│       pretrained_model_path: null                                             
+│       pretrained_model_strict_load: false                                     
+│       pretrained_model_state_hook:                                            
+│         _name_: load_backbone                                                 
+│         freeze_backbone: false                                                
+│       post_init_hook:                                                         
+│         _name_: null                                                          
+│       layer_decay:                                                            
+│         _name_: null                                                          
+│         decay: 0.7                                                            
+│       gpu_mem: 25                                                             
+│       global_batch_size: 8                                                    
+│       remove_test_loader_in_eval: true                                        
+│                                                                               
+├── tolerance
+│   └── logdir: ./resume                                                        
+│       id: null                                                                
+│                                                                               
+├── wandb
+│   └── None                                                                    
+├── trainer
+│   └── _target_: pytorch_lightning.Trainer                                     
+│       devices: 1                                                              
+│       accelerator: cpu                                                        
+│       accumulate_grad_batches: 1                                              
+│       max_epochs: 1                                                           
+│       gradient_clip_val: 1.0                                                  
+│       log_every_n_steps: 10                                                   
+│       limit_train_batches: 1                                                  
+│       limit_val_batches: 1                                                    
+│       num_nodes: 1                                                            
+│       precision: 32                                                           
+│                                                                               
+├── loader
+│   └── batch_size: 50                                                          
+│       num_workers: 0                                                          
+│       pin_memory: true                                                        
+│       drop_last: true                                                         
+│                                                                               
+├── dataset
+│   └── _name_: genomic_benchmark                                               
+│       dataset_name: dummy_mouse_enhancers_ensembl                             
+│       dest_path: null                                                         
+│       max_length: 256                                                         
+│       d_output: 2                                                             
+│       use_padding: true                                                       
+│       padding_side: left                                                      
+│       add_eos: false                                                          
+│       batch_size: 8                                                           
+│       train_len: 1210                                                         
+│       shuffle: true                                                           
+│       dummy_mouse_enhancers_ensembl:                                          
+│         train_len: 1210                                                       
+│         classes: 2                                                            
+│       demo_coding_vs_intergenomic_seqs:                                       
+│         train_len: 100000                                                     
+│         classes: 2                                                            
+│       demo_human_or_worm:                                                     
+│         train_len: 100000                                                     
+│         classes: 2                                                            
+│       human_enhancers_cohn:                                                   
+│         train_len: 27791                                                      
+│         classes: 2                                                            
+│       human_enhancers_ensembl:                                                
+│         train_len: 154842                                                     
+│         classes: 2                                                            
+│       human_ensembl_regulatory:                                               
+│         train_len: 289061                                                     
+│         classes: 3                                                            
+│       human_nontata_promoters:                                                
+│         train_len: 36131                                                      
+│         classes: 2                                                            
+│       human_ocr_ensembl:                                                      
+│         train_len: 174756                                                     
+│         classes: 2                                                            
+│       tokenizer_name: char                                                    
+│       rc_aug: false                                                           
+│       return_mask: false                                                      
+│                                                                               
+├── task
+│   └── _name_: masked_multiclass                                               
+│       loss: cross_entropy                                                     
+│       metrics:                                                                
+│       - accuracy                                                              
+│       torchmetrics: null                                                      
+│                                                                               
+├── optimizer
+│   └── _name_: adamw                                                           
+│       lr: 0.0006                                                              
+│       weight_decay: 0.1                                                       
+│       betas:                                                                  
+│       - 0.9                                                                   
+│       - 0.999                                                                 
+│                                                                               
+├── scheduler
+│   └── _name_: cosine_warmup_timm                                              
+│       t_in_epochs: false                                                      
+│       t_initial: 152                                                          
+│       lr_min: 5.9999999999999995e-05                                          
+│       warmup_lr_init: 1.0e-06                                                 
+│       warmup_t: 1.52                                                          
+│                                                                               
+├── callbacks
+│   └── learning_rate_monitor:                                                  
+│         logging_interval: step                                                
+│       timer:                                                                  
+│         step: true                                                            
+│         inter_step: false                                                     
+│         epoch: true                                                           
+│         val: true                                                             
+│       params:                                                                 
+│         total: true                                                           
+│         trainable: true                                                       
+│         fixed: true                                                           
+│       model_checkpoint:                                                       
+│         monitor: val/accuracy                                                 
+│         mode: max                                                             
+│         save_top_k: 1                                                         
+│         save_last: true                                                       
+│         dirpath: checkpoints/                                                 
+│         filename: val/accuracy                                                
+│         auto_insert_metric_name: false                                        
+│         verbose: true                                                         
+│                                                                               
+├── encoder
+│   └── id                                                                      
+├── decoder
+│   └── _name_: sequence                                                        
+│       mode: pool                                                              
+│                                                                               
+└── model
+    └── _name_: dna_embedding                                                   
+        d_model: 128                                                            
+        n_layer: 2                                                              
+        d_inner: 512                                                            
+        vocab_size: 12                                                          
+        resid_dropout: 0.0                                                      
+        embed_dropout: 0.1                                                      
+        fused_mlp: false                                                        
+        fused_dropout_add_ln: false                                             
+        residual_in_fp32: true                                                  
+        pad_vocab_size_multiple: 8                                              
+        layer:                                                                  
+          _name_: hyena                                                         
+          emb_dim: 5                                                            
+          filter_order: 64                                                      
+          short_filter_order: 3                                                 
+          l_max: 1026                                                           
+          modulate: true                                                        
+          w: 10                                                                 
+          lr: 0.0006                                                            
+          wd: 0.0                                                               
+          lr_pos_emb: 0.0                                                       
+          bidirectional: false                                                  
+                                                                                
