@@ -24,7 +24,7 @@ cd /data/leuven/383/vsc38330/thesis_project_clean
 
 /lustre1/scratch/383/vsc38330/.venv/bin/python -u hyena-dna/models/train_region_split_hyenadna_6ma_methyl_conditioned_nosample.py \
   --hyena-root /data/leuven/383/vsc38330/thesis_project_clean/hyena-dna/upstream_hyena_dna \
-  --checkpoint-dir /data/leuven/383/vsc38330/hyena-dna-main/checkpoints \
+  --checkpoint-dir /data/leuven/383/vsc38330/thesis_project_clean/hyena-dna/server_artifacts/upstream_checkpoints \
   --model-name hyenadna-small-32k-seqlen \
   --train-npz hyena-dna/logs/generated_tensors_and_checkpoints/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.train.npz \
   --val-npz hyena-dna/logs/generated_tensors_and_checkpoints/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.val.npz \

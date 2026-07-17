@@ -1,0 +1,7 @@
+{
+  "regions": "metadata/regions/4chrom_random_sensitivity_regions.tsv",
+  "cache_dir": "logs/cache/random_encode_sensitivity_cache",
+  "selected_tracks": "metadata/selected_a549_h3k4me3_tracks.tsv",
+  "bigwig": "server_artifacts/external_tracks/ENCSR203XPU/ENCFF074PND_ENCSR203XPU_A549_H3K4me3_fold_change_GRCh38.bigWig",
+  "label": "random_regions"
+}

@@ -1,0 +1,46 @@
+{
+  "npz": "hyena-dna/logs/generated_tensors_and_checkpoints/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.test.npz",
+  "metadata": "hyena-dna/logs/generated_tensors_and_checkpoints/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.test.metadata.tsv",
+  "split_name": "chr16_test",
+  "checkpoint": "hyena-dna/results/checkpoints/hyenadna_reg_given_m_methyl_embedding_long.best.pt",
+  "model_type": "P(Reg|D,M_embedding)",
+  "model_name": "hyenadna-small-32k-seqlen",
+  "device": "cuda",
+  "reads": 1877,
+  "batch_size": 1,
+  "max_length_used": 32768,
+  "sample_conditioned": false,
+  "decoder_hidden_dim": 256,
+  "decoder_dropout": 0.15,
+  "unknown_methylation_value": 0.5,
+  "c_token_id": 8,
+  "g_token_id": 9,
+  "aggregation_unit": "sample/read_id/read_position",
+  "thresholds": {
+    "6mA": 0.5
+  },
+  "aggregation": {
+    "6mA": {
+      "raw_window_valid_positions": 10193258,
+      "aggregated_read_positions": 5869663,
+      "duplicate_overlap_observations_removed": 4323595
+    }
+  },
+  "metrics": {
+    "6mA": {
+      "valid_positions": 5869663,
+      "bce": 0.2674238383769989,
+      "mse": 0.03424051031470299,
+      "mae": 0.10759065300226212,
+      "mean_pred": 0.0844508707523346,
+      "mean_target": 0.08322399854660034,
+      "pearson": 0.29800333922229466,
+      "spearman": 0.3761665174109166,
+      "auroc": 0.693128480856403,
+      "auprc": 0.1295720556660536,
+      "positive_fraction": 0.05186072863126895,
+      "auprc_enrichment": 2.498461920720669
+    }
+  },
+  "per_region_metrics": "hyena-dna/results/hyenadna_reg_given_m_methyl_embedding_long_best_chr16_test_overlapagg.per_region_metrics.tsv"
+}

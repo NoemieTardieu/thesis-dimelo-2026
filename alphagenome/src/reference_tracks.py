@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+from __future__ import annotations
+
 from collections import Counter, defaultdict
 from pathlib import Path
-from typing import Callable
+from typing import Any, Callable
 
 import numpy as np
 import pysam
@@ -22,7 +24,7 @@ from benchmark_utils import (
 )
 
 ObservationGetter = Callable[[list[int]], tuple[dict[int, float], int]]
-ReferenceTransform = Callable[[pysam.AlignedSegment, int], int | None]
+ReferenceTransform = Callable[[Any, int], int | None]
 
 TRACK_FIELDS = [
     "split",

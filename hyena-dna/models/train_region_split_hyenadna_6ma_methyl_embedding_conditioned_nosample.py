@@ -234,7 +234,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--hyena-root", default="/data/leuven/383/vsc38330/thesis_project_clean/hyena-dna/upstream_hyena_dna")
     parser.add_argument("--model-name", default="hyenadna-small-32k-seqlen")
-    parser.add_argument("--checkpoint-dir", default="/data/leuven/383/vsc38330/hyena-dna-main/checkpoints")
+    parser.add_argument("--checkpoint-dir", default="/data/leuven/383/vsc38330/thesis_project_clean/hyena-dna/server_artifacts/upstream_checkpoints")
     parser.add_argument("--train-npz", required=True)
     parser.add_argument("--val-npz", required=True)
     parser.add_argument("--out", required=True)

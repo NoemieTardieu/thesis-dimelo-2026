@@ -1,16 +1,16 @@
 #!/bin/bash
-#SBATCH --job-name=reg_m_embed_smoke
+#SBATCH --job-name=reg_m_embed_long
 #SBATCH --clusters=wice
 #SBATCH --account=lccbe
 #SBATCH --partition=gpu_a100
 #SBATCH --gres=gpu:1
-#SBATCH --time=03:00:00
+#SBATCH --time=16:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=48G
-#SBATCH --output=/data/leuven/383/vsc38330/thesis_project_clean/hyena-dna/logs/slurm/slurm-reg-given-m-methyl-embedding-smoke-%j.out
-#SBATCH --error=/data/leuven/383/vsc38330/thesis_project_clean/hyena-dna/logs/slurm/slurm-reg-given-m-methyl-embedding-smoke-%j.err
+#SBATCH --output=/data/leuven/383/vsc38330/thesis_project_clean/hyena-dna/logs/slurm/slurm-reg-given-m-methyl-embedding-long-%j.out
+#SBATCH --error=/data/leuven/383/vsc38330/thesis_project_clean/hyena-dna/logs/slurm/slurm-reg-given-m-methyl-embedding-long-%j.err
 
 set -euo pipefail
 export PYTHONUNBUFFERED=1
@@ -27,11 +27,11 @@ mkdir -p hyena-dna/results/checkpoints
   --checkpoint-dir /data/leuven/383/vsc38330/thesis_project_clean/hyena-dna/server_artifacts/upstream_checkpoints \
   --train-npz hyena-dna/logs/generated_tensors_and_checkpoints/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.train.npz \
   --val-npz hyena-dna/logs/generated_tensors_and_checkpoints/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.val.npz \
-  --out hyena-dna/results/checkpoints/hyenadna_reg_given_m_methyl_embedding_smoke.pt \
-  --best-out hyena-dna/results/checkpoints/hyenadna_reg_given_m_methyl_embedding_smoke.best.pt \
-  --epochs 1 \
-  --max-train-batches 100 \
-  --max-val-batches 200 \
+  --out hyena-dna/results/checkpoints/hyenadna_reg_given_m_methyl_embedding_long.pt \
+  --best-out hyena-dna/results/checkpoints/hyenadna_reg_given_m_methyl_embedding_long.best.pt \
+  --epochs 15 \
+  --max-train-batches 1000 \
+  --max-val-batches 0 \
   --log-every-batches 10 \
   --eval-before-training \
   --lr 1e-4 \
