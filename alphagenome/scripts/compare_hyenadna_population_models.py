@@ -49,11 +49,14 @@ def apply_robust(values: pd.Series, params: RobustParams) -> pd.Series:
 
 def extract_primary_metrics(path: Path, model_label: str) -> pd.DataFrame:
     metrics = read_tsv(path)
+    comparison_col = "pair" if "pair" in metrics.columns else "comparison"
     subset = metrics[
         (metrics["scope"] == "all")
         & (metrics["intersection"] == "pair_specific")
-        & metrics["pair"].isin(["H-D", "T-H", "A-H"])
+        & metrics[comparison_col].isin(["H-D", "T-H", "A-H"])
     ].copy()
+    if comparison_col != "pair":
+        subset = subset.rename(columns={comparison_col: "pair"})
     subset.insert(0, "hyena_model", model_label)
     return subset
 

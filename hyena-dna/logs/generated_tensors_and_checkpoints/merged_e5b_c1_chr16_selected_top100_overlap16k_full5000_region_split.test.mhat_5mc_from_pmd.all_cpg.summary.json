@@ -1,0 +1,13 @@
+{
+  "source_npz": "hyena-dna/logs/generated_tensors_and_checkpoints/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.test.npz",
+  "out_npz": "hyena-dna/logs/generated_tensors_and_checkpoints/merged_e5b_c1_chr16_selected_top100_overlap16k_full5000_region_split.test.mhat_5mc_from_pmd.all_cpg.npz",
+  "checkpoint_5mc": "hyena-dna/logs/generated_tensors_and_checkpoints/hyenadna_small32k_chr16_overlap16k_full5000_5mc_only_lowlr_lastblock_20epochs_1000batches.best.pt",
+  "model_type": "P(M|D) predicted 5mC conditioning tensor",
+  "predicted_mask_mode": "all-cpg",
+  "rows": 1877,
+  "max_length": 32768,
+  "c_token_id": 8,
+  "g_token_id": 9,
+  "cpg_positions_with_mhat": 1094769,
+  "mean_mhat_at_conditioned_positions": 0.58935546875
+}
